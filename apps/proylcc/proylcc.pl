@@ -37,16 +37,46 @@ grid(2, [
 		 [r,b,b,v,p,y,p,r,b,g,p,y,b,r],
 		 [v,g,p,b,v,v,g,g,g,b,v,g,g,g]
 		 ]).
-
-
+		 
+grid(3, [
+		 [y,b,g,v,p,p,v,r,r,v,b,y,y,g],
+		 [r,b,r,r,v,y,g,r,p,p,r,y,g,v],
+		 [r,y,g,b,b,r,v,v,y,v,y,y,r,b],
+		 [r,r,g,v,b,v,b,r,v,y,y,g,g,g],
+		 [r,v,p,p,r,r,v,g,r,g,g,v,r,p],
+		 [v,r,v,y,y,r,p,g,p,r,g,p,y,g],
+		 [r,g,v,r,p,g,y,p,p,g,g,v,r,r],
+		 [g,v,b,y,g,g,v,y,p,b,r,p,p,b],
+		 [y,p,g,v,b,y,r,p,g,r,v,p,r,g],
+		 [r,g,p,y,v,g,p,r,r,y,g,v,g,r],
+		 [b,b,r,p,g,v,r,y,g,v,p,g,g,b],
+		 [r,y,v,g,p,r,g,v,b,b,g,b,r,p],
+		 [y,y,y,v,p,r,v,g,y,g,v,b,r,r],
+		 [r,g,b,v,g,r,g,g,y,y,v,y,p,y]
+		 ]).
+		 
+grid(4, [
+		 [y,g,v,r,g,y,b,y,g,b,y,r,g,v],
+		 [g,y,v,g,y,r,v,b,p,p,g,g,r,y],
+		 [g,g,v,p,r,r,y,y,p,g,b,v,g,b],
+		 [y,r,p,v,g,b,y,r,p,b,g,r,v,b],
+		 [r,p,b,v,p,g,r,p,g,r,y,v,p,v],
+		 [r,p,v,g,r,y,y,v,b,y,b,b,p,b],
+		 [g,r,y,v,p,g,y,b,y,v,y,r,g,p],
+		 [b,g,r,p,g,b,g,v,b,g,p,r,g,b],
+		 [b,g,r,p,g,y,y,g,b,y,y,y,g,v],
+		 [v,v,v,r,y,g,b,p,y,v,b,g,r,g],
+		 [y,r,g,b,v,p,g,g,r,p,v,b,p,r],
+		 [r,g,p,g,b,v,b,g,p,r,y,g,p,g],
+		 [g,y,v,b,r,p,p,g,p,r,b,r,g,g],
+		 [r,g,p,b,r,y,g,b,v,g,p,v,r,b]
+		 ]).
+		 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % flick(+Grid, +Color, -FGrid)
 %
 % FGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 
-flick(Grid, Color, FGrid):-
-	Grid = [F|Fs],
-	F = [_X|Xs],
-	FGrid = [[Color|Xs]|Fs].
+flick(Grid,Color,FGrid):- Grid = [F|Fs], F = [_X|Xs], FGrid = [[Color|Xs]|Fs].
 
