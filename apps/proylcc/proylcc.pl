@@ -78,5 +78,15 @@ grid(4, [
 %
 % FGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 
-flick(Grid,Color,FGrid):- Grid = [F|Fs], F = [_X|Xs], FGrid = [[Color|Xs]|Fs].
+flick(Grid,Color,FGrid):- Grid=[F|Fs], F=[X|Xs], verificarColorHor(X,Xs,Color,FNew), FGrid=[[Color|FNew]|Fs].
 
+%verificarColorHor(+CActual,+Fila,+CNew,-FNew)
+%Busca en la Fila actual colores que sean iguales a CActual y los cambia por CNew,
+%esto sigue hasta encontrar uno que sea distinto o termine la fila.
+%El resultado se guarda en FNew
+
+%verificarColorHor(CActual,[X|Xs],CNew,[X|Xs]). DESCOMENTAR ESTO Y COMENTAR LO DE ABAJO PARA VOLVER A COMO ESTABA AL INICIO (POR SI ACASO)
+
+verificarColorHor(CActual,[],CNew,[]).
+verificarColorHor(CActual,[X|Xs],CNew,[X|Xs]):- CActual\=X.
+verificarColorHor(CActual,[X|Xs],CNew,FNew):- CActual=X, verificarColorHor(CActual,Xs,CNew,FAux), FNew=[CNew|FAux].
