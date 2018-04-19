@@ -78,7 +78,7 @@ grid(4, [
 %
 % FGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 
-flick(Grid,Color,FGrid):- Grid=[F|Fs], F=[X|Xs], verificarColorHor(X,Xs,Color,FNew), FGrid=[[Color|FNew]|Fs].
+flick([F|Fs],Color,FGrid):- F=[X|Xs], verificarColorHor(X,Xs,Color,FNew), verificarColorVer(X,Fs,Color,ColmNew), FGrid=[[Color|FNew]|ColmNew].
 
 %verificarColorHor(+CActual,+Fila,+CNew,-FNew)
 %Busca en la Fila actual colores que sean iguales a CActual y los cambia por CNew,
@@ -90,3 +90,27 @@ flick(Grid,Color,FGrid):- Grid=[F|Fs], F=[X|Xs], verificarColorHor(X,Xs,Color,FN
 verificarColorHor(CActual,[],CNew,[]).
 verificarColorHor(CActual,[X|Xs],CNew,[X|Xs]):- CActual\=X.
 verificarColorHor(CActual,[X|Xs],CNew,FNew):- CActual=X, verificarColorHor(CActual,Xs,CNew,FAux), FNew=[CNew|FAux].
+
+
+%verificarColorVer(+CActual,+Columna,+CNew,-ColmNew)
+%Busca por la columna ubicada mas a la izquierda colores iguales a CActual y los cambia por CNew,
+%Si es igual procede a verificarColHor en esa misma fila, de lo contrario se detiene
+%El resultado se guarda en ColmNew
+
+verificarColorVer(CActual,[],CNew,[]).
+verificarColorVer(CActual,[[F|Fs]|Xs],CNew,[[F|Fs]|Xs]):- CActual\=F.
+verificarColorVer(CActual,[[F|Fs]|Xs],CNew,ColmNew):- CActual=F, verificarColorVer(CActual,Xs,CNew,ColmNewAux), verificarColorHor(CActual,Fs,CNew,FAux), 
+													  ColmNew=[[CNew|FAux]|ColmNewAux].
+
+
+%verificarColorVerNoHor(+CActual,+Columna,+CNew,-ColmNew)
+%Busca por la columna ubicada mas a la izquierda colores iguales a CActual y los cambia por CNew,
+%La diferencia con verificarColorVer está en que este no llama a verificarColorHor ya que no me interesa la fila en este caso
+%El resultado se guarda en ColmNew
+
+%AUN NO ESTA EN USO
+													  
+verificarColorVerNoHor(CActual,[],CNew,[]).
+verificarColorVerNoHor(CActual,[[F|Fs]|Xs],CNew,[[F|Fs]|Xs]):- CActual\=F.
+verificarColorVerNoHor(CActual,[[F|Fs]|Xs],CNew,ColmNew):- CActual=F, verificarColorVer(CActual,Xs,CNew,ColmNewAux), ColmNew=[[CNew|Fs]|ColmNewAux].
+
