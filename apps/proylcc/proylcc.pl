@@ -78,34 +78,57 @@ grid(4, [
 %
 % RGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 
-flick([[Columna1|Columnas]|Filas],Color,RGrid):- verificarColor(0,0,Columna1,Color,[[Columna1|Columnas]|Filas],RGrid).
+flick(Grid,Color,RGrid):- Grid=[[Columna1|Columnas]|Filas], verificarColor(0,0,Columna1,Color,Grid,RGrid).
+%flick(Grid,Color,RGrid):- pintarCeldaVer(5,6,Color,Grid,RGrid). PRUEBA DE QUE PINTAR UNA CELDA CUALQUIERA FUNCIONA
 
 
 %buscarCeldaVer(+X,+Y,+Color,+Grilla,-Res)
+%Busco para ver si la celda coincide con el color que pido.
 
-buscarCeldaVer(X,0,C,[Fila1|Filas],R):- buscarCeldaHor(X,C,Fila1,R). %Encontré la fila en Y que buscaba, empiezo a recorrer sus columnas a derecha.
-buscarCeldaVer(X,Y+1,C,[Fila1|Filas],R):- Y>0, buscarCeldaVer(X,Y,C,Filas,R).
+buscarCeldaVer(X,0,C,[Fila1|_Filas],R):- buscarCeldaHor(X,C,Fila1,R). %Encontré la fila en Y que buscaba, empiezo a recorrer sus columnas a derecha.
+buscarCeldaVer(X,Y,C,[_Fila1|Filas],R):- Y>0, YAux is Y-1, buscarCeldaVer(X,YAux,C,Filas,R).
 
 
 %buscarCeldaHor(+X,+Color,+Grilla,-Res)
+%Busco para ver si la celda coincide con el color que pido.
 
-buscarCeldaHor(0,C,[Columna1|Columnas],Columna1):- C=Columna1. %Llegué a la posición X,Y que buscaba y coincide el color.
-buscarCeldaHor(X+1,C,[Columna1|Columnas],R):- X>0, buscarCeldaHor(X,C,Columnas,R).
-
-
-%verificarColor(+X,+Y,+ColorActual,+ColorNew,+Grilla,-NewGrilla)
-
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,ColorActual,Grilla,F), ColorActual\=F. %Los colores no coinciden, me detengo
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,ColorActual,Grilla,F), ColorActual=F, pintarCeldaVer(X,Y,ColorNew,Grilla,NewGrilla).
+buscarCeldaHor(0,C,[Columna1|_Columnas],Columna1):- C=Columna1. %Llegué a la posición X,Y que buscaba y coincide el color.
+buscarCeldaHor(X,C,[_Columna1|Columnas],R):- X>0, XAux is X-1, buscarCeldaHor(XAux,C,Columnas,R).
 
 
 %pintarCeldaVer(+X,+Y,+ColorNew,+Grilla,+NewGrilla)
+%Se cual es el color de la celda que busco y la pinto.
 
 pintarCeldaVer(X,0,C,[Fila1|Filas],[R|Filas]):- pintarCeldaHor(X,C,Fila1,R).
-pintarCeldaVer(X,Y+1,C,[Fila1|Filas],[Fila1|R]):- Y>0, pintarCeldaVer(X,Y,C,Filas,R).
+pintarCeldaVer(X,Y,C,[Fila1|Filas],[Fila1|R]):- Y>0, YAux is Y-1, pintarCeldaVer(X,YAux,C,Filas,R).
 
 
 %pintarCeldaHor(+X,+ColorNew,+Grilla,+NewGrilla)
+%Se cual es el color de la celda que busco y la pinto.
 
-pintarCeldaHor(0,C,[Columna1|Columnas],[C|Columnas]):- C=Columna1.
-pintarCeldaHor(X+1,C,[Columna1|Columnas],[Columna1|R]):- X>0, pintarCeldaHor(X,C,Columnas,R).
+pintarCeldaHor(0,C,[_Columna1|Columnas],[C|Columnas]).
+pintarCeldaHor(X,C,[Columna1|Columnas],[Columna1|R]):- X>0, XAux is X-1, pintarCeldaHor(XAux,C,Columnas,R).
+
+
+%verificarColor(+X,+Y,+ColorActual,+ColorNew,+Grilla,-NewGrilla)
+%Comienzo el proceso de ver cada celda adyacente.
+
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X<0. %Me cai de la grilla y me detengo.
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y<0. %Me cai de la grilla y me detengo.
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,ColorActual,Grilla,F), ColorActual\=F. %Los colores no coinciden, me detengo.
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,ColorActual,Grilla,F), 
+															ColorActual=F, 
+															pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux), 
+															buscarAdyacencia(X,Y,ColorAtcual,ColorNew,GrillaAux,NewGrilla).
+
+
+%buscarAdyacencia(+X,+Y,+ColorAtcual,+ColorNew,+Grilla,-NewGrilla)
+%Busco en las cuatro celdas adyacentes a X e Y y repito el proceso de verificar el color.
+%Si el color no coincide, ese verificar retorna la misma grilla (lo cual ocurrirá por lo menos 1 vez de las 4).
+
+buscarAdyacencia(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- XP is X+1, YP is Y+1, XN is X-1, YN is Y-1, 
+															  verificarColor(XP,Y,ColorActual,ColorNew,Grilla,Grilla1), 
+															  verificarColor(X,YP,ColorActual,ColorNew,Grilla,Grilla2), 
+															  verificarColor(XN,Y,ColorActual,ColorNew,Grilla2,Grilla3), 
+															  verificarColor(X,YN,ColorActual,ColorNew,Grilla3,NewGrilla).
+
