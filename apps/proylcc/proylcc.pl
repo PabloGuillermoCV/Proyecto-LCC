@@ -74,43 +74,38 @@ grid(4, [
 		 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% flick(+Grid, +Color, -FGrid)
+% flick(+Grid, +Color, -RGrid)
 %
-% FGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
+% RGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 
-flick([F|Fs],Color,FGrid):- F=[X|Xs], verificarColorHor(X,Xs,Color,FNew), verificarColorVer(X,Fs,Color,ColmNew), FGrid=[[Color|FNew]|ColmNew].
-
-%verificarColorHor(+CActual,+Fila,+CNew,-FNew)
-%Busca en la Fila actual colores que sean iguales a CActual y los cambia por CNew,
-%esto sigue hasta encontrar uno que sea distinto o termine la fila.
-%El resultado se guarda en FNew
-
-%verificarColorHor(CActual,[X|Xs],CNew,[X|Xs]). DESCOMENTAR ESTO Y COMENTAR LO DE ABAJO PARA VOLVER A COMO ESTABA AL INICIO (POR SI ACASO)
-
-verificarColorHor(CActual,[],CNew,[]).
-verificarColorHor(CActual,[X|Xs],CNew,[X|Xs]):- CActual\=X.
-verificarColorHor(CActual,[X|Xs],CNew,FNew):- CActual=X, verificarColorHor(CActual,Xs,CNew,FAux), FNew=[CNew|FAux].
+flick([[Columna1|Columnas]|Filas],Color,RGrid):- verificarColor(0,0,Columna1,Color,[[Columna1|Columnas]|Filas],RGrid).
 
 
-%verificarColorVer(+CActual,+Columna,+CNew,-ColmNew)
-%Busca por la columna ubicada mas a la izquierda colores iguales a CActual y los cambia por CNew,
-%Si es igual procede a verificarColHor en esa misma fila, de lo contrario se detiene
-%El resultado se guarda en ColmNew
+%buscarCeldaVer(+X,+Y,+Color,+Grilla,-Res)
 
-verificarColorVer(CActual,[],CNew,[]).
-verificarColorVer(CActual,[[F|Fs]|Xs],CNew,[[F|Fs]|Xs]):- CActual\=F.
-verificarColorVer(CActual,[[F|Fs]|Xs],CNew,ColmNew):- CActual=F, verificarColorVer(CActual,Xs,CNew,ColmNewAux), verificarColorHor(CActual,Fs,CNew,FAux), 
-													  ColmNew=[[CNew|FAux]|ColmNewAux].
+buscarCeldaVer(X,0,C,[Fila1|Filas],R):- buscarCeldaHor(X,C,Fila1,R). %Encontré la fila en Y que buscaba, empiezo a recorrer sus columnas a derecha.
+buscarCeldaVer(X,Y+1,C,[Fila1|Filas],R):- Y>0, buscarCeldaVer(X,Y,C,Filas,R).
 
 
-%verificarColorVerNoHor(+CActual,+Columna,+CNew,-ColmNew)
-%Busca por la columna ubicada mas a la izquierda colores iguales a CActual y los cambia por CNew,
-%La diferencia con verificarColorVer está en que este no llama a verificarColorHor ya que no me interesa la fila en este caso
-%El resultado se guarda en ColmNew
+%buscarCeldaHor(+X,+Color,+Grilla,-Res)
 
-%AUN NO ESTA EN USO
-													  
-verificarColorVerNoHor(CActual,[],CNew,[]).
-verificarColorVerNoHor(CActual,[[F|Fs]|Xs],CNew,[[F|Fs]|Xs]):- CActual\=F.
-verificarColorVerNoHor(CActual,[[F|Fs]|Xs],CNew,ColmNew):- CActual=F, verificarColorVer(CActual,Xs,CNew,ColmNewAux), ColmNew=[[CNew|Fs]|ColmNewAux].
+buscarCeldaHor(0,C,[Columna1|Columnas],Columna1):- C=Columna1. %Llegué a la posición X,Y que buscaba y coincide el color.
+buscarCeldaHor(X+1,C,[Columna1|Columnas],R):- X>0, buscarCeldaHor(X,C,Columnas,R).
 
+
+%verificarColor(+X,+Y,+ColorActual,+ColorNew,+Grilla,-NewGrilla)
+
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,ColorActual,Grilla,F), ColorActual\=F. %Los colores no coinciden, me detengo
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,ColorActual,Grilla,F), ColorActual=F, pintarCeldaVer(X,Y,ColorNew,Grilla,NewGrilla).
+
+
+%pintarCeldaVer(+X,+Y,+ColorNew,+Grilla,+NewGrilla)
+
+pintarCeldaVer(X,0,C,[Fila1|Filas],[R|Filas]):- pintarCeldaHor(X,C,Fila1,R).
+pintarCeldaVer(X,Y+1,C,[Fila1|Filas],[Fila1|R]):- Y>0, pintarCeldaVer(X,Y,C,Filas,R).
+
+
+%pintarCeldaHor(+X,+ColorNew,+Grilla,+NewGrilla)
+
+pintarCeldaHor(0,C,[Columna1|Columnas],[C|Columnas]):- C=Columna1.
+pintarCeldaHor(X+1,C,[Columna1|Columnas],[Columna1|R]):- X>0, pintarCeldaHor(X,C,Columnas,R).
