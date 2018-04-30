@@ -118,9 +118,9 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X < 0. %Me cai de la gr
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X > 13. %Me cai de la grilla y me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y > 13. %Me cai de la grilla y me detengo.
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \== ColorActual. %Los colores no coinciden, me detengo.
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \= ColorActual. %Los colores no coinciden, me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,Grilla,F), 
-															F == ColorActual, 
+															F = ColorActual, 
 															pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux), 
 															buscarAdyacencia(X,Y,ColorAtcual,ColorNew,GrillaAux,NewGrilla).
 
@@ -143,7 +143,7 @@ verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X < 0. %Me cai de la
 verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
 verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \== ColorActual. %Los colores no coinciden, me detengo.
 verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,GrillaAux):- buscarCeldaVer(X,Y,Grilla,F), 
-															   F == ColorActual, 
+															   F = ColorActual, 
 															   pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux).
 															
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
