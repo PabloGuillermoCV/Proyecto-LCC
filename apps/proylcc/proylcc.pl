@@ -1,4 +1,4 @@
-:- module(proylcc, 
+﻿:- module(proylcc, 
 	[  
 		grid/2,
 		flick/3
@@ -116,6 +116,8 @@ pintarCeldaHor(X,C,[Columna1|Columnas],[Columna1|R]):- X > 0, XAux is X-1, pinta
 
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X < 0. %Me cai de la grilla y me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X > 13. %Me cai de la grilla y me detengo.
+verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y > 13. %Me cai de la grilla y me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \== ColorActual. %Los colores no coinciden, me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,Grilla,F), 
 															F == ColorActual, 
