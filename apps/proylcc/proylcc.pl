@@ -112,7 +112,10 @@ pintarCeldaHor(X,C,[Columna1|Columnas],[Columna1|R]):- X > 0, XAux is X-1, pinta
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %verificarColor(+X,+Y,+ColorActual,+ColorNew,+Grilla,-NewGrilla)
-%Comienzo el proceso de ver cada celda adyacente.
+%Comienza buscando el color de la posicion actual y si coincide con el actual, en caso de que no coincida (o me caiga de la grilla) retorno la grilla sin tocarla.
+%Si coincide el color, entonces la pinto del color nuevo.
+%A continuacion repito el proceso para las cuatro posiciones adyacentes a la posicion actual.
+%Esto se repite hasta que no sea posible pintar mas celdas.
 
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X < 0. %Me cai de la grilla y me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
@@ -121,37 +124,55 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y > 13. %Me cai de la g
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \= ColorActual. %Los colores no coinciden, me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,Grilla,F), 
 															F = ColorActual, 
-															pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux), 
-															buscarAdyacencia(X,Y,ColorAtcual,ColorNew,GrillaAux,NewGrilla).
+															pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux0), 
+															XP is X+1, YP is Y+1, XN is X-1, YN is Y-1, 
+															verificarColor(XP,Y,ColorActual,ColorNew,GrillaAux0,GrillaAux1), 
+															verificarColor(X,YP,ColorActual,ColorNew,GrillaAux1,GrillaAux2), 
+															verificarColor(XN,Y,ColorActual,ColorNew,GrillaAux2,GrillaAux3), 
+															verificarColor(X,YN,ColorActual,ColorNew,GrillaAux3,NewGrilla).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%buscarAdyacencia(+X,+Y,+ColorAtcual,+ColorNew,+Grilla,-NewGrilla)
-%Busco en las cuatro celdas adyacentes a X e Y y repito el proceso de verificar el color.
-%Si el color no coincide, ese verificar retorna la misma grilla (lo cual ocurrirá por lo menos 1 vez de las 4).
+%ayudaX(+Grid,+Color,-Res)
+%Depende de cual de los 5 colores precise, llamara a un metodo que contara todas las celdas pintadas al final con dicho color.
+%Es similar al flick pero este no cambia la grilla, solo retorna un valor numerico.
 
-buscarAdyacencia(X,Y,ColorActual,ColorNew,Grilla0,NewGrilla):- XP is X+1, YP is Y+1, XN is X-1, YN is Y-1, 
-															  verificarColor(XP,Y,ColorActual,ColorNew,Grilla0,Grilla1), 
-															  verificarColor(X,YP,ColorActual,ColorNew,Grilla1,Grilla2), 
-															  verificarColor(XN,Y,ColorActual,ColorNew,Grilla2,Grilla3), 
-															  verificarColor(X,YN,ColorActual,ColorNew,Grilla3,NewGrilla).
+ayudaY(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'y',Grid,Res).
+ayudaG(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'g',Grid,Res).
+ayudaV(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'v',Grid,Res).
+ayudaR(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'r',Grid,Res).
+ayudaP(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'p',Grid,Res).
+ayudaB(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'b',Grid,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Un verificar auxiliar que no realiza la recursion tal que solo revisa (1,0) y (0,1). Lo uso solo para testeo.
-verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X < 0. %Me cai de la grilla y me detengo.
-verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
-verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \== ColorActual. %Los colores no coinciden, me detengo.
-verificarColorAux(X,Y,ColorActual,ColorNew,Grilla,GrillaAux):- buscarCeldaVer(X,Y,Grilla,F), 
-															   F = ColorActual, 
-															   pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux).
-															
+%marcarCeldas(+X,+Y,+ColorActual,+ColorNew,+Grilla,-Res)
+%Llama a verificarColor para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
+%Luego con esa grilla resultante pasa a llamar a contarCeldas para que cuente todas las celdas del nuevo color adyacentes entre si y retorne el resultado.
+
+marcarCeldas(X,Y,ColorActual,ColorNew,Grilla,Res):- verificarColor(X,Y,ColorActual,ColorNew,Grilla,GrillaPintada), contarCeldas(X,Y,ColorNew,GrillaPintada,Res).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%CUAL ES EL PROBLEMA: Lo que ocurre es que al tratar de pintar adyacentes al primer lugar no lo hacen. Me da la impresion de que esta relacionado con
-% los signos == o = o \= o \==. Me parece que es algo similar a eso lo que causa el problema. Uso los buscarCelda para traerme una letra en una
-% posicion y compararla con la de la primera celda a ver si es igual, si no es igual retorno la grilla sin modificarla, pero si es igual
-% llamo a los pintarCelda para que cambien el color en esa posicion. La cosa es que al comparar no funciona algo bien.
-% El verificarColorAux esta de prueba para que solo mire 5 lugares de la grilla y no siga la recursividad, lo use antes cambiando los llamados
-% en buscarAdyacencia porque no funcionaba bien el pintado.
-% No le des bola a los warnings que salen al ejecutar el programa por el momento.
+%contarCeldas(+X,+Y,+Color,+Grilla,-GrillaNew,-Res)
+%Se encarga de recorrer la grilla contando cada uno de las celdas con color igual a Color y sumando a un contador.
+%Se pinta una grilla auxiliar para evitar ciclar por lugares que ya se contaron.
+%El proceso de recursion es el mismo que en verificarColor.
+
+contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- X < 0. %Me cai de la grilla y me detengo.
+contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- Y < 0. %Me cai de la grilla y me detengo.
+contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- X > 13. %Me cai de la grilla y me detengo.
+contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- Y > 13. %Me cai de la grilla y me detengo.
+contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- buscarCeldaVer(X,Y,Grilla,F), F \= Color. %Los colores no coinciden, me detengo.
+contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F), 
+											   F = ColorActual, 
+											   pintarCeldaVer(X,Y,'n',Grilla,GrillaAux0), 
+											   XP is X+1, YP is Y+1, XN is X-1, YN is Y-1, 
+											   contarCeldas(XP,Y,Color,GrillaAux0,GrillaAux1,Res1), 
+											   contarCeldas(X,YP,Color,GrillaAux1,GrillaAux2,Res2), 
+											   contarCeldas(XN,Y,Color,GrillaAux2,GrillaAux3,Res3), 
+											   contarCeldas(X,YN,Color,GrillaAux3,GrillaNew,Res4),
+											   Res12 is Res1+Res2, Res123 is Res12+Res3, Res1234 is Res123+Res4, Res is Res1234+1.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
