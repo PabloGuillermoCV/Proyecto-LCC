@@ -78,7 +78,7 @@ grid(4, [
 %
 % RGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 
-flick(Grid,Color,RGrid):- Grid=[[Columna1|Columnas]|Filas], verificarColor(0,0,Columna1,Color,Grid,RGrid).
+flick(Grid,Color,RGrid):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,RGrid).
 %En este caso, Columna1 es el color ubicado arriba a la izquierda (en 0,0) de la grilla Grid.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,14 +86,14 @@ flick(Grid,Color,RGrid):- Grid=[[Columna1|Columnas]|Filas], verificarColor(0,0,C
 %buscarCeldaVer(+X,+Y,+Grilla,-Res)
 %Recorro las filas (el eje Y) para buscar una celda especifica.
 
-buscarCeldaVer(X,0,[Fila1|Filas],R):- buscarCeldaHor(X,Fila1,R). %Encontré la fila en Y que buscaba, empiezo a recorrer sus columnas a derecha.
-buscarCeldaVer(X,Y,[Fila1|Filas],R):- Y > 0, YAux is Y-1, buscarCeldaVer(X,YAux,Filas,R).
+buscarCeldaVer(X,0,[Fila1|_Filas],R):- buscarCeldaHor(X,Fila1,R). %Encontré la fila en Y que buscaba, empiezo a recorrer sus columnas a derecha.
+buscarCeldaVer(X,Y,[_Fila1|Filas],R):- Y > 0, YAux is Y-1, buscarCeldaVer(X,YAux,Filas,R).
 
 %buscarCeldaHor(+X,+Grilla,-Res)
 %Recorro las columnas (el eje X) para buscar una celda especifica.
 
-buscarCeldaHor(0,[Columna1|Columnas],Columna1). %Llegué a la posición X,Y que buscaba.
-buscarCeldaHor(X,[Columna1|Columnas],R):- X > 0, XAux is X-1, buscarCeldaHor(XAux,Columnas,R).
+buscarCeldaHor(0,[Columna1|_Columnas],Columna1). %Llegué a la posición X,Y que buscaba.
+buscarCeldaHor(X,[_Columna1|Columnas],R):- X > 0, XAux is X-1, buscarCeldaHor(XAux,Columnas,R).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -106,7 +106,7 @@ pintarCeldaVer(X,Y,C,[Fila1|Filas],[Fila1|R]):- Y > 0, YAux is Y-1, pintarCeldaV
 %pintarCeldaHor(+X,+ColorNew,+Grilla,+NewGrilla)
 %Recorro las columnas (el eje X) para pintar una celda especifica.
 
-pintarCeldaHor(0,C,[Columna1|Columnas],[C|Columnas]). %Llegué a la posición X,Y que buscaba, la retorno con un color distinto.
+pintarCeldaHor(0,C,[_Columna1|Columnas],[C|Columnas]). %Llegué a la posición X,Y que buscaba, la retorno con un color distinto.
 pintarCeldaHor(X,C,[Columna1|Columnas],[Columna1|R]):- X > 0, XAux is X-1, pintarCeldaHor(XAux,C,Columnas,R).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,11 +117,11 @@ pintarCeldaHor(X,C,[Columna1|Columnas],[Columna1|R]):- X > 0, XAux is X-1, pinta
 %A continuacion repito el proceso para las cuatro posiciones adyacentes a la posicion actual.
 %Esto se repite hasta que no sea posible pintar mas celdas.
 
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X < 0. %Me cai de la grilla y me detengo.
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- X > 13. %Me cai de la grilla y me detengo.
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- Y > 13. %Me cai de la grilla y me detengo.
-verificarColor(X,Y,ColorActual,ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \= ColorActual. %Los colores no coinciden, me detengo.
+verificarColor(X,_Y,_ColorActual,_ColorNew,Grilla,Grilla):- X < 0. %Me cai de la grilla y me detengo.
+verificarColor(_X,Y,_ColorActual,_ColorNew,Grilla,Grilla):- Y < 0. %Me cai de la grilla y me detengo.
+verificarColor(X,_Y,_ColorActual,_ColorNew,Grilla,Grilla):- X > 13. %Me cai de la grilla y me detengo.
+verificarColor(_X,Y,_ColorActual,_ColorNew,Grilla,Grilla):- Y > 13. %Me cai de la grilla y me detengo.
+verificarColor(X,Y,ColorActual,_ColorNew,Grilla,Grilla):- buscarCeldaVer(X,Y,Grilla,F), F \= ColorActual. %Los colores no coinciden, me detengo.
 verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,Grilla,F), 
 															F = ColorActual, 
 															pintarCeldaVer(X,Y,ColorNew,Grilla,GrillaAux0), 
@@ -133,16 +133,12 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%ayudaX(+Grid,+Color,-Res)
+%ayudaBasica(+Grid,+Color,-Res)
 %Depende de cual de los 5 colores precise, llamara a un metodo que contara todas las celdas pintadas al final con dicho color.
 %Es similar al flick pero este no cambia la grilla, solo retorna un valor numerico.
+%Esto sera llamado externamente 6 veces para una ayuda de cada color.
 
-ayudaY(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'y',Grid,Res).
-ayudaG(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'g',Grid,Res).
-ayudaV(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'v',Grid,Res).
-ayudaR(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'r',Grid,Res).
-ayudaP(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'p',Grid,Res).
-ayudaB(Grid,Color,Res):- Grid=[[Columna1|Columnas]|Filas], marcarCeldas(0,0,Columna1,'b',Grid,Res).
+ayudaBasica(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], marcarCeldas(0,0,Columna1,Color,Grid,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -159,13 +155,13 @@ marcarCeldas(X,Y,ColorActual,ColorNew,Grilla,Res):- verificarColor(X,Y,ColorActu
 %Se pinta una grilla auxiliar para evitar ciclar por lugares que ya se contaron.
 %El proceso de recursion es el mismo que en verificarColor.
 
-contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- X < 0. %Me cai de la grilla y me detengo.
-contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- Y < 0. %Me cai de la grilla y me detengo.
-contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- X > 13. %Me cai de la grilla y me detengo.
-contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- Y > 13. %Me cai de la grilla y me detengo.
-contarCeldas(X,Y,Color,Grilla,GrillaNew,0):- buscarCeldaVer(X,Y,Grilla,F), F \= Color. %Los colores no coinciden, me detengo.
+contarCeldas(X,_Y,_Color,_Grilla,_GrillaNew,0):- X < 0. %Me cai de la grilla y me detengo.
+contarCeldas(_X,Y,_Color,_Grilla,_GrillaNew,0):- Y < 0. %Me cai de la grilla y me detengo.
+contarCeldas(X,_Y,_Color,_Grilla,_GrillaNew,0):- X > 13. %Me cai de la grilla y me detengo.
+contarCeldas(_X,Y,_Color,_Grilla,_GrillaNew,0):- Y > 13. %Me cai de la grilla y me detengo.
+contarCeldas(X,Y,Color,Grilla,_GrillaNew,0):- buscarCeldaVer(X,Y,Grilla,F), F \= Color. %Los colores no coinciden, me detengo.
 contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F), 
-											   F = ColorActual, 
+											   F = Color, 
 											   pintarCeldaVer(X,Y,'n',Grilla,GrillaAux0), 
 											   XP is X+1, YP is Y+1, XN is X-1, YN is Y-1, 
 											   contarCeldas(XP,Y,Color,GrillaAux0,GrillaAux1,Res1), 
@@ -176,3 +172,44 @@ contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F),
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%IMPORTANTE: Honestamente no entiendo que es lo que me pide la segunda ayuda en el enunciado del proyecto.
+
+%ayudaExtendidaShell(+Grid,+Color,-Res)
+%Llamo al ayudaExtendida con cada color y luego con la grilla que me retorna realizo lo mismo que en ayudaBasica para obtener un valor numerico con cada combinacion.
+
+ayudaExtendidaShell(Grid,Color,Res):- ayudaExtendida(Grid,'y',GridY), ayudaBasica(GridY,Color,ResY), 
+									  ayudaExtendida(Grid,'r',GridR), ayudaBasica(GridR,Color,ResR), 
+									  ayudaExtendida(Grid,'g',GridG), ayudaBasica(GridG,Color,ResG), 
+									  ayudaExtendida(Grid,'p',GridP), ayudaBasica(GridP,Color,ResP), 
+									  ayudaExtendida(Grid,'b',GridB), ayudaBasica(GridB,Color,ResB), 
+									  ayudaExtendida(Grid,'v',GridV), ayudaBasica(GridV,Color,ResV), 
+									  Res is ResY + ResR + ResG + ResP + ResB + ResV.
+
+%ayudaExtendida(+Grid,+Color,-NewGrid)
+%Similar al ayudaBasica pero este solamente retorna la grilla pintada de un color y no calcula ningun valor numerico
+
+ayudaExtendida(Grid,Color,NewGrid):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,NewGrid).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%IMPORTANTE: Estoy pensando que no sera necesario hacer un proceso para cambiar la grilla celda por celda. Se podria simplemente retornar la siguiente?
+%Dejo el codigo que empeze por las dudas.
+
+%cambiarGrilla(+GridOrigen,+GridNueva,-GridResultado)
+%Dada la grilla actual origen sin modificar y la grilla siguiente en la lista, se reemplaza cada elemento de Origen por Nueva para formar la grilla Resultado.
+
+%cambiarGrilla(GridOrigen,GridNueva,GridResultado):- cambiarGrillaV(0,GridOrigen,GridNueva,GridResultado).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%cambiarGrillaV(+Y,+GridOrigen,+GridNueva,-GridResultado)
+
+%cambiarGrillaV(13,GO,GN,GR):- .
+%cambiarGrillaV(Y,GO,GN,GR):- GO=[[GOColumna1|GOColumnas]|GOFilas], 
+%							   GN=[[GNColumna1|GNColumnas]|GNFilas], 
+%							   cambiarGrillaH(0,GOColumnas,GNColumnas,GRColumnas), 
+%							   YAux is Y+1, 
+%							   cambiarGrilla(X,YAux,GOFilas,GNFilas,GRFilas), 
+%							   GR = [[GNColumna1|GRColumnas]|GRFilas].
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
