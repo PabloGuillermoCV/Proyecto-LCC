@@ -73,13 +73,12 @@ grid(4, [
 		 ]).
 		 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% flick(+Grid, +Color, -RGrid)
-%
-% RGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
+
+%flick(+Grid,+Color,-RGrid)
+%RGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
+%En este caso, el verificarColor, comenzara a revisar la grilla celda por celda comenzando por arriba a la izquierda (en la celda 0,0).
 
 flick(Grid,Color,RGrid):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,RGrid).
-%En este caso, Columna1 es el color ubicado arriba a la izquierda (en 0,0) de la grilla Grid.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -140,8 +139,6 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 
 ayudaBasica(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], marcarCeldas(0,0,Columna1,Color,Grid,Res).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %marcarCeldas(+X,+Y,+ColorActual,+ColorNew,+Grilla,-Res)
 %Llama a verificarColor para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
 %Luego con esa grilla resultante pasa a llamar a contarCeldas para que cuente todas las celdas del nuevo color adyacentes entre si y retorne el resultado.
@@ -172,44 +169,26 @@ contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F),
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%IMPORTANTE: Honestamente no entiendo que es lo que me pide la segunda ayuda en el enunciado del proyecto.
+%ayudaExtendida(+Grid,+Color,-Res)
+%Pinto a la grilla de un color dado, y con ese resultado comienzo a usar ayudaBasica para ver las posibilidades de cada color y poder elegir la mayor.
 
-%ayudaExtendidaShell(+Grid,+Color,-Res)
-%Llamo al ayudaExtendida con cada color y luego con la grilla que me retorna realizo lo mismo que en ayudaBasica para obtener un valor numerico con cada combinacion.
-
-ayudaExtendidaShell(Grid,Color,Res):- ayudaExtendida(Grid,'y',GridY), ayudaBasica(GridY,Color,ResY), 
-									  ayudaExtendida(Grid,'r',GridR), ayudaBasica(GridR,Color,ResR), 
-									  ayudaExtendida(Grid,'g',GridG), ayudaBasica(GridG,Color,ResG), 
-									  ayudaExtendida(Grid,'p',GridP), ayudaBasica(GridP,Color,ResP), 
-									  ayudaExtendida(Grid,'b',GridB), ayudaBasica(GridB,Color,ResB), 
-									  ayudaExtendida(Grid,'v',GridV), ayudaBasica(GridV,Color,ResV), 
-									  Res is ResY + ResR + ResG + ResP + ResB + ResV.
-
-%ayudaExtendida(+Grid,+Color,-NewGrid)
-%Similar al ayudaBasica pero este solamente retorna la grilla pintada de un color y no calcula ningun valor numerico
-
-ayudaExtendida(Grid,Color,NewGrid):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,NewGrid).
+ayudaExtendidaShell(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], 
+									  verificarColor(0,0,Columna1,Color,Grid,NewGrid), 
+									  ayudaBasica(NewGrid,'y',ResY), 
+									  ayudaBasica(NewGrid,'r',ResR), L1 = [ResR|ResY], 
+									  ayudaBasica(NewGrid,'g',ResG), L2 = [ResG|L1], 
+									  ayudaBasica(NewGrid,'p',ResP), L3 = [ResP|L2], 
+									  ayudaBasica(NewGrid,'b',ResB), L4 = [ResB|L3], 
+									  ayudaBasica(NewGrid,'v',ResV), L5 = [ResV|L4], 
+									  calcularMayor(L5,ResV,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%IMPORTANTE: Estoy pensando que no sera necesario hacer un proceso para cambiar la grilla celda por celda. Se podria simplemente retornar la siguiente?
-%Dejo el codigo que empeze por las dudas.
+%calcularMayor(+L,+M,-Res)
+%Predicado auxiliar que se encarga de calcular el mayor elemento de una lista.
 
-%cambiarGrilla(+GridOrigen,+GridNueva,-GridResultado)
-%Dada la grilla actual origen sin modificar y la grilla siguiente en la lista, se reemplaza cada elemento de Origen por Nueva para formar la grilla Resultado.
-
-%cambiarGrilla(GridOrigen,GridNueva,GridResultado):- cambiarGrillaV(0,GridOrigen,GridNueva,GridResultado).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%cambiarGrillaV(+Y,+GridOrigen,+GridNueva,-GridResultado)
-
-%cambiarGrillaV(13,GO,GN,GR):- .
-%cambiarGrillaV(Y,GO,GN,GR):- GO=[[GOColumna1|GOColumnas]|GOFilas], 
-%							   GN=[[GNColumna1|GNColumnas]|GNFilas], 
-%							   cambiarGrillaH(0,GOColumnas,GNColumnas,GRColumnas), 
-%							   YAux is Y+1, 
-%							   cambiarGrilla(X,YAux,GOFilas,GNFilas,GRFilas), 
-%							   GR = [[GNColumna1|GRColumnas]|GRFilas].
+calcularMayor([],M,M).
+calcularMayor([X|Xs],M,Res):- X =< M, calcularMayor(Xs,M,Res).
+calcularMayor([X|Xs],M,Res):- X > M, calcularMayor(Xs,X,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
