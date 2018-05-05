@@ -70,6 +70,7 @@ function init() {
     });
 
     var buttonsPanelElem = document.getElementById("buttonsPanel");
+    var buttonsPanelAyuda = document.getElementById("buttonsPanelAyuda"); //se supone que este será el menú de los botones de ayuda
 
     for (let color in colors) {
         var buttonElem = document.createElement("button");
@@ -79,6 +80,16 @@ function init() {
             handleColorClick(color);
         });
         buttonsPanelElem.appendChild(buttonElem);
+    }
+    //como para que se lea mejor, acá haria lo mismo que el menú de botones, nada más que sería para la ayuda básica
+    for(let color in colors){
+        var buttonElem = document.createElement("button");
+        buttonElem.className = "colorBtn";
+        buttonElem.style.backgroundColor = colorToCss(color);
+        buttonElem.addEventListener("click", function(e) {
+            handleColorAyuda(color);
+        });
+        buttonsPanelAyuda.appendChild(buttonElem)
     }
 }
 
