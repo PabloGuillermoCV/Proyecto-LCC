@@ -9,7 +9,8 @@ var cellElems = null;
 var turns = -1;
 // Reference to element displaying turns
 var turnsElem;
-
+//variable global para contar clicks de ayuda
+var contadorAyuda = 0
 /**
  * Representation of color enumerate as object where each property key defines an enum value (a color), and the
  * associated property value (the string) defines the color name.
@@ -140,6 +141,33 @@ function createGridElems(numOfRows, numOfCols) {
 function handleColorClick(color) {
     var s = "flick(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
     pengine.ask(s)
+}
+
+/**
+* Handler para la ayuda
+* La idea es que cuente la cantidad de clicks y en base a eso de o la ayuda básica, o la ayuda doble
+*/
+function handleColorAyuda(color){
+  var s;
+  if(contadorAyuda < 2){
+    contadorAyuda++;
+    
+    switch(contadorAyuda){
+
+        case 1: 
+            s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Respuesta)";
+            pengine.ask(s);
+        case 2:
+            s = "ayudaExtendida(" Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
+            pengine.ask(s);
+        default:
+            s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Respuesta)";
+            pengine.ask(s);
+    }
+  }
+  else{
+    contadorAyuda = 0;
+  }
 }
 
 /**
