@@ -6,18 +6,20 @@ var gridData;
 // Bidimensional array with grid cells elements.
 var cellElems = null;
 // Number of turns
-var turns = -1;
+var turns = 0;
 // Reference to element displaying turns
 var turnsElem;
-//variable global para contar clicks de ayuda
-var contadorAyuda = 0
+// Variable global que mantiene la grilla actual
+var currentGrid = 1;
+// Variable que se encarga del manejo de la deshabilitacion del cambio de grilla
+var firstMove = false;
+
 /**
  * Representation of color enumerate as object where each property key defines an enum value (a color), and the
  * associated property value (the string) defines the color name.
  *
  * Values: RED, VIOLET, PINK, GREEN, BLUE, YELLOW
  */
-
 const colors = Object.freeze({
     RED : "red",
     VIOLET : "violet",
@@ -30,7 +32,6 @@ const colors = Object.freeze({
 /*
  * Returns the Prolog representation of the received color
  */
-
 function colorToProlog(color) {
     return colors[color].charAt(0);
 }
@@ -38,7 +39,6 @@ function colorToProlog(color) {
 /*
  * Returns the color in colors enum associated to pColor, in Prolog representation.
  */
-
 function colorFromProlog(pColor) {
     for (let color in colors) {
         if (colorToProlog(color) == pColor)
@@ -50,7 +50,6 @@ function colorFromProlog(pColor) {
 /*
  * Returns the CSS representation of the received color.
  */
-
 function colorToCss(color) {
     return colors[color];
 }
@@ -59,7 +58,6 @@ function colorToCss(color) {
 * Initialization function. Requests to server, through pengines.js library, 
 * the creation of a Pengine instance, which will run Prolog code server-side.
 */
-
 function init() {
     turnsElem = document.getElementById("turnsNum");
     pengine = new Pengine({
@@ -70,8 +68,11 @@ function init() {
         destroy: false
     });
 
-    var buttonsPanelElem = document.getElementById("buttonsPanel");
-    var buttonsPanelAyuda = document.getElementById("buttonsPanelAyuda"); //se supone que este será el menú de los botones de ayuda
+    var buttonsPanelElem = document.getElementById("buttonsPanel"); //Menu de seleccion de colores normal.
+    var buttonsPanelAyudaBasica = document.getElementById("buttonsPanelAyudaBasica"); //Menu de los botones de ayuda basica.
+	var buttonsPanelAyudaExtendida = document.getElementById("buttonsPanelAyudaExtendida"); //Menu de los botones de ayuda extendida.
+	var buttonPanelGrid = document.getElementById("buttonPanelGrid"); //Panel para el boton para cambiar de grilla.
+	var buttonGird = document.getElementById("buttonGrid"); //Boton para cambiar de grilla.
 
     for (let color in colors) {
         var buttonElem = document.createElement("button");
@@ -82,33 +83,47 @@ function init() {
         });
         buttonsPanelElem.appendChild(buttonElem);
     }
-    //como para que se lea mejor, acá haria lo mismo que el menú de botones, nada más que sería para la ayuda básica
+	
+	//HABRIA QUE MODIFICAR esto para que cada "boton" sea una etiqueta donde le podamos poner el resultado
+	for(let color in colors){
+        var buttonElem = document.createElement("button");
+        buttonElem.className = "colorBtn";
+        buttonElem.style.backgroundColor = colorToCss(color);
+        buttonsPanelAyudaBasica.appendChild(buttonElem);
+    }
+	var buttonAyuda = document.createElement("button");
+	buttonAyuda.className = "ayuda1Btn";
+	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaBasica (); });
+	buttonsPanelAyudaBasica.appendChild(buttonAyuda);
+	
+	//HABRIA QUE MODIFICAR esto para que cada "boton" sea una etiqueta donde le podamos poner el resultado
     for(let color in colors){
         var buttonElem = document.createElement("button");
         buttonElem.className = "colorBtn";
         buttonElem.style.backgroundColor = colorToCss(color);
-        buttonElem.addEventListener("click", function(e) {
-            handleColorAyuda(color);
-        });
-        buttonsPanelAyuda.appendChild(buttonElem)
+        buttonsPanelAyudaExtendida.appendChild(buttonElem);
     }
+	var buttonAyuda = document.createElement("button");
+	buttonAyuda.className = "ayuda2Btn";
+	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaExtendida(); });
+	buttonsPanelAyudaExtendida.appendChild(buttonAyuda);
+	
+	buttonGrid.addEventListener("click", function(e) { handleCambioGrilla(); });
+	buttonPanelGrid.appendChild(buttonGrid);
 }
 
 /**
  * Callback for Pengine server creation
  */
-
 function handleCreate() {
-    pengine.ask('grid(1, Grid)');
+    pengine.ask("grid(" + currentGrid + ", Grid)");
 }
 
 /**
  * Callback for successful response received from Pengines server
  */
-
 function handleSuccess(response) {
     gridData = response.data[0].Grid;
-    turns++;
     if (cellElems == null)
         createGridElems(gridData.length, gridData[0].length);
     for (let row = 0; row < gridData.length; row++)
@@ -120,7 +135,6 @@ function handleSuccess(response) {
 /**
  * Create grid cells elements
  */
-
 function createGridElems(numOfRows, numOfCols) {
     var gridElem = document.getElementById("grid");
     cellElems = [];
@@ -137,42 +151,50 @@ function createGridElems(numOfRows, numOfCols) {
 /**
  * Handler for color click. Ask query to Pengines server.
  */
-
 function handleColorClick(color) {
     var s = "flick(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
-    pengine.ask(s)
+    pengine.ask(s);
+	turns++;
+	if (turns > 0) {
+		document.getElemntById("buttonGrid").disabled = true;
+	}
 }
 
 /**
-* Handler para la ayuda
-* La idea es que cuente la cantidad de clicks y en base a eso de o la ayuda básica, o la ayuda doble
+* Handler para cambiar de grilla.
 */
-function handleColorAyuda(color){
-  var s;
-  if(contadorAyuda < 2){
-    contadorAyuda++;
-    
-    switch(contadorAyuda){
+function handleCambioGrilla () {
+	currentGrid = currentGrid + 1;
+	if (currentGrid == 5) {currentGrid = 1;}
+	pengine.ask("grid(" + currentGrid + ", Grid)");
+}
 
-        case 1: 
-            s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Respuesta)";
-            pengine.ask(s);
-        case 2:
-            s = "ayudaExtendida(" Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
-            pengine.ask(s);
-        default:
-            s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Respuesta)";
-            pengine.ask(s);
+/**
+* Handler para la ayuda basica.
+* El metodo llama a la ayuda basica 1 vez por color para tener los 6 valores numericos.
+*/
+function handleColorAyudaBasica () {
+	var s;
+	for (let color in colors) {
+        s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
+		pengine.ask(s);
     }
-  }
-  else{
-    contadorAyuda = 0;
-  }
+}
+
+/**
+* Handler para la ayuda extendida.
+* El metodo llama a la ayuda extendida 1 vez por color para tener los 6 valores numericos.
+*/
+function handleColorAyudaExtendida () {
+	var s;
+	for (let color in colors) {
+        s = "ayudaExtendida(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
+		pengine.ask(s);
+    }
 }
 
 /**
 * Call init function after window loaded to ensure all HTML was created before
 * accessing and manipulating it.
 */
-
 window.onload = init;

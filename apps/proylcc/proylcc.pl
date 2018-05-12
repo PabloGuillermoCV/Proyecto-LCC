@@ -22,20 +22,20 @@ grid(1, [
 		 ]).
 
 grid(2, [
-		 [y,y,b,g,v,y,p,v,b,p,v,p,v,r],
-		 [y,y,p,p,g,v,v,r,r,b,g,v,p,r],
-		 [b,y,g,y,b,g,r,g,p,g,p,r,y,y],
-		 [r,y,y,y,y,p,y,g,r,g,y,v,y,p],
-		 [y,p,y,v,y,g,g,v,r,b,v,y,r,g],
-		 [r,b,v,g,b,r,y,p,b,p,y,r,y,y],
-		 [p,g,v,y,y,r,b,r,v,r,v,y,p,y],
-		 [b,y,v,g,r,v,r,g,b,y,b,y,p,g],
-		 [r,b,b,v,g,v,p,y,r,v,r,y,p,g],
-		 [v,b,g,v,v,r,g,y,b,b,b,b,r,y],
-		 [v,v,b,r,p,b,g,g,p,p,b,y,v,p],
-		 [r,p,g,y,v,y,r,b,v,r,b,y,r,v],
-		 [r,b,b,v,p,y,p,r,b,g,p,y,b,r],
-		 [v,g,p,b,v,v,g,g,g,b,v,g,g,g]
+		 [y,b,r,r,v,y,p,v,b,p,v,p,v,y],
+		 [b,v,p,p,g,v,v,r,r,b,g,v,p,p],
+		 [b,v,g,y,v,b,r,v,r,r,p,r,y,y],
+		 [r,y,r,r,g,r,y,b,v,g,y,v,y,p],
+		 [y,p,y,b,y,y,g,v,g,b,p,y,r,b],
+		 [b,g,y,r,b,r,y,p,b,p,y,r,v,r],
+		 [r,y,b,p,y,r,b,v,r,r,v,b,v,r],
+		 [r,y,g,g,r,r,p,g,b,p,b,b,p,g],
+		 [v,b,r,v,g,g,r,y,r,v,g,g,r,y],
+		 [y,b,g,v,v,r,r,y,b,b,g,b,g,y],
+		 [y,v,b,p,p,b,b,y,p,p,b,v,g,p],
+		 [b,p,g,y,v,y,b,y,v,r,b,y,r,v],
+		 [g,b,b,v,p,y,p,r,b,g,p,y,b,r],
+		 [y,r,y,r,b,v,r,r,v,b,g,y,g,y]
 		 ]).
 		 
 grid(3, [
@@ -172,15 +172,15 @@ contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F),
 %ayudaExtendida(+Grid,+Color,-Res)
 %Pinto a la grilla de un color dado, y con ese resultado comienzo a usar ayudaBasica para ver las posibilidades de cada color y poder elegir la mayor.
 
-ayudaExtendidaShell(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], 
-									  verificarColor(0,0,Columna1,Color,Grid,NewGrid), 
-									  ayudaBasica(NewGrid,'y',ResY), 
-									  ayudaBasica(NewGrid,'r',ResR), L1 = [ResR|ResY], 
-									  ayudaBasica(NewGrid,'g',ResG), L2 = [ResG|L1], 
-									  ayudaBasica(NewGrid,'p',ResP), L3 = [ResP|L2], 
-									  ayudaBasica(NewGrid,'b',ResB), L4 = [ResB|L3], 
-									  ayudaBasica(NewGrid,'v',ResV), L5 = [ResV|L4], 
-									  calcularMayor(L5,ResV,Res).
+ayudaExtendida(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], 
+								 verificarColor(0,0,Columna1,Color,Grid,NewGrid), 
+								 ayudaBasica(NewGrid,'y',ResY), 
+								 ayudaBasica(NewGrid,'r',ResR), L1 = [ResR|ResY], 
+								 ayudaBasica(NewGrid,'g',ResG), L2 = [ResG|L1], 
+								 ayudaBasica(NewGrid,'p',ResP), L3 = [ResP|L2], 
+								 ayudaBasica(NewGrid,'b',ResB), L4 = [ResB|L3], 
+								 ayudaBasica(NewGrid,'v',ResV), L5 = [ResV|L4], 
+								 calcularMayor(L5,ResV,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
