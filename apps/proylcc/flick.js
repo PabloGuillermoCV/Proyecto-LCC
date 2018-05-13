@@ -93,6 +93,7 @@ function init() {
     }
 	var buttonAyuda = document.createElement("button");
 	buttonAyuda.className = "ayuda1Btn";
+    buttonAyuda.innerHTML = "Ayuda Basica";
 	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaBasica (); });
 	buttonsPanelAyudaBasica.appendChild(buttonAyuda);
 	
@@ -101,10 +102,12 @@ function init() {
         var buttonElem = document.createElement("button");
         buttonElem.className = "colorBtn";
         buttonElem.style.backgroundColor = colorToCss(color);
+        //buttonElem.innerHTML = "algo"; para modificar el texto del botón 
         buttonsPanelAyudaExtendida.appendChild(buttonElem);
     }
 	var buttonAyuda = document.createElement("button");
 	buttonAyuda.className = "ayuda2Btn";
+    buttonAyuda.innerHTML = "Ayuda Extendida";
 	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaExtendida(); });
 	buttonsPanelAyudaExtendida.appendChild(buttonAyuda);
 	
@@ -121,6 +124,7 @@ function handleCreate() {
 
 /**
  * Callback for successful response received from Pengines server
+ * Aquí es donde se estaria modificando la Grilla, cada vez que Prolog tira "True"
  */
 function handleSuccess(response) {
     gridData = response.data[0].Grid;
@@ -156,7 +160,7 @@ function handleColorClick(color) {
     pengine.ask(s);
 	turns++;
 	if (turns > 0) {
-		document.getElemntById("buttonGrid").disabled = true;
+		document.getElemntById("buttonGrid").setAttribute("disabled","disabled"); //otra forma de hacer lo mismo, tampoco funciona...
 	}
 }
 
