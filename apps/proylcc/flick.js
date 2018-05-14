@@ -11,8 +11,6 @@ var turns = 0;
 var turnsElem;
 // Variable global que mantiene la grilla actual
 var currentGrid = 1;
-// Variable que se encarga del manejo de la deshabilitacion del cambio de grilla
-var firstMove = false;
 
 /**
  * Representation of color enumerate as object where each property key defines an enum value (a color), and the
@@ -72,8 +70,7 @@ function init() {
     var buttonsPanelAyudaBasica = document.getElementById("buttonsPanelAyudaBasica"); //Menu de los botones de ayuda basica.
 	var buttonsPanelAyudaExtendida = document.getElementById("buttonsPanelAyudaExtendida"); //Menu de los botones de ayuda extendida.
 	var buttonPanelGrid = document.getElementById("buttonPanelGrid"); //Panel para el boton para cambiar de grilla.
-	var buttonGird = document.getElementById("buttonGrid"); //Boton para cambiar de grilla.
-
+	
     for (let color in colors) {
         var buttonElem = document.createElement("button");
         buttonElem.className = "colorBtn";
@@ -84,12 +81,11 @@ function init() {
         buttonsPanelElem.appendChild(buttonElem);
     }
 	
-	//HABRIA QUE MODIFICAR esto para que cada "boton" sea una etiqueta donde le podamos poner el resultado
 	for(let color in colors){
-        var buttonElem = document.createElement("button");
-        buttonElem.className = "colorBtn";
-        buttonElem.style.backgroundColor = colorToCss(color);
-        buttonsPanelAyudaBasica.appendChild(buttonElem);
+        var labelElem = document.createElement("label");
+        labelElem.className = "colorLbl";
+        labelElem.style.backgroundColor = colorToCss(color);
+        buttonsPanelAyudaBasica.appendChild(labelElem);
     }
 	var buttonAyuda = document.createElement("button");
 	buttonAyuda.className = "ayuda1Btn";
@@ -97,13 +93,12 @@ function init() {
 	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaBasica (); });
 	buttonsPanelAyudaBasica.appendChild(buttonAyuda);
 	
-	//HABRIA QUE MODIFICAR esto para que cada "boton" sea una etiqueta donde le podamos poner el resultado
-    for(let color in colors){
-        var buttonElem = document.createElement("button");
-        buttonElem.className = "colorBtn";
-        buttonElem.style.backgroundColor = colorToCss(color);
+	for(let color in colors){
+        var labelElem = document.createElement("label");
+        labelElem.className = "colorLbl";
+        labelElem.style.backgroundColor = colorToCss(color);
         //buttonElem.innerHTML = "algo"; para modificar el texto del botón 
-        buttonsPanelAyudaExtendida.appendChild(buttonElem);
+        buttonsPanelAyudaExtendida.appendChild(labelElem);
     }
 	var buttonAyuda = document.createElement("button");
 	buttonAyuda.className = "ayuda2Btn";
@@ -111,8 +106,8 @@ function init() {
 	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaExtendida(); });
 	buttonsPanelAyudaExtendida.appendChild(buttonAyuda);
 	
-	buttonGrid.addEventListener("click", function(e) { handleCambioGrilla(); });
-	buttonPanelGrid.appendChild(buttonGrid);
+    document.getElementById("buttonCambiarGrilla").addEventListener("click", function(e) { handleCambioGrilla(); });
+
 }
 
 /**
@@ -160,7 +155,7 @@ function handleColorClick(color) {
     pengine.ask(s);
 	turns++;
 	if (turns > 0) {
-		document.getElemntById("buttonGrid").setAttribute("disabled","disabled"); //otra forma de hacer lo mismo, tampoco funciona...
+		document.getElementById("buttonCambiarGrilla").disabled = true;
 	}
 }
 
@@ -182,6 +177,8 @@ function handleColorAyudaBasica () {
 	for (let color in colors) {
         s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
 		pengine.ask(s);
+
+        var respuesta = response.data[0].Res;
     }
 }
 

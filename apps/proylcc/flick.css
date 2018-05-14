@@ -52,7 +52,7 @@
 .buttonGrid {
 	height: 40px;
     width: 40px;
-    border: none;
+    border: 1px;
     cursor: pointer;
 }
 
@@ -61,6 +61,12 @@
     width: 40px;
     border: none;
     cursor: pointer;
+}
+
+.colorLbl {
+    height: 40px;
+    width: 40px;
+    border: none;
 }
 
 .turnsPanel {
