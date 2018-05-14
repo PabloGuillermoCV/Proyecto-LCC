@@ -143,7 +143,7 @@ ayudaBasica(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], marcarCeldas(0
 %Llama a verificarColor para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
 %Luego con esa grilla resultante pasa a llamar a contarCeldas para que cuente todas las celdas del nuevo color adyacentes entre si y retorne el resultado.
 
-marcarCeldas(X,Y,ColorActual,ColorNew,Grilla,Res):- verificarColor(X,Y,ColorActual,ColorNew,Grilla,GrillaPintada), contarCeldas(X,Y,ColorNew,GrillaPintada,Res).
+marcarCeldas(X,Y,ColorActual,ColorNew,Grilla,Res):- verificarColor(X,Y,ColorActual,ColorNew,Grilla,GrillaPintada), contarCeldas(X,Y,ColorNew,GrillaPintada,_GrillaNew,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

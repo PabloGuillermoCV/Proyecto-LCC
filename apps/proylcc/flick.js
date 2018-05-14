@@ -11,6 +11,8 @@ var turns = 0;
 var turnsElem;
 // Variable global que mantiene la grilla actual
 var currentGrid = 1;
+// Variable que mantiene si el cambio de grilla ya fue apagado para evitar usar disable cada vez
+var gridChangeOff = false;
 
 /**
  * Representation of color enumerate as object where each property key defines an enum value (a color), and the
@@ -81,32 +83,41 @@ function init() {
         buttonsPanelElem.appendChild(buttonElem);
     }
 	
+	var buttonsPanelAyudaBasicaAux = document.getElementById("buttonsPanelAyudaBasicaAux");
 	for(let color in colors){
         var labelElem = document.createElement("label");
         labelElem.className = "colorLbl";
         labelElem.style.backgroundColor = colorToCss(color);
-        buttonsPanelAyudaBasica.appendChild(labelElem);
+        buttonsPanelAyudaBasicaAux.appendChild(labelElem);
     }
+	buttonsPanelAyudaBasica.appendChild(buttonsPanelAyudaBasicaAux);
 	var buttonAyuda = document.createElement("button");
 	buttonAyuda.className = "ayuda1Btn";
     buttonAyuda.innerHTML = "Ayuda Basica";
-	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaBasica (); });
+	buttonAyuda.addEventListener("click", function(e) { 
+		handleColorAyudaBasica (); 
+	});
 	buttonsPanelAyudaBasica.appendChild(buttonAyuda);
 	
+	var buttonsPanelAyudaExtendidaAux = document.getElementById("buttonsPanelAyudaExtendidaAux");
 	for(let color in colors){
         var labelElem = document.createElement("label");
         labelElem.className = "colorLbl";
         labelElem.style.backgroundColor = colorToCss(color);
-        //buttonElem.innerHTML = "algo"; para modificar el texto del botón 
-        buttonsPanelAyudaExtendida.appendChild(labelElem);
+        buttonsPanelAyudaExtendidaAux.appendChild(labelElem);
     }
+	buttonsPanelAyudaExtendida.appendChild(buttonsPanelAyudaExtendidaAux);
 	var buttonAyuda = document.createElement("button");
 	buttonAyuda.className = "ayuda2Btn";
     buttonAyuda.innerHTML = "Ayuda Extendida";
-	buttonAyuda.addEventListener("click", function(e) { handleColorAyudaExtendida(); });
+	buttonAyuda.addEventListener("click", function(e) { 
+		handleColorAyudaExtendida(); 
+	});
 	buttonsPanelAyudaExtendida.appendChild(buttonAyuda);
 	
-    document.getElementById("buttonCambiarGrilla").addEventListener("click", function(e) { handleCambioGrilla(); });
+    document.getElementById("buttonCambiarGrilla").addEventListener("click", function(e) { 
+		handleCambioGrilla(); 
+	});
 
 }
 
@@ -154,8 +165,9 @@ function handleColorClick(color) {
     var s = "flick(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
     pengine.ask(s);
 	turns++;
-	if (turns > 0) {
+	if (turns > 0 && !gridChangeOff) {
 		document.getElementById("buttonCambiarGrilla").disabled = true;
+		gridChangeOff = true;
 	}
 }
 
@@ -177,8 +189,7 @@ function handleColorAyudaBasica () {
 	for (let color in colors) {
         s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
 		pengine.ask(s);
-
-        var respuesta = response.data[0].Res;
+        var Ayuda = response.data[0].Res;
     }
 }
 
@@ -191,6 +202,7 @@ function handleColorAyudaExtendida () {
 	for (let color in colors) {
         s = "ayudaExtendida(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
 		pengine.ask(s);
+		var Ayuda = response.data[0].Res;
     }
 }
 
