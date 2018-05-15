@@ -136,14 +136,10 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 %Depende de cual de los 5 colores precise, llamara a un metodo que contara todas las celdas pintadas al final con dicho color.
 %Es similar al flick pero este no cambia la grilla, solo retorna un valor numerico.
 %Esto sera llamado externamente 6 veces para una ayuda de cada color.
-
-ayudaBasica(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], marcarCeldas(0,0,Columna1,Color,Grid,Res).
-
-%marcarCeldas(+X,+Y,+ColorActual,+ColorNew,+Grilla,-Res)
 %Llama a verificarColor para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
 %Luego con esa grilla resultante pasa a llamar a contarCeldas para que cuente todas las celdas del nuevo color adyacentes entre si y retorne el resultado.
 
-marcarCeldas(X,Y,ColorActual,ColorNew,Grilla,Res):- verificarColor(X,Y,ColorActual,ColorNew,Grilla,GrillaPintada), contarCeldas(X,Y,ColorNew,GrillaPintada,_GrillaNew,Res).
+ayudaBasica(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,GrillaPintada), contarCeldas(0,0,Color,GrillaPintada,_GrillaNew,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -152,11 +148,11 @@ marcarCeldas(X,Y,ColorActual,ColorNew,Grilla,Res):- verificarColor(X,Y,ColorActu
 %Se pinta una grilla auxiliar para evitar ciclar por lugares que ya se contaron.
 %El proceso de recursion es el mismo que en verificarColor.
 
-contarCeldas(X,_Y,_Color,_Grilla,_GrillaNew,0):- X < 0. %Me cai de la grilla y me detengo.
-contarCeldas(_X,Y,_Color,_Grilla,_GrillaNew,0):- Y < 0. %Me cai de la grilla y me detengo.
-contarCeldas(X,_Y,_Color,_Grilla,_GrillaNew,0):- X > 13. %Me cai de la grilla y me detengo.
-contarCeldas(_X,Y,_Color,_Grilla,_GrillaNew,0):- Y > 13. %Me cai de la grilla y me detengo.
-contarCeldas(X,Y,Color,Grilla,_GrillaNew,0):- buscarCeldaVer(X,Y,Grilla,F), F \= Color. %Los colores no coinciden, me detengo.
+contarCeldas(X,_Y,_Color,Grilla,Grilla,0):- X < 0. %Me cai de la grilla y me detengo.
+contarCeldas(_X,Y,_Color,Grilla,Grilla,0):- Y < 0. %Me cai de la grilla y me detengo.
+contarCeldas(X,_Y,_Color,Grilla,Grilla,0):- X > 13. %Me cai de la grilla y me detengo.
+contarCeldas(_X,Y,_Color,Grilla,Grilla,0):- Y > 13. %Me cai de la grilla y me detengo.
+contarCeldas(X,Y,Color,Grilla,Grilla,0):- buscarCeldaVer(X,Y,Grilla,F), F \= Color. %Los colores no coinciden, me detengo.
 contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F), 
 											   F = Color, 
 											   pintarCeldaVer(X,Y,'n',Grilla,GrillaAux0), 

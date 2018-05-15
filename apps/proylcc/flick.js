@@ -13,6 +13,12 @@ var turnsElem;
 var currentGrid = 1;
 // Variable que mantiene si el cambio de grilla ya fue apagado para evitar usar disable cada vez
 var gridChangeOff = false;
+// Variables que se encargan de mandarme a la seccion del handleSuccess adecuada
+var esFlick = true;
+var esAyudaB = false;
+var esAyudaE = false;
+// Variable que mantiene el color actual, sirve para la ayuda
+var colorActual;
 
 /**
  * Representation of color enumerate as object where each property key defines an enum value (a color), and the
@@ -32,14 +38,14 @@ const colors = Object.freeze({
 /*
  * Returns the Prolog representation of the received color
  */
-function colorToProlog(color) {
+function colorToProlog (color) {
     return colors[color].charAt(0);
 }
 
 /*
  * Returns the color in colors enum associated to pColor, in Prolog representation.
  */
-function colorFromProlog(pColor) {
+function colorFromProlog (pColor) {
     for (let color in colors) {
         if (colorToProlog(color) == pColor)
             return color;
@@ -50,7 +56,7 @@ function colorFromProlog(pColor) {
 /*
  * Returns the CSS representation of the received color.
  */
-function colorToCss(color) {
+function colorToCss (color) {
     return colors[color];
 }
 
@@ -58,7 +64,7 @@ function colorToCss(color) {
 * Initialization function. Requests to server, through pengines.js library, 
 * the creation of a Pengine instance, which will run Prolog code server-side.
 */
-function init() {
+function init () {
     turnsElem = document.getElementById("turnsNum");
     pengine = new Pengine({
         server: "http://localhost:3030/pengine",
@@ -84,10 +90,10 @@ function init() {
     }
 	
 	var buttonsPanelAyudaBasicaAux = document.getElementById("buttonsPanelAyudaBasicaAux");
-	for(let color in colors){
-        var labelElem = document.createElement("label");
-        labelElem.className = "colorLbl";
+	for (let color in colors){
+        var labelElem = document.getElementById("labelColorAyudaBasica-"+colorToCss(color));
         labelElem.style.backgroundColor = colorToCss(color);
+		labelElem.innerHTML = 0;
         buttonsPanelAyudaBasicaAux.appendChild(labelElem);
     }
 	buttonsPanelAyudaBasica.appendChild(buttonsPanelAyudaBasicaAux);
@@ -100,10 +106,10 @@ function init() {
 	buttonsPanelAyudaBasica.appendChild(buttonAyuda);
 	
 	var buttonsPanelAyudaExtendidaAux = document.getElementById("buttonsPanelAyudaExtendidaAux");
-	for(let color in colors){
-        var labelElem = document.createElement("label");
-        labelElem.className = "colorLbl";
+	for (let color in colors){
+        var labelElem = document.getElementById("labelColorAyudaExtendida-"+colorToCss(color));
         labelElem.style.backgroundColor = colorToCss(color);
+		labelElem.innerHTML = 0;
         buttonsPanelAyudaExtendidaAux.appendChild(labelElem);
     }
 	buttonsPanelAyudaExtendida.appendChild(buttonsPanelAyudaExtendidaAux);
@@ -118,13 +124,12 @@ function init() {
     document.getElementById("buttonCambiarGrilla").addEventListener("click", function(e) { 
 		handleCambioGrilla(); 
 	});
-
 }
 
 /**
  * Callback for Pengine server creation
  */
-function handleCreate() {
+function handleCreate () {
     pengine.ask("grid(" + currentGrid + ", Grid)");
 }
 
@@ -132,20 +137,32 @@ function handleCreate() {
  * Callback for successful response received from Pengines server
  * Aquí es donde se estaria modificando la Grilla, cada vez que Prolog tira "True"
  */
-function handleSuccess(response) {
-    gridData = response.data[0].Grid;
-    if (cellElems == null)
-        createGridElems(gridData.length, gridData[0].length);
-    for (let row = 0; row < gridData.length; row++)
-        for (let col = 0; col < gridData[row].length; col++)
-            cellElems[row][col].style.backgroundColor = colorToCss(colorFromProlog(gridData[row][col]));
-    turnsElem.innerHTML = turns;
+function handleSuccess (response) {
+	if (esFlick && !esAyudaB && !esAyudaE) {
+		gridData = response.data[0].Grid;
+		if (cellElems == null)
+			createGridElems(gridData.length, gridData[0].length);
+		for (let row = 0; row < gridData.length; row++)
+			for (let col = 0; col < gridData[row].length; col++)
+				cellElems[row][col].style.backgroundColor = colorToCss(colorFromProlog(gridData[row][col]));
+		turnsElem.innerHTML = turns;
+	}
+	else {
+		if (!esFlick && esAyudaB && !esAyudaE) {
+			document.getElementById("labelColorAyudaBasica-"+colorToCss(colorActual)).innerHTML = response.data[0].Res;
+		}
+		else {
+			if (!esFlick && !esAyudaB && esAyudaE) {
+				document.getElementById("labelColorAyudaExtendida-"+colorToCss(colorActual)).innerHTML = response.data[0].Res;
+			}
+		}
+	}
 }
 
 /**
  * Create grid cells elements
  */
-function createGridElems(numOfRows, numOfCols) {
+function createGridElems (numOfRows, numOfCols) {
     var gridElem = document.getElementById("grid");
     cellElems = [];
     for (let row = 0; row < numOfRows; row++) {
@@ -161,14 +178,26 @@ function createGridElems(numOfRows, numOfCols) {
 /**
  * Handler for color click. Ask query to Pengines server.
  */
-function handleColorClick(color) {
+function handleColorClick (color) {
     var s = "flick(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
+	esFlick = true; esAyudaB = false; esAyudaE = false;
     pengine.ask(s);
 	turns++;
 	if (turns > 0 && !gridChangeOff) {
 		document.getElementById("buttonCambiarGrilla").disabled = true;
 		gridChangeOff = true;
 	}
+	resetHelp ();
+}
+
+/**
+ * Se encarga de resetear las ayudas a 0 despues de cada movimiento.
+ */
+function resetHelp () {
+	for (let color in colors) {
+		document.getElementById("labelColorAyudaBasica-"+colorToCss(color)).innerHTML = 0;
+		document.getElementById("labelColorAyudaExtendida-"+colorToCss(color)).innerHTML = 0;
+    }
 }
 
 /**
@@ -177,7 +206,9 @@ function handleColorClick(color) {
 function handleCambioGrilla () {
 	currentGrid = currentGrid + 1;
 	if (currentGrid == 5) {currentGrid = 1;}
+	esFlick = true; esAyudaB = false; esAyudaE = false;
 	pengine.ask("grid(" + currentGrid + ", Grid)");
+	resetHelp ();
 }
 
 /**
@@ -188,8 +219,9 @@ function handleColorAyudaBasica () {
 	var s;
 	for (let color in colors) {
         s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
+		esFlick = false; esAyudaB = true; esAyudaE = false;
+		colorActual = color;
 		pengine.ask(s);
-        var Ayuda = response.data[0].Res;
     }
 }
 
@@ -201,8 +233,9 @@ function handleColorAyudaExtendida () {
 	var s;
 	for (let color in colors) {
         s = "ayudaExtendida(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
+		esFlick = false; esAyudaB = false; esAyudaE = true;
+		colorActual = color;
 		pengine.ask(s);
-		var Ayuda = response.data[0].Res;
     }
 }
 
