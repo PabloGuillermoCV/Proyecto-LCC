@@ -149,7 +149,12 @@ function handleSuccess (response) {
 	}
 	else {
 		if (!esFlick && esAyudaB && !esAyudaE) {
-			document.getElementById("labelColorAyudaBasica-"+colorToCss(colorActual)).innerHTML = response.data[0].Res;
+			document.getElementById("labelColorAyudaBasica-red").innerHTML = response.data[0].Res1;
+			document.getElementById("labelColorAyudaBasica-violet").innerHTML = response.data[0].Res2;
+			document.getElementById("labelColorAyudaBasica-pink").innerHTML = response.data[0].Res3;
+			document.getElementById("labelColorAyudaBasica-green").innerHTML = response.data[0].Res4;
+			document.getElementById("labelColorAyudaBasica-blue").innerHTML = response.data[0].Res5;
+			document.getElementById("labelColorAyudaBasica-yellow").innerHTML = response.data[0].Res6;
 		}
 		else {
 			if (!esFlick && !esAyudaB && esAyudaE) {
@@ -217,12 +222,9 @@ function handleCambioGrilla () {
 */
 function handleColorAyudaBasica () {
 	var s;
-	for (let color in colors) {
-        s = "ayudaBasica(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
-		esFlick = false; esAyudaB = true; esAyudaE = false;
-		colorActual = color;
-		pengine.ask(s);
-    }
+    s = "ayudaBasicaShell(" + Pengine.stringify(gridData) + ",Res1,Res2,Res3,Res4,Res5,Res6)";
+	esFlick = false; esAyudaB = true; esAyudaE = false;
+	pengine.ask(s);
 }
 
 /**

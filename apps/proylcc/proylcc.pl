@@ -136,32 +136,26 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 %Depende de cual de los 5 colores precise, llamara a un metodo que contara todas las celdas pintadas al final con dicho color.
 %Es similar al flick pero este no cambia la grilla, solo retorna un valor numerico.
 %Esto sera llamado externamente 6 veces para una ayuda de cada color.
-%Llama a verificarColor para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
-%Luego con esa grilla resultante pasa a llamar a contarCeldas para que cuente todas las celdas del nuevo color adyacentes entre si y retorne el resultado.
+%Llama a flick para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
+%Luego se vuelve a pintar la grilla con un valor 'n' (esto no afecta a la grilla en pantalla).
+%Luego con esa grilla resultante pasa a llamar a contarCeldasFil para que cuente todas las celdas que tengan ese valor 'n'.
 
-ayudaBasica(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,GrillaPintada), contarCeldas(0,0,Color,GrillaPintada,_GrillaNew,Res).
+ayudaBasicaShell(Grid,Res1,Res2,Res3,Res4,Res5,Res6):- ayudaBasica(Grid,'r',Res1), ayudaBasica(Grid,'v',Res2), ayudaBasica(Grid,'p',Res3), 
+													   ayudaBasica(Grid,'g',Res4), ayudaBasica(Grid,'b',Res5), ayudaBasica(Grid,'y',Res6).
+
+ayudaBasica(Grid,Color,Res):- flick(Grid,Color,GrillaPintada), flick(GrillaPintada,'n',GrillaPintadaN), GrillaPintadaN = [Fila1|Filas], contarCeldasFil('n',[Fila1|Filas],Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%contarCeldas(+X,+Y,+Color,+Grilla,-GrillaNew,-Res)
+%contarCeldas(+X,+Y,+Color,+Grilla,-Res)
 %Se encarga de recorrer la grilla contando cada uno de las celdas con color igual a Color y sumando a un contador.
-%Se pinta una grilla auxiliar para evitar ciclar por lugares que ya se contaron.
-%El proceso de recursion es el mismo que en verificarColor.
 
-contarCeldas(X,_Y,_Color,Grilla,Grilla,0):- X < 0. %Me cai de la grilla y me detengo.
-contarCeldas(_X,Y,_Color,Grilla,Grilla,0):- Y < 0. %Me cai de la grilla y me detengo.
-contarCeldas(X,_Y,_Color,Grilla,Grilla,0):- X > 13. %Me cai de la grilla y me detengo.
-contarCeldas(_X,Y,_Color,Grilla,Grilla,0):- Y > 13. %Me cai de la grilla y me detengo.
-contarCeldas(X,Y,Color,Grilla,Grilla,0):- buscarCeldaVer(X,Y,Grilla,F), F \= Color. %Los colores no coinciden, me detengo.
-contarCeldas(X,Y,Color,Grilla,GrillaNew,Res):- buscarCeldaVer(X,Y,Grilla,F), 
-											   F = Color, 
-											   pintarCeldaVer(X,Y,'n',Grilla,GrillaAux0), 
-											   XP is X+1, YP is Y+1, XN is X-1, YN is Y-1, 
-											   contarCeldas(XP,Y,Color,GrillaAux0,GrillaAux1,Res1), 
-											   contarCeldas(X,YP,Color,GrillaAux1,GrillaAux2,Res2), 
-											   contarCeldas(XN,Y,Color,GrillaAux2,GrillaAux3,Res3), 
-											   contarCeldas(X,YN,Color,GrillaAux3,GrillaNew,Res4),
-											   Res12 is Res1+Res2, Res123 is Res12+Res3, Res1234 is Res123+Res4, Res is Res1234+1.
+contarCeldasFil(_Color,[],0).
+contarCeldasFil(Color,[Fila1|Filas],Res):- contarCeldasCol(Color,Fila1,ResCol), contarCeldasFil(Color,Filas,ResFil), Res is ResCol + ResFil.
+
+contarCeldasCol(_Color,[],0).
+contarCeldasCol(Color,[Columna1|Columnas],Res):- Color = Columna1, contarCeldasCol(Color,Columnas,ResAux), Res is ResAux + 1.
+contarCeldasCol(Color,[Columna1|Columnas],Res):- Color \= Columna1, contarCeldasCol(Color,Columnas,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
