@@ -17,8 +17,6 @@ var gridChangeOff = false;
 var esFlick = true;
 var esAyudaB = false;
 var esAyudaE = false;
-// Variable que mantiene el color actual, sirve para la ayuda
-var colorActual;
 
 /**
  * Representation of color enumerate as object where each property key defines an enum value (a color), and the
@@ -149,16 +147,21 @@ function handleSuccess (response) {
 	}
 	else {
 		if (!esFlick && esAyudaB && !esAyudaE) {
-			document.getElementById("labelColorAyudaBasica-red").innerHTML = response.data[0].Res1;
-			document.getElementById("labelColorAyudaBasica-violet").innerHTML = response.data[0].Res2;
-			document.getElementById("labelColorAyudaBasica-pink").innerHTML = response.data[0].Res3;
-			document.getElementById("labelColorAyudaBasica-green").innerHTML = response.data[0].Res4;
-			document.getElementById("labelColorAyudaBasica-blue").innerHTML = response.data[0].Res5;
-			document.getElementById("labelColorAyudaBasica-yellow").innerHTML = response.data[0].Res6;
+			document.getElementById("labelColorAyudaBasica-red").innerHTML = response.data[0].ResR;
+			document.getElementById("labelColorAyudaBasica-violet").innerHTML = response.data[0].ResV;
+			document.getElementById("labelColorAyudaBasica-pink").innerHTML = response.data[0].ResP;
+			document.getElementById("labelColorAyudaBasica-green").innerHTML = response.data[0].ResG;
+			document.getElementById("labelColorAyudaBasica-blue").innerHTML = response.data[0].ResB;
+			document.getElementById("labelColorAyudaBasica-yellow").innerHTML = response.data[0].ResY;
 		}
 		else {
 			if (!esFlick && !esAyudaB && esAyudaE) {
-				document.getElementById("labelColorAyudaExtendida-"+colorToCss(colorActual)).innerHTML = response.data[0].Res;
+				document.getElementById("labelColorAyudaExtendida-red").innerHTML = response.data[0].ResR;
+				document.getElementById("labelColorAyudaExtendida-violet").innerHTML = response.data[0].ResV;
+				document.getElementById("labelColorAyudaExtendida-pink").innerHTML = response.data[0].ResP;
+				document.getElementById("labelColorAyudaExtendida-green").innerHTML = response.data[0].ResG;
+				document.getElementById("labelColorAyudaExtendida-blue").innerHTML = response.data[0].ResB;
+				document.getElementById("labelColorAyudaExtendida-yellow").innerHTML = response.data[0].ResY;
 			}
 		}
 	}
@@ -222,7 +225,7 @@ function handleCambioGrilla () {
 */
 function handleColorAyudaBasica () {
 	var s;
-    s = "ayudaBasicaShell(" + Pengine.stringify(gridData) + ",Res1,Res2,Res3,Res4,Res5,Res6)";
+    s = "ayudaBasicaShell(" + Pengine.stringify(gridData) + ",ResR,ResV,ResP,ResG,ResB,ResY)";
 	esFlick = false; esAyudaB = true; esAyudaE = false;
 	pengine.ask(s);
 }
@@ -233,12 +236,9 @@ function handleColorAyudaBasica () {
 */
 function handleColorAyudaExtendida () {
 	var s;
-	for (let color in colors) {
-        s = "ayudaExtendida(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Res)";
-		esFlick = false; esAyudaB = false; esAyudaE = true;
-		colorActual = color;
-		pengine.ask(s);
-    }
+    s = "ayudaExtendidaShell(" + Pengine.stringify(gridData) + ",ResR,ResV,ResP,ResG,ResB,ResY)";
+	esFlick = false; esAyudaB = false; esAyudaE = true;
+	pengine.ask(s);
 }
 
 /**

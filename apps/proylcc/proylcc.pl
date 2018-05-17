@@ -140,8 +140,8 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 %Luego se vuelve a pintar la grilla con un valor 'n' (esto no afecta a la grilla en pantalla).
 %Luego con esa grilla resultante pasa a llamar a contarCeldasFil para que cuente todas las celdas que tengan ese valor 'n'.
 
-ayudaBasicaShell(Grid,Res1,Res2,Res3,Res4,Res5,Res6):- ayudaBasica(Grid,'r',Res1), ayudaBasica(Grid,'v',Res2), ayudaBasica(Grid,'p',Res3), 
-													   ayudaBasica(Grid,'g',Res4), ayudaBasica(Grid,'b',Res5), ayudaBasica(Grid,'y',Res6).
+ayudaBasicaShell(Grid,ResR,ResV,ResP,ResG,ResB,ResY):- ayudaBasica(Grid,'r',ResR), ayudaBasica(Grid,'v',ResV), ayudaBasica(Grid,'p',ResP), 
+													   ayudaBasica(Grid,'g',ResG), ayudaBasica(Grid,'b',ResB), ayudaBasica(Grid,'y',ResY).
 
 ayudaBasica(Grid,Color,Res):- flick(Grid,Color,GrillaPintada), flick(GrillaPintada,'n',GrillaPintadaN), GrillaPintadaN = [Fila1|Filas], contarCeldasFil('n',[Fila1|Filas],Res).
 
@@ -161,16 +161,18 @@ contarCeldasCol(Color,[Columna1|Columnas],Res):- Color \= Columna1, contarCeldas
 
 %ayudaExtendida(+Grid,+Color,-Res)
 %Pinto a la grilla de un color dado, y con ese resultado comienzo a usar ayudaBasica para ver las posibilidades de cada color y poder elegir la mayor.
+%Su funcionamiento es similar al ayudaBasica
 
-ayudaExtendida(Grid,Color,Res):- Grid=[[Columna1|_Columnas]|_Filas], 
-								 verificarColor(0,0,Columna1,Color,Grid,NewGrid), 
-								 ayudaBasica(NewGrid,'y',ResY), 
-								 ayudaBasica(NewGrid,'r',ResR), L1 = [ResR|ResY], 
-								 ayudaBasica(NewGrid,'g',ResG), L2 = [ResG|L1], 
-								 ayudaBasica(NewGrid,'p',ResP), L3 = [ResP|L2], 
-								 ayudaBasica(NewGrid,'b',ResB), L4 = [ResB|L3], 
-								 ayudaBasica(NewGrid,'v',ResV), L5 = [ResV|L4], 
-								 calcularMayor(L5,ResV,Res).
+ayudaExtendidaShell(Grid,ResR,ResV,ResP,ResG,ResB,ResY):- ayudaExtendida(Grid,'r',ResR), ayudaExtendida(Grid,'v',ResV), ayudaExtendida(Grid,'p',ResP), 
+														  ayudaExtendida(Grid,'g',ResG), ayudaExtendida(Grid,'b',ResB), ayudaExtendida(Grid,'y',ResY).
+
+ayudaExtendida(Grid,Color,Res):- flick(Grid,Color,NewGrid), 
+								 ayudaBasicaShell(NewGrid,ResR,ResV,ResP,ResG,ResB,ResY), 
+								 L1 = [ResV|ResR], 
+								 L2 = [ResP|L1], 
+								 L3 = [ResG|L2], 
+								 L4 = [ResB|L3], 
+								 calcularMayor(L4,ResY,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
