@@ -187,7 +187,7 @@ function createGridElems (numOfRows, numOfCols) {
  * Handler for color click. Ask query to Pengines server.
  */
 function handleColorClick (color) {
-    var s = "flick(" + Pengine.stringify(gridData) + "," + colorToProlog(color) + ",Grid)";
+    var s = "flick(" + Pengine.stringify(gridData) + "," + Pengine.stringify(colorToProlog(color)) + ",Grid)";
 	esFlick = true; esAyudaB = false; esAyudaE = false;
     pengine.ask(s);
 	turns++;
