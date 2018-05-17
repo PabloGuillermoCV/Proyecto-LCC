@@ -134,8 +134,8 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%ayudaBasica(+Grid,+Color,-Res)
-%Depende de cual de los 5 colores precise, llamara a un metodo que contara todas las celdas pintadas al final con dicho color.
+%ayudaBasica(+Grid,+Color,-Res) y ayudaBasicaShell(+Grid,-ResR,-ResV,-ResP,-ResG,-ResB,-ResY)
+%Uso la cascara para llamar a ayudaBasica con cada color.
 %Es similar al flick pero este no cambia la grilla, solo retorna un valor numerico.
 %Esto sera llamado externamente 6 veces para una ayuda de cada color.
 %Llama a flick para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
@@ -161,22 +161,31 @@ contarCeldasCol(Color,[Columna1|Columnas],Res):- Color \= Columna1, contarCeldas
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%ayudaExtendida(+Grid,+Color,-Res)
+%ayudaExtendida(+Grid,+Color,-Res) y ayudaExtendidaShell(+Grid,-ResR,-ResV,-ResP,-ResG,-ResB,-ResY)
+%Uso la cascara para llamar a ayudaExtendida con cada Color.
 %Pinto a la grilla de un color dado, y con ese resultado comienzo a usar ayudaBasica para ver las posibilidades de cada color y poder elegir la mayor.
-%Su funcionamiento es similar al ayudaBasica
+%Su funcionamiento es similar al ayudaBasica. Pero se agrega el hecho de que se juntan todos los 6 resultados en una lista y se retorna el mayor.
+%Ese mayor es el mayor valor para el segundo movimiento despues de pintar con Color
 
 ayudaExtendidaShell(Grid,ResR,ResV,ResP,ResG,ResB,ResY):- ayudaExtendida(Grid,"r",ResR), ayudaExtendida(Grid,"v",ResV), ayudaExtendida(Grid,"p",ResP), 
 														  ayudaExtendida(Grid,"g",ResG), ayudaExtendida(Grid,"b",ResB), ayudaExtendida(Grid,"y",ResY).
 
 ayudaExtendida(Grid,Color,Res):- flick(Grid,Color,NewGrid), 
 								 ayudaBasicaShell(NewGrid,ResR,ResV,ResP,ResG,ResB,ResY), 
-								 L1 = [ResV|ResR], 
-								 L2 = [ResP|L1], 
-								 L3 = [ResG|L2], 
-								 L4 = [ResB|L3], 
-								 calcularMayor(L4,ResY,Res).
+								 insertar(ResR,[],L1), 
+								 insertar(ResV,L1,L2), 
+								 insertar(ResP,L2,L3), 
+								 insertar(ResG,L3,L4), 
+								 insertar(ResB,L4,L5), 
+								 calcularMayor(L5,ResY,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%insertar(+X,+L,-LNew)
+%Inserta un elemento X al inicio de la lista L, resultando LNew.
+
+insertar(X,[],[X]).
+insertar(X,L,[X|L]).
 
 %calcularMayor(+L,+M,-Res)
 %Predicado auxiliar que se encarga de calcular el mayor elemento de una lista.
