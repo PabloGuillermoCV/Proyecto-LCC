@@ -77,7 +77,9 @@ grid(4, [
 %flick(+Grid,+Color,-RGrid)
 %RGrid es el resultado de hacer 'flick' de la grilla Grid con el color Color. 
 %En este caso, el verificarColor, comenzara a revisar la grilla celda por celda comenzando por arriba a la izquierda (en la celda 0,0).
+%Si la primera posicion de la grilla es igual a la de Color, entonces se retorna la grilla normal sin cambiar nada.
 
+flick(Grid,Color,Grid):- Grid=[[Columna1|_Columnas]|_Filas], Color = Columna1.
 flick(Grid,Color,RGrid):- Grid=[[Columna1|_Columnas]|_Filas], verificarColor(0,0,Columna1,Color,Grid,RGrid).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
