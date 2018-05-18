@@ -188,7 +188,9 @@ function createGridElems (numOfRows, numOfCols) {
  */
 function handleColorClick (color) {
     var s = "flick(" + Pengine.stringify(gridData) + "," + Pengine.stringify(colorToProlog(color)) + ",Grid)";
-	esFlick = true; esAyudaB = false; esAyudaE = false;
+	esFlick = true;
+	esAyudaB = false;
+	esAyudaE = false;
     pengine.ask(s);
 	turns++;
 	if (turns > 0 && !gridChangeOff) {
@@ -214,7 +216,9 @@ function resetHelp () {
 function handleCambioGrilla () {
 	currentGrid = currentGrid + 1;
 	if (currentGrid == 5) {currentGrid = 1;}
-	esFlick = true; esAyudaB = false; esAyudaE = false;
+	esFlick = true;
+	esAyudaB = false;
+	esAyudaE = false;
 	pengine.ask("grid(" + currentGrid + ", Grid)");
 	resetHelp ();
 }
@@ -226,7 +230,9 @@ function handleCambioGrilla () {
 function handleColorAyudaBasica () {
 	var s;
     s = "ayudaBasicaShell(" + Pengine.stringify(gridData) + ",ResR,ResV,ResP,ResG,ResB,ResY)";
-	esFlick = false; esAyudaB = true; esAyudaE = false;
+	esFlick = false;
+	esAyudaB = true;
+	esAyudaE = false;
 	pengine.ask(s);
 }
 
@@ -237,7 +243,9 @@ function handleColorAyudaBasica () {
 function handleColorAyudaExtendida () {
 	var s;
     s = "ayudaExtendidaShell(" + Pengine.stringify(gridData) + ",ResR,ResV,ResP,ResG,ResB,ResY)";
-	esFlick = false; esAyudaB = false; esAyudaE = true;
+	esFlick = false; 
+	esAyudaB = false; 
+	esAyudaE = true;
 	pengine.ask(s);
 }
 

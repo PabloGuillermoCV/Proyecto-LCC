@@ -141,11 +141,36 @@ verificarColor(X,Y,ColorActual,ColorNew,Grilla,NewGrilla):- buscarCeldaVer(X,Y,G
 %Llama a flick para que pinte toda la grilla (usando verificarColor) del color con el que se selecciono la ayuda (esto no afecta a la grilla en pantalla).
 %Luego se vuelve a pintar la grilla con un valor 'n' (esto no afecta a la grilla en pantalla).
 %Luego con esa grilla resultante pasa a llamar a contarCeldasFil para que cuente todas las celdas que tengan ese valor 'n'.
+%Al terminar con el predicado normal, la cascara luego se encarga de buscar cual era el color de la posicion 0,0.
+%Luego usa ayudaBasica una vez mas para obtener la cantidad de celdas con ese color, y se lo resta a los 6 valores obtenidos previamente.
+%Esto resulta en 6 valores que marcan cuantas celdas nuevas se tendran al presionar el boton de ese color.
+%Cabe notar que uno de esos valores sera 0.
 
-ayudaBasicaShell(Grid,ResR,ResV,ResP,ResG,ResB,ResY):- ayudaBasica(Grid,"r",ResR), ayudaBasica(Grid,"v",ResV), ayudaBasica(Grid,"p",ResP), 
-													   ayudaBasica(Grid,"g",ResG), ayudaBasica(Grid,"b",ResB), ayudaBasica(Grid,"y",ResY).
+ayudaBasicaShell(Grid,ResR,ResV,ResP,ResG,ResB,ResY):- ayudaBasica(Grid,"r",ResRAux), ayudaBasica(Grid,"v",ResVAux), ayudaBasica(Grid,"p",ResPAux), 
+													   ayudaBasica(Grid,"g",ResGAux), ayudaBasica(Grid,"b",ResBAux), ayudaBasica(Grid,"y",ResYAux), 
+													   Grid=[[Columna1|_Columnas]|_Filas], calcularActual(Columna1,ColorActual), 
+													   ayudaBasica(Grid,ColorActual,Res), 
+													   ResR is ResRAux - Res, 
+													   ResV is ResVAux - Res, 
+													   ResP is ResPAux - Res, 
+													   ResG is ResGAux - Res, 
+													   ResB is ResBAux - Res, 
+													   ResY is ResYAux - Res.
 
 ayudaBasica(Grid,Color,Res):- flick(Grid,Color,GrillaPintada), flick(GrillaPintada,"n",GrillaPintadaN), contarCeldasFil("n",GrillaPintadaN,Res).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%calcularActual(+PosInicial,-ColorActual)
+%Este predicado se encarga de buscar cual de los 6 colores dados coincide con PosInicial.
+%Esta PosInicial en contexto sera la posicion 0,0 de la grilla (Columna1).
+
+calcularActual(PosInicial,"r"):- PosInicial = "r".
+calcularActual(PosInicial,"v"):- PosInicial = "v".
+calcularActual(PosInicial,"p"):- PosInicial = "p".
+calcularActual(PosInicial,"g"):- PosInicial = "g".
+calcularActual(PosInicial,"b"):- PosInicial = "b".
+calcularActual(PosInicial,"y"):- PosInicial = "y".
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -177,7 +202,9 @@ ayudaExtendida(Grid,Color,Res):- flick(Grid,Color,NewGrid),
 								 insertar(ResP,L2,L3), 
 								 insertar(ResG,L3,L4), 
 								 insertar(ResB,L4,L5), 
-								 calcularMayor(L5,ResY,Res).
+								 calcularMayor(L5,ResY,ResExtendido), 
+								 ayudaBasica(Grid,Color,ResBasico), 
+								 Res is ((ResBasico + ResExtendido) - 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
