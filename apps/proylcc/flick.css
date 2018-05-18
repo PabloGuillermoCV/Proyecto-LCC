@@ -80,6 +80,7 @@
     width: 40px;
     border: none;
     cursor: pointer;
+    border-radius: 25px;
 }
 
 .colorLbl {
@@ -87,6 +88,8 @@
     width: 40px;
     border: none;
 	text-align: center;
+    font-weight: 900;
+    border-radius: 25px;
 }
 
 .turnsPanel {

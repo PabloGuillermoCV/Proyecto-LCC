@@ -234,11 +234,3 @@ calcularMayor([X|Xs],M,Res):- X =< M, calcularMayor(Xs,M,Res).
 calcularMayor([X|Xs],M,Res):- X > M, calcularMayor(Xs,X,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%PABLO COPIA Y PONE ESTO EN EL DOCUMENTO EN LISTA PREDICADOS INVOLUCRADOS DE AYUDA EXTENDIDA, ENTRE ayudaExtendida E insertar, DESPUES BORRA ESTO
-
-ayudaAuxiliar(+Grid,+Color,-Res): Es un predicado usado para calcular lo que seria la ayuda basica pero sin llamar al shell junto con los 6 resultados que conlleva. Se encarga de calcular la cantidad de celdas que tiene la grilla de un color sin tocar nada y despues de la primera pintada y calcula la diferencia Res. Esto es usado para obtener el verdadero ResBasico usado por ayudaExtendida.
-
-%TAMBIEN BORRA EN ayudaExtendida LA PARTE DEL FINAL QUE DICE ", y le resto 1". Y TAMBIEN EL PARRAFO DE LAS CONCLUSIONES QUE HABLA DE RESTARLE 1.
-%GRACIAS
