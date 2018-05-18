@@ -203,8 +203,18 @@ ayudaExtendida(Grid,Color,Res):- flick(Grid,Color,NewGrid),
 								 insertar(ResG,L3,L4), 
 								 insertar(ResB,L4,L5), 
 								 calcularMayor(L5,ResY,ResExtendido), 
-								 ayudaBasica(Grid,Color,ResBasico), 
-								 Res is ((ResBasico + ResExtendido) - 1).
+								 ayudaAuxiliar(Grid,Color,ResBasico), 
+								 Res is ResBasico + ResExtendido.
+								 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%ayudaAuxiliar(+Grid,+Color,-Res)
+%El proposito de este predicado es simplemente poder llamar a una version de ayudaBasica que no necesite llamar a cada uno de los 6 colores.
+%Es usada para calcular la cantidad de celdas nuevas luego del primer movimiento en Grilla, pero como solamente necesito un solo Color, 
+%no es necesario usar ayudaBasicaShell, lo cual me retorna mas cosas de lo necesario.
+%Lo que hace es calcular la diferencia entre las celdas pintadas en Grilla sin tocar nada (con Res2) y luego del primer movimiento (con Res1).
+
+ayudaAuxiliar(Grid,Color,Res):- ayudaBasica(Grid,Color,Res1), Grid=[[Columna1|_Columnas]|_Filas], ayudaBasica(Grid,Columna1,Res2), Res is Res1 - Res2. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -214,6 +224,8 @@ ayudaExtendida(Grid,Color,Res):- flick(Grid,Color,NewGrid),
 insertar(X,[],[X]).
 insertar(X,L,[X|L]).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %calcularMayor(+L,+M,-Res)
 %Predicado auxiliar que se encarga de calcular el mayor elemento de una lista.
 
@@ -222,3 +234,11 @@ calcularMayor([X|Xs],M,Res):- X =< M, calcularMayor(Xs,M,Res).
 calcularMayor([X|Xs],M,Res):- X > M, calcularMayor(Xs,X,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%PABLO COPIA Y PONE ESTO EN EL DOCUMENTO EN LISTA PREDICADOS INVOLUCRADOS DE AYUDA EXTENDIDA, ENTRE ayudaExtendida E insertar, DESPUES BORRA ESTO
+
+ayudaAuxiliar(+Grid,+Color,-Res): Es un predicado usado para calcular lo que seria la ayuda basica pero sin llamar al shell junto con los 6 resultados que conlleva. Se encarga de calcular la cantidad de celdas que tiene la grilla de un color sin tocar nada y despues de la primera pintada y calcula la diferencia Res. Esto es usado para obtener el verdadero ResBasico usado por ayudaExtendida.
+
+%TAMBIEN BORRA EN ayudaExtendida LA PARTE DEL FINAL QUE DICE ", y le resto 1". Y TAMBIEN EL PARRAFO DE LAS CONCLUSIONES QUE HABLA DE RESTARLE 1.
+%GRACIAS
