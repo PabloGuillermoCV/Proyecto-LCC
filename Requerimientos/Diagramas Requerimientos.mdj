@@ -29551,19 +29551,6 @@
 					"name": "DCU Adicional Jurado",
 					"ownedViews": [
 						{
-							"_type": "UMLNoteView",
-							"_id": "AAAAAAFjnOU5kpVT9Bk=",
-							"_parent": {
-								"$ref": "AAAAAAFjnN+ujJRPFEw="
-							},
-							"font": "Arial;13;0",
-							"left": 136,
-							"top": 200,
-							"width": 104,
-							"height": 116,
-							"text": "Aquí van las consultas que puede realizar un Jurado de Trabajos y las notificaciones que le llegan del sistema"
-						},
-						{
 							"_type": "UMLActorView",
 							"_id": "AAAAAAFjnOgdBJd9Z8U=",
 							"_parent": {
@@ -29728,22 +29715,6 @@
 							"templateParameterCompartment": {
 								"$ref": "AAAAAAFjnOgdB5eG6So="
 							}
-						},
-						{
-							"_type": "UMLNoteLinkView",
-							"_id": "AAAAAAFjnOg7b5elVOw=",
-							"_parent": {
-								"$ref": "AAAAAAFjnN+ujJRPFEw="
-							},
-							"font": "Arial;13;0",
-							"head": {
-								"$ref": "AAAAAAFjnOU5kpVT9Bk="
-							},
-							"tail": {
-								"$ref": "AAAAAAFjnOgdBJd9Z8U="
-							},
-							"lineStyle": 1,
-							"points": "175:447;183:316"
 						},
 						{
 							"_type": "UMLUseCaseView",
@@ -31596,19 +31567,6 @@
 					"name": "DCU Adicional Autor",
 					"ownedViews": [
 						{
-							"_type": "UMLNoteView",
-							"_id": "AAAAAAFjnOQwBpVPurQ=",
-							"_parent": {
-								"$ref": "AAAAAAFjnN/3cpS/V2c="
-							},
-							"font": "Arial;13;0",
-							"left": 128,
-							"top": 192,
-							"width": 112,
-							"height": 103,
-							"text": "Van las consultas que puede realizar un Autor de Trabajos y las notificaciones que le llegan"
-						},
-						{
 							"_type": "UMLActorView",
 							"_id": "AAAAAAFjnOfmLZdQmpE=",
 							"_parent": {
@@ -31773,22 +31731,6 @@
 							"templateParameterCompartment": {
 								"$ref": "AAAAAAFjnOfmMpdZEr4="
 							}
-						},
-						{
-							"_type": "UMLNoteLinkView",
-							"_id": "AAAAAAFjnOgJd5d4QPQ=",
-							"_parent": {
-								"$ref": "AAAAAAFjnN/3cpS/V2c="
-							},
-							"font": "Arial;13;0",
-							"head": {
-								"$ref": "AAAAAAFjnOQwBpVPurQ="
-							},
-							"tail": {
-								"$ref": "AAAAAAFjnOfmLZdQmpE="
-							},
-							"lineStyle": 1,
-							"points": "185:391;184:295"
 						},
 						{
 							"_type": "UMLUseCaseView",
@@ -33649,19 +33591,6 @@
 					"name": "DCU Adicional Organizador",
 					"ownedViews": [
 						{
-							"_type": "UMLNoteView",
-							"_id": "AAAAAAFjnOJvPJVLgxE=",
-							"_parent": {
-								"$ref": "AAAAAAFjnOIyFpUFwc4="
-							},
-							"font": "Arial;13;0",
-							"left": 56,
-							"top": 168,
-							"width": 98.76806640625,
-							"height": 155,
-							"text": "Van las consultas que puede realizar el organizador y las notificaciones que le llegan del sistema"
-						},
-						{
 							"_type": "UMLActorView",
 							"_id": "AAAAAAFjnOd4m5ceWms=",
 							"_parent": {
@@ -33840,22 +33769,6 @@
 							"templateParameterCompartment": {
 								"$ref": "AAAAAAFjnOd4nZcnSi4="
 							}
-						},
-						{
-							"_type": "UMLNoteLinkView",
-							"_id": "AAAAAAFjnOenFZdHMU0=",
-							"_parent": {
-								"$ref": "AAAAAAFjnOIyFpUFwc4="
-							},
-							"font": "Arial;13;0",
-							"head": {
-								"$ref": "AAAAAAFjnOJvPJVLgxE="
-							},
-							"tail": {
-								"$ref": "AAAAAAFjnOd4m5ceWms="
-							},
-							"lineStyle": 1,
-							"points": "119:415;111:323"
 						},
 						{
 							"_type": "UMLUseCaseView",
@@ -37564,19 +37477,6 @@
 					"name": "DCU Adicional Público",
 					"ownedViews": [
 						{
-							"_type": "UMLNoteView",
-							"_id": "AAAAAAFjnObKp5btwcY=",
-							"_parent": {
-								"$ref": "AAAAAAFjnOaTDJZ9+eg="
-							},
-							"font": "Arial;13;0",
-							"left": 48,
-							"top": 168,
-							"width": 129,
-							"height": 116,
-							"text": "Aquí van las consultas públicas EN EL SISTEMA, NO EN LA PÁGINA"
-						},
-						{
 							"_type": "UMLActorView",
 							"_id": "AAAAAAFjnOcAgZbzrRQ=",
 							"_parent": {
@@ -37755,22 +37655,6 @@
 							"templateParameterCompartment": {
 								"$ref": "AAAAAAFjnOcAhpb8yJM="
 							}
-						},
-						{
-							"_type": "UMLNoteLinkView",
-							"_id": "AAAAAAFjnOfJ9JdL8uM=",
-							"_parent": {
-								"$ref": "AAAAAAFjnOaTDJZ9+eg="
-							},
-							"font": "Arial;13;0",
-							"head": {
-								"$ref": "AAAAAAFjnObKp5btwcY="
-							},
-							"tail": {
-								"$ref": "AAAAAAFjnOcAgZbzrRQ="
-							},
-							"lineStyle": 1,
-							"points": "140:375;123:284"
 						},
 						{
 							"_type": "UMLUseCaseView",
