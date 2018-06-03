@@ -2479,7 +2479,7 @@
 										"$ref": "AAAAAAFjsxQmCxD485k="
 									},
 									"edgePosition": 2,
-									"text": "0..1"
+									"text": "1"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -10524,7 +10524,7 @@
 								"reference": {
 									"$ref": "AAAAAAFjnGiebkQ7sKE="
 								},
-								"multiplicity": "0..1"
+								"multiplicity": "1"
 							},
 							"end2": {
 								"_type": "UMLAssociationEnd",
@@ -10608,7 +10608,8 @@
 								"$ref": "AAAAAAFjnGiebkQ7sKE="
 							},
 							"name": "CallForPaper",
-							"visibility": "private"
+							"visibility": "private",
+							"type": ""
 						}
 					]
 				},
@@ -10714,7 +10715,8 @@
 								"$ref": "AAAAAAFjnIcZDkTmznA="
 							},
 							"name": "AñoDePublicación",
-							"visibility": "private"
+							"visibility": "private",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -10743,7 +10745,8 @@
 								"$ref": "AAAAAAFjnIcZDkTmznA="
 							},
 							"name": "AreaTemática",
-							"visibility": "private"
+							"visibility": "private",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -10752,7 +10755,8 @@
 								"$ref": "AAAAAAFjnIcZDkTmznA="
 							},
 							"name": "PalabrasClave",
-							"visibility": "private"
+							"visibility": "private",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
