@@ -16,6 +16,19 @@
     
 )
 
+(defun longitud (L)
+    (setq Cant 0)
+    (cond
+        ((eq L NIL)
+            (return-from Cant)
+        )
+        (T
+            (setq Cant (1+ Cant))
+            (longitud (cdr L))
+        )
+    )
+)
+(longitud '(a b c d))
 
 (defun partes (L)
     
