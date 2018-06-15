@@ -15,22 +15,38 @@
 (rango 1 3)
 
 (defun ordenarl (L)
-    
-)
-
-(defun longitud (L)
-    (setq Cant 0)
+    (setq Menor (car L))
     (cond
-        ((eq L NIL)
-            (return-from Cant)
+        (
+            (null L) 
+                ()
         )
         (T
-            (setq Cant (1+ Cant))
-            (longitud (cdr L))
+            (loop for X in L do 
+                (cond
+                    (
+                        (> (list-length Menor) (list-length X))
+                            (setq Menor X)
+                    )
+                    (
+                        (< (list-length Menor) (list-length X))
+                            ()
+                    )
+                    (
+                        (= (list-length Menor) (list-length X))
+                            ()
+                    )
+                    (T
+                        ()
+                    )
+                )
+            )
+            (write Menor)
+            (ordenarl (remove Menor L))
         )
     )
 )
-(longitud '(a b c d))
+(ordenarl '((a b c) (d e) (f g h) (i j k l) (m)))
 
 ;recordar que NIL = [] en este caso
 (defun partes (L)
