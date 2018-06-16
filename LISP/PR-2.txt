@@ -70,17 +70,48 @@
 ;EJERCICIO 3
 ;---------------------------------------------------------------------------
 
+(defun partes (S)
+    (cond
+        (
+            (null S) ;Si S esta vacia
+                '(()) ;No hay nada que poner, retorno una lista vacia.
+        )
+        (
+            T ;Caso contrario
+                (combinar (car S) (partes (cdr S)))
+        )
+    )
+)
+
+(defun combinar (X S)
+    (cond
+        (
+            (null S) ;Si S esta vacia
+                () ;No agrego nada a ninguna lista.
+        )
+        (
+            T ;Caso contrario
+                (cons (car S) (cons (cons X (car S)) (combinar X (cdr S))))
+        )
+    )
+)
+(write (partes '(1 2 3)))
+
+
+;--------
+;Resolucion alternativa en caso de que la otra no sea valida
+
 ;recordar que NIL = [] en este caso ------> car o cdr con nil retorna []
-(defun partes (L)
+(defun partes (S)
     (cond 
         (
-            (null L) 
+            (null S) 
                 (car nil)
         )
         (
 			T
-				(setq PX (partes (cdr L)))
-				(setq Comb (combinar (car L) PX))
+				(setq PX (partes (cdr S)))
+				(setq Comb (combinar (car S) PX))
 				(append Comb PX)
         )
     )
@@ -90,21 +121,25 @@
 ;Otro drama, parece que APPEND no une elementos atómicos y listas, habria que ver esto, se me ocurre crear listas de un elemento para 
 ;saltar esta limitación, pero hay que probarlo
 ;dudo si hacer cosas como '((X)) es correcto para decir "La lista que contiene a X como elemento"
-(defun combinar (X L)
+(defun combinar (X S)
     (cond
-        ;Tengo duda de esto, estás preguntando si x es un atomo pero despues
-        ;no hacés nada. Lo de null L forma parte de otra condicion distinta.
-        ;Lo dejo así como está porque no se cual de las 2 condiciones seria.
-        (atom X)
         (
-            (null L) 
-                (list NIL)
+            (atom X) 
+                (cond
+                    (
+                        (null S) 
+                            (list NIL)
+                    )
+                    (
+                		T
+                			(setq Rta (append '(car S) '(combinar (X (cdr S)))))
+                			(append '(X) Rta)
+                    )
+                )
         )
         (
-			T
-				(setq Rta (append '(car L) '(combinar (X (cdr L)))))
-				;No creo que sea necesario poner parentesis dobles
-				(append '(X) Rta)
+            T
+                ()
         )
     )
 )
