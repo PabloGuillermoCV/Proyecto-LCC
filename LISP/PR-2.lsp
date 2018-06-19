@@ -5,22 +5,31 @@
 (defun rango (M N)
     (cond
         (
-			(< M N) ;Si M es menor a N
-				(write M)
-				(write-char #\Space)
-				(rango (+ M 1) N)
+            (and (integerp M) (integerp N)) ;Si M y N son enteros
+                (cond
+                    (
+            			(< M N) ;Si M es menor a N
+            				(write M)
+            				(write-char #\Space)
+            				(rango (+ M 1) N)
+                    )
+                    (
+            			(= M N) ;Si M y N son iguales
+            				(write N)
+                    )
+                    (
+                        (> M N) ;Si M es mayor a N
+                            (write "ERROR: El primer elemento debe ser menor o igual al segundo.")
+                    )
+                    (
+                        T
+                            ()
+                    )
+                )
         )
         (
-			(= M N) ;Si M y N son iguales
-				(write N)
-        )
-        (
-            (> M N) ;Si M es mayor a N
-                (write "ERROR: El primer elemento debe ser menor o igual al segundo.")
-        )
-        (
-            T
-                ()
+			T ;Si M y/o N no son enteros
+				(write "ERROR: Los valores ingresados no son ambos numeros enteros.")
         )
     )
 )
@@ -31,36 +40,45 @@
 ;---------------------------------------------------------------------------
 
 (defun ordenarl (L)
-    (setq Menor (car L))
     (cond
         (
-            (null L) ;Si L esta vacia
-                ()
+            (listp L)
+                (setq Menor (car L))
+                (cond
+                    (
+                        (null L) ;Si L esta vacia
+                            ()
+                    )
+                    (
+            			T ;Caso contrario
+            				(loop for X in L do ;Para cada elemento (lista) X de la lista L
+            					(cond
+            						(
+            							(> (list-length Menor) (list-length X))
+            								(setq Menor X)
+            						)
+            						(
+            							(< (list-length Menor) (list-length X))
+            								()
+            						)
+            						(
+            							(= (list-length Menor) (list-length X))
+            								()
+            						)
+            						(
+            							T
+            								()
+            						)
+            					)
+            				)
+            				(write Menor)
+            				(ordenarl (remove Menor L))
+                    )
+                )
         )
         (
-			T ;Caso contrario
-				(loop for X in L do ;Para cada elemento (lista) X de la lista L
-					(cond
-						(
-							(> (list-length Menor) (list-length X))
-								(setq Menor X)
-						)
-						(
-							(< (list-length Menor) (list-length X))
-								()
-						)
-						(
-							(= (list-length Menor) (list-length X))
-								()
-						)
-						(
-							T
-								()
-						)
-					)
-				)
-				(write Menor)
-				(ordenarl (remove Menor L))
+			T
+				(write "ERROR: El valor ingresado no es una lista")
         )
     )
 )
@@ -73,12 +91,21 @@
 (defun partes (S)
     (cond
         (
-            (null S) ;Si S esta vacia
-                '(()) ;No hay nada que poner, retorno una lista vacia.
+            (listp S)
+                (cond
+                    (
+                        (null S) ;Si S esta vacia
+                            '(()) ;No hay nada que poner, retorno una lista vacia.
+                    )
+                    (
+                        T ;Caso contrario
+                            (combinar (car S) (partes (cdr S)))
+                    )
+                )
         )
         (
-            T ;Caso contrario
-                (combinar (car S) (partes (cdr S)))
+            T
+                (write "ERROR: El valor ingresado no es una lista")
         )
     )
 )
