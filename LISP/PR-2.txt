@@ -128,46 +128,57 @@
 ;--------
 ;Resolucion alternativa en caso de que la otra no sea valida
 
-;recordar que NIL = [] en este caso ------> car o cdr con nil retorna []
-(defun partes (S)
-    (cond 
-        (
-            (null S) 
-                (car nil)
-        )
-        (
-			T
-				(setq PX (partes (cdr S)))
-				(setq Comb (combinar (car S) PX))
-				(append Comb PX)
-        )
-    )
-)
-
-;hay que verificar que X sea un átomo y no otra cosa, ATOM verifica esto
-;Otro drama, parece que APPEND no une elementos atómicos y listas, habria que ver esto, se me ocurre crear listas de un elemento para 
-;saltar esta limitación, pero hay que probarlo
-;dudo si hacer cosas como '((X)) es correcto para decir "La lista que contiene a X como elemento"
-(defun combinar (X S)
+(defun partes (S) ;Variante 1
     (cond
         (
-            (atom X) 
+            (listp S)
                 (cond
                     (
-                        (null S) 
-                            (list NIL)
+                        (null S) ;Si S esta vacia
+                            () ;No hay nada que poner, retorno una lista vacia.
                     )
                     (
-                		T
-                			(setq Rta (append '(car S) '(combinar (X (cdr S)))))
-                			(append '(X) Rta)
+                        T ;Caso contrario
+                            (print S)
+                            (setq Primer (car S))
+                            (setq Saux (cdr S))
+                            (loop for X in Saux do ;Para cada elemento X de la lista S
+            					(print (cons Primer (partes (remove Primer S))))
+            				)
                     )
                 )
         )
         (
             T
-                ()
+                (write "ERROR: El valor ingresado no es una lista")
         )
     )
 )
-(partes '(a b))
+(partes '(1 2 3))
+
+(defun partes (S) ;Variante 2
+    (cond
+        (
+            (listp S)
+                (cond
+                    (
+                        (null S) ;Si S esta vacia
+                            () ;No hay nada que poner, retorno una lista vacia.
+                    )
+                    (
+                        T ;Caso contrario
+                            (print S)
+                            (loop for X in S do ;Para cada elemento X de la lista S
+                                (print (remove X S))
+                                ;(partes (remove X S))
+                            )
+                    )
+                )
+        )
+        (
+            T
+                (write "ERROR: El valor ingresado no es una lista")
+        )
+    )
+)
+(partes '(1 2 3))
