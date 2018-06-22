@@ -48,8 +48,9 @@
                     )
                     (
                         T ;Caso contrario
-                            (let ((Menor (sacarMenor L)))
-                                (cons Menor (ordenarL (remove Menor L)))
+                            (
+                                let ((Menor (sacarMenor L)))
+                                    (cons Menor (ordenarL (remove Menor L)))
                             )
                     )
                 )
@@ -61,29 +62,30 @@
     )
 )
 
-(defun sacarMenor (L)
+(defun sacarMenor (L) ;Obtiene la menor sublista de L
     (cond
         (
-            (= (list-length L) 0)
+            (= (list-length L) 0) ;Si L esta vacia
                 ()
         )
         (
-            (= (list-length L) 1)
+            (= (list-length L) 1) ;Si L tiene 1 solo elemento
                 (car L)
         )
         (
-            T
-                (let ((MenorSubLista (sacarMenor (cdr L))))
-                    (cond
-                        (
-                            (> (list-length (car L)) (list-length MenorSubLista))
-                                MenorSubLista
+            T ;Si L tiene mas de 1 elemento
+                (
+                    let ((MenorSubLista (sacarMenor (cdr L))))
+                        (cond
+                            (
+                                (> (list-length (car L)) (list-length MenorSubLista))
+                                    MenorSubLista
+                            )
+                            (
+                                T
+                                    (car L)
+                            )
                         )
-                        (
-                            T
-                                (car L)
-                        )
-                    )
                 )
         )
     )
@@ -124,10 +126,9 @@
         )
         (
             T ;Caso contrario
+                ;Combinar es la lista S con y sin X, y el combinar del resto de S
                 (cons (car S) (cons (cons X (car S)) (combinar X (cdr S))))
         )
     )
 )
-(trace partes combinar)
-(setq *trace-indent* t)
-(partes '(1 2 3))
+(write (partes '(1 2 3)))
