@@ -8,14 +8,12 @@
             (and (integerp M) (integerp N)) ;Si M y N son enteros
                 (cond
                     (
-            			(< M N) ;Si M es menor a N
-            				(write M)
-            				(write-char #\Space)
-            				(rango (+ M 1) N)
+                        (< M N) ;Si M es menor a N
+                            (cons M (rango (+ M 1) N))
                     )
                     (
-            			(= M N) ;Si M y N son iguales
-            				(write N)
+                        (= M N) ;Si M y N son iguales
+                            (cons N nil)
                     )
                     (
                         (> M N) ;Si M es mayor a N
@@ -28,12 +26,12 @@
                 )
         )
         (
-			T ;Si M y/o N no son enteros
-				(write "ERROR: Los valores ingresados no son ambos numeros enteros.")
+            T ;Si M y/o N no son enteros
+                (write "ERROR: Los valores ingresados no son ambos numeros enteros.")
         )
     )
 )
-(rango 2 6)
+(write (rango 2 6))
 
 ;---------------------------------------------------------------------------
 ;EJERCICIO 2
@@ -43,46 +41,54 @@
     (cond
         (
             (listp L)
-                (setq Menor (car L))
                 (cond
                     (
                         (null L) ;Si L esta vacia
                             ()
                     )
                     (
-            			T ;Caso contrario
-            				(loop for X in L do ;Para cada elemento (lista) X de la lista L
-            					(cond
-            						(
-            							(> (list-length Menor) (list-length X))
-            								(setq Menor X)
-            						)
-            						(
-            							(< (list-length Menor) (list-length X))
-            								()
-            						)
-            						(
-            							(= (list-length Menor) (list-length X))
-            								()
-            						)
-            						(
-            							T
-            								()
-            						)
-            					)
-            				)
-            				(write Menor)
-            				(ordenarl (remove Menor L))
+                        T ;Caso contrario
+                            (let ((Menor (sacarMenor L)))
+                                (cons Menor (ordenarL (remove Menor L)))
+                            )
                     )
                 )
         )
         (
-			T
-				(write "ERROR: El valor ingresado no es una lista")
+            T
+                (write "ERROR: El valor ingresado no es una lista")
         )
     )
 )
-(ordenarl '((a b c) (d e) (f g h) (i j k l) (m)))
+
+(defun sacarMenor (L)
+    (cond
+        (
+            (= (list-length L) 0)
+                ()
+        )
+        (
+            (= (list-length L) 1)
+                (car L)
+        )
+        (
+            T
+                (let ((MenorSubLista (sacarMenor (cdr L))))
+                    (cond
+                        (
+                            (> (list-length (car L)) (list-length MenorSubLista))
+                                MenorSubLista
+                        )
+                        (
+                            T
+                                (car L)
+                        )
+                    )
+                )
+        )
+    )
+)
+(write (ordenarl '((a b c) (d e) (f g h) (i j k l) (m))))
 
 ;---------------------------------------------------------------------------
 ;EJERCICIO 3
@@ -122,52 +128,6 @@
         )
     )
 )
-(write (partes '(1 2 3)))
-
-
-;--------
-;Resolucion alternativa en caso de que la otra no sea valida
-
-;recordar que NIL = [] en este caso ------> car o cdr con nil retorna []
-(defun partes (S)
-    (cond 
-        (
-            (null S) 
-                (car nil)
-        )
-        (
-			T
-				(setq PX (partes (cdr S)))
-				(setq Comb (combinar (car S) PX))
-				(append Comb PX)
-        )
-    )
-)
-
-;hay que verificar que X sea un átomo y no otra cosa, ATOM verifica esto
-;Otro drama, parece que APPEND no une elementos atómicos y listas, habria que ver esto, se me ocurre crear listas de un elemento para 
-;saltar esta limitación, pero hay que probarlo
-;dudo si hacer cosas como '((X)) es correcto para decir "La lista que contiene a X como elemento"
-(defun combinar (X S)
-    (cond
-        (
-            (atom X) 
-                (cond
-                    (
-                        (null S) 
-                            (list NIL)
-                    )
-                    (
-                		T
-                			(setq Rta (append '(car S) '(combinar (X (cdr S)))))
-                			(append '(X) Rta)
-                    )
-                )
-        )
-        (
-            T
-                ()
-        )
-    )
-)
-(partes '(a b))
+(trace partes combinar)
+(setq *trace-indent* t)
+(partes '(1 2 3))
