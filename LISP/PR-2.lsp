@@ -17,7 +17,7 @@
                     )
                     (
                         (> M N) ;Si M es mayor a N
-                            (write "ERROR: El primer elemento debe ser menor o igual al segundo.")
+                            "ERROR: El primer elemento debe ser menor o igual al segundo."
                     )
                     (
                         T
@@ -27,7 +27,7 @@
         )
         (
             T ;Si M y/o N no son enteros
-                (write "ERROR: Los valores ingresados no son ambos numeros enteros.")
+                "ERROR: Los valores ingresados no son ambos numeros enteros."
         )
     )
 )
@@ -57,7 +57,7 @@
         )
         (
             T
-                (write "ERROR: El valor ingresado no es una lista")
+                "ERROR: El valor ingresado no es una lista"
         )
     )
 )
@@ -113,7 +113,7 @@
         )
         (
             T
-                (write "ERROR: El valor ingresado no es una lista")
+                "ERROR: El valor ingresado no es una lista"
         )
     )
 )
