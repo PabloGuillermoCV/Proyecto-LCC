@@ -14044,19 +14044,19 @@
 												"$ref": "AAAAAAFi/K9gIuSxNYg="
 											},
 											"font": "Arial;13;0",
-											"left": 178,
-											"top": 634,
-											"width": 54.18994140625,
+											"left": 98,
+											"top": 522,
+											"width": 94.18994140625,
 											"height": 13,
 											"text": "Autor",
 											"wordWrap": true
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 168,
-									"top": 624,
-									"width": 74.18994140625,
-									"height": 33,
+									"left": 88,
+									"top": 512,
+									"width": 114.18994140625,
+									"height": 73,
 									"nameLabel": {
 										"$ref": "AAAAAAFi/K9gIuSyLqg="
 									}
@@ -14150,16 +14150,16 @@
 											},
 											"font": "Arial;13;0",
 											"left": 296,
-											"top": 512,
+											"top": 492,
 											"width": 231.96240234375,
 											"height": 13,
-											"alpha": 1.9568968665270061,
-											"distance": 132.7742444904131,
+											"alpha": 1.651918399829379,
+											"distance": 123.40583454602137,
 											"hostEdge": {
 												"$ref": "AAAAAAFi/LLqtuTZMfo="
 											},
 											"edgePosition": 1,
-											"text": "Mail Automático de Resultado del Paper"
+											"text": "Notificación de Trabajo Evaluado"
 										}
 									],
 									"font": "Arial;13;0",
@@ -14170,102 +14170,9 @@
 										"$ref": "AAAAAAFjCV2FWu1z5PI="
 									},
 									"lineStyle": 2,
-									"points": "536:505;288:505;288:632;241:632",
+									"points": "536:505;288:505;288:512;201:512",
 									"nameLabel": {
 										"$ref": "AAAAAAFi/LLqtuTabVU="
-									}
-								},
-								{
-									"_type": "FCFlowView",
-									"_id": "AAAAAAFi/LOzv+Uodjw=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFi/LOzv+UmtHM="
-									},
-									"subViews": [
-										{
-											"_type": "EdgeLabelView",
-											"_id": "AAAAAAFi/LOzv+Upln4=",
-											"_parent": {
-												"$ref": "AAAAAAFi/LOzv+Uodjw="
-											},
-											"model": {
-												"$ref": "AAAAAAFi/LOzv+UmtHM="
-											},
-											"font": "Arial;13;0",
-											"left": 655,
-											"top": 519,
-											"width": 86.7216796875,
-											"height": 13,
-											"alpha": -3.114717404060826,
-											"distance": 186.06719216455113,
-											"hostEdge": {
-												"$ref": "AAAAAAFi/LOzv+Uodjw="
-											},
-											"edgePosition": 1,
-											"text": "Listado Papers"
-										}
-									],
-									"font": "Arial;13;0",
-									"showShadow": false,
-									"head": {
-										"$ref": "AAAAAAFi/LGqMOTGxQg="
-									},
-									"tail": {
-										"$ref": "AAAAAAFjCV2FWu1z5PI="
-									},
-									"lineStyle": 2,
-									"points": "625:520;1144:520",
-									"nameLabel": {
-										"$ref": "AAAAAAFi/LOzv+Upln4="
-									}
-								},
-								{
-									"_type": "FCFlowView",
-									"_id": "AAAAAAFi/L0Ak+VvTow=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFi/L0Ak+VtlEE="
-									},
-									"subViews": [
-										{
-											"_type": "EdgeLabelView",
-											"_id": "AAAAAAFi/L0Ak+VwrRA=",
-											"_parent": {
-												"$ref": "AAAAAAFi/L0Ak+VvTow="
-											},
-											"model": {
-												"$ref": "AAAAAAFi/L0Ak+VtlEE="
-											},
-											"font": "Arial;13;0",
-											"left": 607,
-											"top": 391,
-											"width": 178.5087890625,
-											"height": 13,
-											"alpha": -3.1882876598119627,
-											"distance": 214.23351745233518,
-											"hostEdge": {
-												"$ref": "AAAAAAFi/L0Ak+VvTow="
-											},
-											"edgePosition": 1,
-											"text": "Lista de asistentes y abonados"
-										}
-									],
-									"font": "Arial;13;0",
-									"head": {
-										"$ref": "AAAAAAFi/LGqMOTGxQg="
-									},
-									"tail": {
-										"$ref": "AAAAAAFjCV2FWu1z5PI="
-									},
-									"lineStyle": 2,
-									"points": "608:472;608:408;1212:408;1212:448",
-									"nameLabel": {
-										"$ref": "AAAAAAFi/L0Ak+VwrRA="
 									}
 								},
 								{
@@ -14289,7 +14196,7 @@
 											"top": 314,
 											"width": 101,
 											"height": 13,
-											"text": "Jurado",
+											"text": "Experto",
 											"wordWrap": true
 										}
 									],
@@ -14368,7 +14275,7 @@
 												"$ref": "AAAAAAFjAvwEAGk8NpA="
 											},
 											"font": "Arial;13;0",
-											"left": 192,
+											"left": 115,
 											"top": 467,
 											"width": 99.708984375,
 											"height": 13,
@@ -14389,7 +14296,7 @@
 										"$ref": "AAAAAAFi/K9gIuSxNYg="
 									},
 									"lineStyle": 2,
-									"points": "241:624;241:488;536:488",
+									"points": "164:512;164:488;536:488",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAvwEAWk/3nI="
 									}
@@ -14435,7 +14342,7 @@
 										"$ref": "AAAAAAFjCV2FWu1z5PI="
 									},
 									"lineStyle": 2,
-									"points": "592:538;592:800;776:800",
+									"points": "592:600;592:800;776:800",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAvxOuGlLxsg="
 									}
@@ -14460,12 +14367,12 @@
 												"$ref": "AAAAAAFjAvy2k2lWN5w="
 											},
 											"font": "Arial;13;0",
-											"left": 999,
-											"top": 439,
+											"left": 759,
+											"top": 527,
 											"width": 122,
 											"height": 13,
-											"alpha": 3.063971149147405,
-											"distance": 180.54362353736008,
+											"alpha": -0.09232934323210973,
+											"distance": 108.46197490364999,
 											"hostEdge": {
 												"$ref": "AAAAAAFjAvy2k2lYBGQ="
 											},
@@ -14481,7 +14388,7 @@
 										"$ref": "AAAAAAFi/LGqMOTGxQg="
 									},
 									"lineStyle": 2,
-									"points": "1144:448;1144:432;616:432;616:472",
+									"points": "1144:544;712:544",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAvy2k2lZfhU="
 									}
@@ -14552,12 +14459,12 @@
 												"$ref": "AAAAAAFjAwMA/2mRFA8="
 											},
 											"font": "Arial;13;0",
-											"left": 974,
-											"top": 545,
+											"left": 751,
+											"top": 487,
 											"width": 106.9453125,
 											"height": 13,
-											"alpha": 3.0440015672177076,
-											"distance": 143.68368035375485,
+											"alpha": -0.1441543985781233,
+											"distance": 125.29964086141668,
 											"hostEdge": {
 												"$ref": "AAAAAAFjAwMA/2mTcqM="
 											},
@@ -14573,101 +14480,9 @@
 										"$ref": "AAAAAAFi/LGqMOTGxQg="
 									},
 									"lineStyle": 2,
-									"points": "1144:538;625:538",
+									"points": "1144:512;712:512",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAwMA/2mU5Hw="
-									}
-								},
-								{
-									"_type": "FCFlowView",
-									"_id": "AAAAAAFjAwhZLGnb7Z8=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFjAwhZK2nZLhI="
-									},
-									"subViews": [
-										{
-											"_type": "EdgeLabelView",
-											"_id": "AAAAAAFjAwhZLGncTy0=",
-											"_parent": {
-												"$ref": "AAAAAAFjAwhZLGnb7Z8="
-											},
-											"model": {
-												"$ref": "AAAAAAFjAwhZK2nZLhI="
-											},
-											"font": "Arial;13;0",
-											"left": 336,
-											"top": 656,
-											"width": 145.9833984375,
-											"height": 13,
-											"alpha": 0.0468407165700504,
-											"distance": 128.14054783713078,
-											"hostEdge": {
-												"$ref": "AAAAAAFjAwhZLGnb7Z8="
-											},
-											"edgePosition": 1,
-											"text": "Estado Evaluación Paper"
-										}
-									],
-									"font": "Arial;13;0",
-									"head": {
-										"$ref": "AAAAAAFi/K9gIuSxNYg="
-									},
-									"tail": {
-										"$ref": "AAAAAAFjCV2FWu1z5PI="
-									},
-									"lineStyle": 2,
-									"points": "536:538;536:656;241:656",
-									"nameLabel": {
-										"$ref": "AAAAAAFjAwhZLGncTy0="
-									}
-								},
-								{
-									"_type": "FCFlowView",
-									"_id": "AAAAAAFjAw5xuGoJyl8=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFjAw5xt2oHHx4="
-									},
-									"subViews": [
-										{
-											"_type": "EdgeLabelView",
-											"_id": "AAAAAAFjAw5xuGoKG1U=",
-											"_parent": {
-												"$ref": "AAAAAAFjAw5xuGoJyl8="
-											},
-											"model": {
-												"$ref": "AAAAAAFjAw5xt2oHHx4="
-											},
-											"font": "Arial;13;0",
-											"left": 952,
-											"top": 480,
-											"width": 169.1015625,
-											"height": 13,
-											"alpha": 3.2072874508326565,
-											"distance": 152.3285921946369,
-											"hostEdge": {
-												"$ref": "AAAAAAFjAw5xuGoJyl8="
-											},
-											"edgePosition": 1,
-											"text": "Asignación Jurados a Papers"
-										}
-									],
-									"font": "Arial;13;0",
-									"head": {
-										"$ref": "AAAAAAFjCV2FWu1z5PI="
-									},
-									"tail": {
-										"$ref": "AAAAAAFi/LGqMOTGxQg="
-									},
-									"lineStyle": 2,
-									"points": "1144:496;625:496",
-									"nameLabel": {
-										"$ref": "AAAAAAFjAw5xuGoKG1U="
 									}
 								},
 								{
@@ -14690,17 +14505,17 @@
 												"$ref": "AAAAAAFjAxDIBWomv4U="
 											},
 											"font": "Arial;13;0",
-											"left": 991,
-											"top": 583,
-											"width": 208.83154296875,
+											"left": 752,
+											"top": 592,
+											"width": 217.7373046875,
 											"height": 13,
-											"alpha": 3.1077073255986356,
-											"distance": 177.1016657177453,
+											"alpha": 0.03975177652397033,
+											"distance": 352.27829907617075,
 											"hostEdge": {
 												"$ref": "AAAAAAFjAxDIBWooQLQ="
 											},
 											"edgePosition": 1,
-											"text": "Métricas de Evaluación para Papers"
+											"text": "Métricas de Evaluación para Trabajos"
 										}
 									],
 									"font": "Arial;13;0",
@@ -14711,7 +14526,7 @@
 										"$ref": "AAAAAAFi/LGqMOTGxQg="
 									},
 									"lineStyle": 2,
-									"points": "1212:544;1212:584;624:584;624:538",
+									"points": "1212:544;1212:584;712:584",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAxDIBWopnfI="
 									}
@@ -14791,7 +14606,7 @@
 										"$ref": "AAAAAAFjCVfv5e1YXPk="
 									},
 									"lineStyle": 2,
-									"points": "279:775;580:775;580:538",
+									"points": "279:775;580:775;580:600",
 									"nameLabel": {
 										"$ref": "AAAAAAFjCVicdO1iz9I="
 									}
@@ -14815,8 +14630,8 @@
 											"font": "Arial;13;0",
 											"left": 546,
 											"top": 482,
-											"width": 70.078125,
-											"height": 39,
+											"width": 157,
+											"height": 26,
 											"text": "Sistema de Gestión de Congresos",
 											"wordWrap": true
 										}
@@ -14824,10 +14639,445 @@
 									"font": "Arial;13;0",
 									"left": 536,
 									"top": 472,
-									"width": 90.078125,
-									"height": 67,
+									"width": 177,
+									"height": 129,
 									"nameLabel": {
 										"$ref": "AAAAAAFjCV2FW+1097A="
+									}
+								},
+								{
+									"_type": "FCProcessView",
+									"_id": "AAAAAAFkMz+5E5Ft6XI=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkMz+5E5FrJDI="
+									},
+									"subViews": [
+										{
+											"_type": "LabelView",
+											"_id": "AAAAAAFkMz+5E5FurzI=",
+											"_parent": {
+												"$ref": "AAAAAAFkMz+5E5Ft6XI="
+											},
+											"font": "Arial;13;0",
+											"left": 578,
+											"top": 130,
+											"width": 84,
+											"height": 13,
+											"text": "Público",
+											"wordWrap": true
+										}
+									],
+									"font": "Arial;13;0",
+									"left": 568,
+									"top": 120,
+									"width": 104,
+									"height": 40,
+									"nameLabel": {
+										"$ref": "AAAAAAFkMz+5E5FurzI="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0ClaJF5x5Y=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0ClZ5F3CpE="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0ClaJF6xMo=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0ClaJF5x5Y="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0ClZ5F3CpE="
+											},
+											"font": "Arial;13;0",
+											"left": 622,
+											"top": 183,
+											"width": 170.5361328125,
+											"height": 13,
+											"alpha": -0.6187343246121119,
+											"distance": 153.44705927452634,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0ClaJF5x5Y="
+											},
+											"edgePosition": 1,
+											"text": "Consultas Públicas Congreso"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFkMz+5E5Ft6XI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"lineStyle": 2,
+									"points": "619:472;619:159",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0ClaJF6xMo="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0FD15GG3KA=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0FD15GEqb8="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0FD15GH/NU=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0FD15GG3KA="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0FD15GEqb8="
+											},
+											"font": "Arial;13;0",
+											"left": 200,
+											"top": 593,
+											"width": 191.4580078125,
+											"height": 13,
+											"alpha": 0.20265869615504162,
+											"distance": 74.52516353554684,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0FD15GG3KA="
+											},
+											"edgePosition": 1,
+											"text": "Notificación Fecha límite próxima"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFi/K9gIuSxNYg="
+									},
+									"tail": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"lineStyle": 2,
+									"points": "536:584;201:584",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0FD15GH/NU="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0ImMZGYjnA=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0ImL5GWU3g="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0ImMZGZIHs=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0ImMZGYjnA="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0ImL5GWU3g="
+											},
+											"font": "Arial;13;0",
+											"left": 463,
+											"top": 520,
+											"width": 50.095703125,
+											"height": 13,
+											"alpha": 0.08314122499189007,
+											"distance": 120.41594578792295,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0ImMZGYjnA="
+											},
+											"edgePosition": 1,
+											"text": "Trabajos"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFi/K9gIuSxNYg="
+									},
+									"lineStyle": 2,
+									"points": "201:536;536:536",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0ImMZGZIHs="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0OTtJGkUDw=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0OTs5GitsI="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0OTtJGlktU=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0OTtJGkUDw="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0OTs5GitsI="
+											},
+											"font": "Arial;13;0",
+											"left": 408,
+											"top": 552,
+											"width": 119.462890625,
+											"height": 13,
+											"alpha": 0.10066864205784,
+											"distance": 99.50376877284599,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0OTtJGkUDw="
+											},
+											"edgePosition": 1,
+											"text": "Fe de Errata Trabajo"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFi/K9gIuSxNYg="
+									},
+									"lineStyle": 2,
+									"points": "201:568;536:568",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0OTtJGlktU="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0YeGZHDpj4=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0YeGZHBIVQ="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0YeGpHEMxQ=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0YeGZHDpj4="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0YeGZHBIVQ="
+											},
+											"font": "Arial;13;0",
+											"left": 308,
+											"top": 455,
+											"width": 106.2216796875,
+											"height": 13,
+											"alpha": -1.410033535057604,
+											"distance": 74.96665925596525,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0YeGZHDpj4="
+											},
+											"edgePosition": 1,
+											"text": "Consultas Experto"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjAvrExGkX5VA="
+									},
+									"tail": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"lineStyle": 2,
+									"points": "536:474;288:474;288:336",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0YeGpHEMxQ="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0Z4YZHPbhI=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0Z4YZHNmkA="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0Z4YZHQjGQ=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0Z4YZHPbhI="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0Z4YZHNmkA="
+											},
+											"font": "Arial;13;0",
+											"left": 1103,
+											"top": 619,
+											"width": 132.9580078125,
+											"height": 13,
+											"alpha": 0.0809040948010944,
+											"distance": 185.60711193270586,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0Z4YZHPbhI="
+											},
+											"edgePosition": 1,
+											"text": "Consultas Organizador"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFi/LGqMOTGxQg="
+									},
+									"tail": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"lineStyle": 2,
+									"points": "712:600;712:640;1256:640;1256:544",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0Z4YZHQjGQ="
+									}
+								},
+								{
+									"_type": "FCProcessView",
+									"_id": "AAAAAAFkM0d+F5HquqY=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0d+F5Ho5r0="
+									},
+									"subViews": [
+										{
+											"_type": "LabelView",
+											"_id": "AAAAAAFkM0d+GJHrYXY=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0d+F5HquqY="
+											},
+											"font": "Arial;13;0",
+											"left": 906,
+											"top": 250,
+											"width": 92,
+											"height": 26,
+											"text": "Repartidor de Trabajos",
+											"wordWrap": true
+										}
+									],
+									"font": "Arial;13;0",
+									"left": 896,
+									"top": 240,
+									"width": 112,
+									"height": 46,
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0d+GJHrYXY="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM0eq7ZHzvqE=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM0eq7ZHxka0="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM0eq7ZH0AoA=",
+											"_parent": {
+												"$ref": "AAAAAAFkM0eq7ZHzvqE="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM0eq7ZHxka0="
+											},
+											"font": "Arial;13;0",
+											"left": 704,
+											"top": 312,
+											"width": 117.3046875,
+											"height": 13,
+											"alpha": 0.2782997129134772,
+											"distance": 50.96076922496363,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM0eq7ZHzvqE="
+											},
+											"edgePosition": 1,
+											"text": "Asignación Trabajos"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFkM0d+F5HquqY="
+									},
+									"points": "951:285;951:304;672:304;672:472",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM0eq7ZH0AoA="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkM01joqIoWME=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkM01joaImgI0="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkM01joqIph1Q=",
+											"_parent": {
+												"$ref": "AAAAAAFkM01joqIoWME="
+											},
+											"model": {
+												"$ref": "AAAAAAFkM01joaImgI0="
+											},
+											"font": "Arial;13;0",
+											"left": 301,
+											"top": 681,
+											"width": 92.49169921875,
+											"height": 13,
+											"alpha": 1.5707963267948966,
+											"distance": 15,
+											"hostEdge": {
+												"$ref": "AAAAAAFkM01joqIoWME="
+											},
+											"edgePosition": 1,
+											"text": "Consultas Autor"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFi/K9gIuSxNYg="
+									},
+									"tail": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"lineStyle": 2,
+									"points": "536:600;536:672;160:672;160:584",
+									"nameLabel": {
+										"$ref": "AAAAAAFkM01joqIph1Q="
 									}
 								}
 							]
@@ -14846,40 +15096,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFi/K2dVuSi5t0="
 									},
-									"name": "Mail Automático de Resultado del Paper",
+									"name": "Notificación de Trabajo Evaluado",
 									"source": {
 										"$ref": "AAAAAAFjCV2FWe1xvJ4="
 									},
 									"target": {
 										"$ref": "AAAAAAFi/K9gIeSvEWg="
-									}
-								},
-								{
-									"_type": "FCFlow",
-									"_id": "AAAAAAFi/LOzv+UmtHM=",
-									"_parent": {
-										"$ref": "AAAAAAFi/K2dVuSi5t0="
-									},
-									"name": "Listado Papers",
-									"source": {
-										"$ref": "AAAAAAFjCV2FWe1xvJ4="
-									},
-									"target": {
-										"$ref": "AAAAAAFi/LGqL+TEsEc="
-									}
-								},
-								{
-									"_type": "FCFlow",
-									"_id": "AAAAAAFi/L0Ak+VtlEE=",
-									"_parent": {
-										"$ref": "AAAAAAFi/K2dVuSi5t0="
-									},
-									"name": "Lista de asistentes y abonados",
-									"source": {
-										"$ref": "AAAAAAFjCV2FWe1xvJ4="
-									},
-									"target": {
-										"$ref": "AAAAAAFi/LGqL+TEsEc="
 									}
 								},
 								{
@@ -14894,20 +15116,6 @@
 									},
 									"target": {
 										"$ref": "AAAAAAFi/LEz9eS5GDc="
-									}
-								},
-								{
-									"_type": "FCFlow",
-									"_id": "AAAAAAFjAwhZK2nZLhI=",
-									"_parent": {
-										"$ref": "AAAAAAFi/K2dVuSi5t0="
-									},
-									"name": "Estado Evaluación Paper",
-									"source": {
-										"$ref": "AAAAAAFjCV2FWe1xvJ4="
-									},
-									"target": {
-										"$ref": "AAAAAAFi/K9gIeSvEWg="
 									}
 								}
 							]
@@ -14927,6 +15135,34 @@
 										"$ref": "AAAAAAFi/K9gIeSvEWg="
 									},
 									"name": "Datos Inscripción",
+									"source": {
+										"$ref": "AAAAAAFi/K9gIeSvEWg="
+									},
+									"target": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0ImL5GWU3g=",
+									"_parent": {
+										"$ref": "AAAAAAFi/K9gIeSvEWg="
+									},
+									"name": "Trabajos",
+									"source": {
+										"$ref": "AAAAAAFi/K9gIeSvEWg="
+									},
+									"target": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0OTs5GitsI=",
+									"_parent": {
+										"$ref": "AAAAAAFi/K9gIeSvEWg="
+									},
+									"name": "Fe de Errata Trabajo",
 									"source": {
 										"$ref": "AAAAAAFi/K9gIeSvEWg="
 									},
@@ -14982,25 +15218,11 @@
 								},
 								{
 									"_type": "FCFlow",
-									"_id": "AAAAAAFjAw5xt2oHHx4=",
-									"_parent": {
-										"$ref": "AAAAAAFi/LGqL+TEsEc="
-									},
-									"name": "Asignación Jurados a Papers",
-									"source": {
-										"$ref": "AAAAAAFi/LGqL+TEsEc="
-									},
-									"target": {
-										"$ref": "AAAAAAFjCV2FWe1xvJ4="
-									}
-								},
-								{
-									"_type": "FCFlow",
 									"_id": "AAAAAAFjAxDIBWomv4U=",
 									"_parent": {
 										"$ref": "AAAAAAFi/LGqL+TEsEc="
 									},
-									"name": "Métricas de Evaluación para Papers",
+									"name": "Métricas de Evaluación para Trabajos",
 									"source": {
 										"$ref": "AAAAAAFi/LGqL+TEsEc="
 									},
@@ -15016,7 +15238,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFi/KhLn+Qrhx0="
 							},
-							"name": "Jurado",
+							"name": "Experto",
 							"ownedElements": [
 								{
 									"_type": "FCFlow",
@@ -15078,7 +15300,111 @@
 							"_parent": {
 								"$ref": "AAAAAAFi/KhLn+Qrhx0="
 							},
-							"name": "Sistema de Gestión de Congresos"
+							"name": "Sistema de Gestión de Congresos",
+							"ownedElements": [
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0ClZ5F3CpE=",
+									"_parent": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"name": "Consultas Públicas Congreso",
+									"source": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"target": {
+										"$ref": "AAAAAAFkMz+5E5FrJDI="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0FD15GEqb8=",
+									"_parent": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"name": "Notificación Fecha límite próxima",
+									"source": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"target": {
+										"$ref": "AAAAAAFi/K9gIeSvEWg="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0YeGZHBIVQ=",
+									"_parent": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"name": "Consultas Experto",
+									"source": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"target": {
+										"$ref": "AAAAAAFjAvrEw2kVN9I="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0Z4YZHNmkA=",
+									"_parent": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"name": "Consultas Organizador",
+									"source": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"target": {
+										"$ref": "AAAAAAFi/LGqL+TEsEc="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM01joaImgI0=",
+									"_parent": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"name": "Consultas Autor",
+									"source": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									},
+									"target": {
+										"$ref": "AAAAAAFi/K9gIeSvEWg="
+									}
+								}
+							]
+						},
+						{
+							"_type": "FCProcess",
+							"_id": "AAAAAAFkMz+5E5FrJDI=",
+							"_parent": {
+								"$ref": "AAAAAAFi/KhLn+Qrhx0="
+							},
+							"name": "Público"
+						},
+						{
+							"_type": "FCProcess",
+							"_id": "AAAAAAFkM0d+F5Ho5r0=",
+							"_parent": {
+								"$ref": "AAAAAAFi/KhLn+Qrhx0="
+							},
+							"name": "Repartidor de Trabajos",
+							"ownedElements": [
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkM0eq7ZHxka0=",
+									"_parent": {
+										"$ref": "AAAAAAFkM0d+F5Ho5r0="
+									},
+									"name": "Asignación Trabajos",
+									"source": {
+										"$ref": "AAAAAAFkM0d+F5Ho5r0="
+									},
+									"target": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									}
+								}
+							]
 						}
 					]
 				},
