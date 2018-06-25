@@ -14595,7 +14595,7 @@
 									"top": 216,
 									"width": 153,
 									"height": 137,
-									"text": "Este flujo incluye los sgtes datos:\n"
+									"text": "Este flujo incluye los sgtes datos:\n<Dato1, etc>"
 								},
 								{
 									"_type": "UMLNoteLinkView",
@@ -14711,7 +14711,7 @@
 									"top": 64,
 									"width": 121,
 									"height": 81,
-									"text": "Este flujo incluye las siguientes Consultas:\n\n"
+									"text": "Este flujo incluye las siguientes Consultas:\n\n<según DCU X>"
 								},
 								{
 									"_type": "UMLNoteLinkView",
