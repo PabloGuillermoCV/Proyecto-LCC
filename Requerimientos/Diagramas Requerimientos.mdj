@@ -14149,12 +14149,12 @@
 												"$ref": "AAAAAAFi/LLqtuTXKQA="
 											},
 											"font": "Arial;13;0",
-											"left": 296,
-											"top": 492,
+											"left": 232,
+											"top": 495,
 											"width": 231.96240234375,
 											"height": 13,
-											"alpha": 1.651918399829379,
-											"distance": 123.40583454602137,
+											"alpha": -0.44441939474405423,
+											"distance": 23.259406699226016,
 											"hostEdge": {
 												"$ref": "AAAAAAFi/LLqtuTZMfo="
 											},
@@ -14170,7 +14170,7 @@
 										"$ref": "AAAAAAFjCV2FWu1z5PI="
 									},
 									"lineStyle": 2,
-									"points": "536:505;288:505;288:512;201:512",
+									"points": "536:512;201:512",
 									"nameLabel": {
 										"$ref": "AAAAAAFi/LLqtuTabVU="
 									}
@@ -14367,12 +14367,12 @@
 												"$ref": "AAAAAAFjAvy2k2lWN5w="
 											},
 											"font": "Arial;13;0",
-											"left": 759,
-											"top": 527,
+											"left": 751,
+											"top": 551,
 											"width": 122,
 											"height": 13,
-											"alpha": -0.09232934323210973,
-											"distance": 108.46197490364999,
+											"alpha": -0.03011137891950355,
+											"distance": 332.150568266863,
 											"hostEdge": {
 												"$ref": "AAAAAAFjAvy2k2lYBGQ="
 											},
@@ -14388,7 +14388,7 @@
 										"$ref": "AAAAAAFi/LGqMOTGxQg="
 									},
 									"lineStyle": 2,
-									"points": "1144:544;712:544",
+									"points": "1144:544;1144:568;712:568",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAvy2k2lZfhU="
 									}
@@ -14460,7 +14460,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 751,
-											"top": 487,
+											"top": 447,
 											"width": 106.9453125,
 											"height": 13,
 											"alpha": -0.1441543985781233,
@@ -14480,7 +14480,7 @@
 										"$ref": "AAAAAAFi/LGqMOTGxQg="
 									},
 									"lineStyle": 2,
-									"points": "1144:512;712:512",
+									"points": "1144:472;712:472",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAwMA/2mU5Hw="
 									}
@@ -14548,8 +14548,8 @@
 												"$ref": "AAAAAAFjCVfv5e1YXPk="
 											},
 											"font": "Arial;13;0",
-											"left": 186,
-											"top": 754,
+											"left": 210,
+											"top": 786,
 											"width": 84,
 											"height": 39,
 											"text": "Sistema Web de Pasarela de Pagos",
@@ -14557,8 +14557,8 @@
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 176,
-									"top": 744,
+									"left": 200,
+									"top": 776,
 									"width": 104,
 									"height": 64,
 									"nameLabel": {
@@ -14586,7 +14586,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 314,
-											"top": 760,
+											"top": 792,
 											"width": 244.25146484375,
 											"height": 13,
 											"alpha": -4.775243098682462,
@@ -14606,7 +14606,7 @@
 										"$ref": "AAAAAAFjCVfv5e1YXPk="
 									},
 									"lineStyle": 2,
-									"points": "279:775;580:775;580:600",
+									"points": "303:807;580:807;580:600",
 									"nameLabel": {
 										"$ref": "AAAAAAFjCVicdO1iz9I="
 									}
@@ -14699,7 +14699,7 @@
 												"$ref": "AAAAAAFkM0ClZ5F3CpE="
 											},
 											"font": "Arial;13;0",
-											"left": 622,
+											"left": 635,
 											"top": 183,
 											"width": 170.5361328125,
 											"height": 13,
@@ -14720,7 +14720,7 @@
 										"$ref": "AAAAAAFjCV2FWu1z5PI="
 									},
 									"lineStyle": 2,
-									"points": "619:472;619:159",
+									"points": "632:472;632:159",
 									"nameLabel": {
 										"$ref": "AAAAAAFkM0ClaJF6xMo="
 									}
@@ -15054,12 +15054,12 @@
 												"$ref": "AAAAAAFkM01joaImgI0="
 											},
 											"font": "Arial;13;0",
-											"left": 301,
-											"top": 681,
+											"left": 159,
+											"top": 679,
 											"width": 92.49169921875,
 											"height": 13,
-											"alpha": 1.5707963267948966,
-											"distance": 15,
+											"alpha": 0.09065989350591597,
+											"distance": 143.58969322343438,
 											"hostEdge": {
 												"$ref": "AAAAAAFkM01joqIoWME="
 											},
@@ -15078,6 +15078,289 @@
 									"points": "536:600;536:672;160:672;160:584",
 									"nameLabel": {
 										"$ref": "AAAAAAFkM01joqIph1Q="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkNr1b+OIuefs=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkNr1b8+Is2iY="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkNr1b+eIvET0=",
+											"_parent": {
+												"$ref": "AAAAAAFkNr1b+OIuefs="
+											},
+											"model": {
+												"$ref": "AAAAAAFkNr1b8+Is2iY="
+											},
+											"font": "Arial;13;0",
+											"left": 752,
+											"top": 511,
+											"width": 111.5283203125,
+											"height": 13,
+											"alpha": -0.0988503301846011,
+											"distance": 121.59358535712317,
+											"hostEdge": {
+												"$ref": "AAAAAAFkNr1b+OIuefs="
+											},
+											"edgePosition": 1,
+											"text": "Aceptación Trabajo"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFi/LGqMOTGxQg="
+									},
+									"lineStyle": 2,
+									"points": "1144:530;712:530",
+									"nameLabel": {
+										"$ref": "AAAAAAFkNr1b+eIvET0="
+									}
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkNr8WdeI8L7c=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkNr8WdOI6YwE="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkNr8WduI93xU=",
+											"_parent": {
+												"$ref": "AAAAAAFkNr8WdeI8L7c="
+											},
+											"model": {
+												"$ref": "AAAAAAFkNr8WdOI6YwE="
+											},
+											"font": "Arial;13;0",
+											"left": 759,
+											"top": 487,
+											"width": 94.66259765625,
+											"height": 13,
+											"alpha": -0.08178438729178206,
+											"distance": 122.40914998479485,
+											"hostEdge": {
+												"$ref": "AAAAAAFkNr8WdeI8L7c="
+											},
+											"edgePosition": 1,
+											"text": "Plantel Expertos"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFi/LGqMOTGxQg="
+									},
+									"lineStyle": 2,
+									"points": "1144:504;712:504",
+									"nameLabel": {
+										"$ref": "AAAAAAFkNr8WduI93xU="
+									}
+								},
+								{
+									"_type": "UMLNoteView",
+									"_id": "AAAAAAFkNsj72eJka6E=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"left": 1120,
+									"top": 216,
+									"width": 153,
+									"height": 137,
+									"text": "Este flujo incluye los sgtes datos:\n"
+								},
+								{
+									"_type": "UMLNoteLinkView",
+									"_id": "AAAAAAFkNsj8VeJnCys=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFkNsj72eJka6E="
+									},
+									"tail": {
+										"$ref": "AAAAAAFjAwMA/2mTcqM="
+									},
+									"lineStyle": 1,
+									"points": "928:472;1119:338"
+								},
+								{
+									"_type": "UMLNoteView",
+									"_id": "AAAAAAFkNsqbCOJyQrA=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"left": 1144,
+									"top": 680,
+									"width": 130,
+									"height": 113,
+									"text": "Este Flujo incluye las sgtes Consultas:\n"
+								},
+								{
+									"_type": "UMLNoteLinkView",
+									"_id": "AAAAAAFkNsqbiOJ1vVc=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFkNsqbCOJyQrA="
+									},
+									"tail": {
+										"$ref": "AAAAAAFkM0Z4YZHPbhI="
+									},
+									"lineStyle": 1,
+									"points": "984:640;1143:708"
+								},
+								{
+									"_type": "UMLNoteView",
+									"_id": "AAAAAAFkNswfBeJ8Ef8=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"left": 32,
+									"top": 736,
+									"width": 121,
+									"height": 121,
+									"text": "Este flujo incluye las sgtes Consultas:"
+								},
+								{
+									"_type": "UMLNoteLinkView",
+									"_id": "AAAAAAFkNswfg+J/wiU=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFkNswfBeJ8Ef8="
+									},
+									"tail": {
+										"$ref": "AAAAAAFkM01joqIoWME="
+									},
+									"lineStyle": 1,
+									"points": "348:672;153:766"
+								},
+								{
+									"_type": "UMLNoteView",
+									"_id": "AAAAAAFkNs1O4uKKMhg=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"left": 48,
+									"top": 304,
+									"width": 129,
+									"height": 97,
+									"text": "Este flujo incluye las sgtes Consultas:\n"
+								},
+								{
+									"_type": "UMLNoteLinkView",
+									"_id": "AAAAAAFkNs1PZuKNsqo=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFkNs1O4uKKMhg="
+									},
+									"tail": {
+										"$ref": "AAAAAAFkM0YeGZHDpj4="
+									},
+									"lineStyle": 1,
+									"points": "288:405;177:372"
+								},
+								{
+									"_type": "UMLNoteView",
+									"_id": "AAAAAAFkNs9BzeKT3l0=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"left": 856,
+									"top": 64,
+									"width": 121,
+									"height": 81,
+									"text": "Este flujo incluye las siguientes Consultas:\n\n"
+								},
+								{
+									"_type": "UMLNoteLinkView",
+									"_id": "AAAAAAFkNs9CUuKWNXI=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFkNs9BzeKT3l0="
+									},
+									"tail": {
+										"$ref": "AAAAAAFkM0ClaJF5x5Y="
+									},
+									"lineStyle": 1,
+									"points": "632:315;861:145"
+								},
+								{
+									"_type": "FCFlowView",
+									"_id": "AAAAAAFkNtCFtuKfUiY=",
+									"_parent": {
+										"$ref": "AAAAAAFi/KhLn+QsZw8="
+									},
+									"model": {
+										"$ref": "AAAAAAFkNtCFtuKdMVc="
+									},
+									"subViews": [
+										{
+											"_type": "EdgeLabelView",
+											"_id": "AAAAAAFkNtCFt+Kgv6k=",
+											"_parent": {
+												"$ref": "AAAAAAFkNtCFtuKfUiY="
+											},
+											"model": {
+												"$ref": "AAAAAAFkNtCFtuKdMVc="
+											},
+											"font": "Arial;13;0",
+											"left": 520,
+											"top": 223,
+											"width": 85.97900390625,
+											"height": 13,
+											"alpha": -2.645549129914569,
+											"distance": 96.64884893261792,
+											"hostEdge": {
+												"$ref": "AAAAAAFkNtCFtuKfUiY="
+											},
+											"edgePosition": 1,
+											"text": "Datos Registro"
+										}
+									],
+									"font": "Arial;13;0",
+									"head": {
+										"$ref": "AAAAAAFjCV2FWu1z5PI="
+									},
+									"tail": {
+										"$ref": "AAAAAAFkMz+5E5Ft6XI="
+									},
+									"lineStyle": 2,
+									"points": "608:159;608:472",
+									"nameLabel": {
+										"$ref": "AAAAAAFkNtCFt+Kgv6k="
 									}
 								}
 							]
@@ -15223,6 +15506,34 @@
 										"$ref": "AAAAAAFi/LGqL+TEsEc="
 									},
 									"name": "Métricas de Evaluación para Trabajos",
+									"source": {
+										"$ref": "AAAAAAFi/LGqL+TEsEc="
+									},
+									"target": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkNr1b8+Is2iY=",
+									"_parent": {
+										"$ref": "AAAAAAFi/LGqL+TEsEc="
+									},
+									"name": "Aceptación Trabajo",
+									"source": {
+										"$ref": "AAAAAAFi/LGqL+TEsEc="
+									},
+									"target": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									}
+								},
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkNr8WdOI6YwE=",
+									"_parent": {
+										"$ref": "AAAAAAFi/LGqL+TEsEc="
+									},
+									"name": "Plantel Expertos",
 									"source": {
 										"$ref": "AAAAAAFi/LGqL+TEsEc="
 									},
@@ -15380,7 +15691,23 @@
 							"_parent": {
 								"$ref": "AAAAAAFi/KhLn+Qrhx0="
 							},
-							"name": "Público"
+							"name": "Público",
+							"ownedElements": [
+								{
+									"_type": "FCFlow",
+									"_id": "AAAAAAFkNtCFtuKdMVc=",
+									"_parent": {
+										"$ref": "AAAAAAFkMz+5E5FrJDI="
+									},
+									"name": "Datos Registro",
+									"source": {
+										"$ref": "AAAAAAFkMz+5E5FrJDI="
+									},
+									"target": {
+										"$ref": "AAAAAAFjCV2FWe1xvJ4="
+									}
+								}
+							]
 						},
 						{
 							"_type": "FCProcess",
