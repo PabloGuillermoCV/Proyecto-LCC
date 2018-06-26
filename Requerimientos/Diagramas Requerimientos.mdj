@@ -14496,40 +14496,6 @@
 								},
 								{
 									"_type": "FCProcessView",
-									"_id": "AAAAAAFi/K2dVuSkRxI=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFi/K2dVuSi5t0="
-									},
-									"subViews": [
-										{
-											"_type": "LabelView",
-											"_id": "AAAAAAFi/K2dVuSlLEk=",
-											"_parent": {
-												"$ref": "AAAAAAFi/K2dVuSkRxI="
-											},
-											"font": "Arial;13;0",
-											"left": 1634,
-											"top": 682,
-											"width": 117,
-											"height": 26,
-											"text": "Sistema de Gestión de Congresos",
-											"wordWrap": true
-										}
-									],
-									"font": "Arial;13;0",
-									"left": 1624,
-									"top": 672,
-									"width": 137,
-									"height": 97,
-									"nameLabel": {
-										"$ref": "AAAAAAFi/K2dVuSlLEk="
-									}
-								},
-								{
-									"_type": "FCProcessView",
 									"_id": "AAAAAAFi/K9gIuSxNYg=",
 									"_parent": {
 										"$ref": "AAAAAAFi/KhLn+QsZw8="
@@ -14627,52 +14593,6 @@
 									"height": 97,
 									"nameLabel": {
 										"$ref": "AAAAAAFi/LGqMOTHE6Y="
-									}
-								},
-								{
-									"_type": "FCFlowView",
-									"_id": "AAAAAAFi/LLqtuTZMfo=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFi/LLqtuTXKQA="
-									},
-									"subViews": [
-										{
-											"_type": "EdgeLabelView",
-											"_id": "AAAAAAFi/LLqtuTabVU=",
-											"_parent": {
-												"$ref": "AAAAAAFi/LLqtuTZMfo="
-											},
-											"model": {
-												"$ref": "AAAAAAFi/LLqtuTXKQA="
-											},
-											"font": "Arial;13;0",
-											"left": 188,
-											"top": 495,
-											"width": 231.96240234375,
-											"height": 13,
-											"alpha": -0.44441939474405423,
-											"distance": 23.259406699226016,
-											"hostEdge": {
-												"$ref": "AAAAAAFi/LLqtuTZMfo="
-											},
-											"edgePosition": 1,
-											"text": "Notificación de Trabajo Evaluado"
-										}
-									],
-									"font": "Arial;13;0",
-									"head": {
-										"$ref": "AAAAAAFi/K9gIuSxNYg="
-									},
-									"tail": {
-										"$ref": "AAAAAAFjCV2FWu1z5PI="
-									},
-									"lineStyle": 2,
-									"points": "536:512;113:512",
-									"nameLabel": {
-										"$ref": "AAAAAAFi/LLqtuTabVU="
 									}
 								},
 								{
@@ -14799,52 +14719,6 @@
 									"points": "56:512;56:488;536:488",
 									"nameLabel": {
 										"$ref": "AAAAAAFjAvwEAWk/3nI="
-									}
-								},
-								{
-									"_type": "FCFlowView",
-									"_id": "AAAAAAFjAvxOuGlKo/4=",
-									"_parent": {
-										"$ref": "AAAAAAFi/KhLn+QsZw8="
-									},
-									"model": {
-										"$ref": "AAAAAAFjAvxOuGlINgg="
-									},
-									"subViews": [
-										{
-											"_type": "EdgeLabelView",
-											"_id": "AAAAAAFjAvxOuGlLxsg=",
-											"_parent": {
-												"$ref": "AAAAAAFjAvxOuGlKo/4="
-											},
-											"model": {
-												"$ref": "AAAAAAFjAvxOuGlINgg="
-											},
-											"font": "Arial;13;0",
-											"left": 498,
-											"top": 863,
-											"width": 106.9453125,
-											"height": 13,
-											"alpha": -0.27829961183530777,
-											"distance": 58.240879114244144,
-											"hostEdge": {
-												"$ref": "AAAAAAFjAvxOuGlKo/4="
-											},
-											"edgePosition": 1,
-											"text": "Detalles Congreso"
-										}
-									],
-									"font": "Arial;13;0",
-									"head": {
-										"$ref": "AAAAAAFi/LEz9eS7IZg="
-									},
-									"tail": {
-										"$ref": "AAAAAAFjCV2FWu1z5PI="
-									},
-									"lineStyle": 2,
-									"points": "608:600;608:885;443:885",
-									"nameLabel": {
-										"$ref": "AAAAAAFjAvxOuGlLxsg="
 									}
 								},
 								{
@@ -16165,44 +16039,6 @@
 									"points": "976:871;976:928;656:928;656:600",
 									"nameLabel": {
 										"$ref": "AAAAAAFkPTvDa/npzkE="
-									}
-								}
-							]
-						},
-						{
-							"_type": "FCProcess",
-							"_id": "AAAAAAFi/K2dVuSi5t0=",
-							"_parent": {
-								"$ref": "AAAAAAFi/KhLn+Qrhx0="
-							},
-							"name": "Sistema de Gestión de Congresos",
-							"ownedElements": [
-								{
-									"_type": "FCFlow",
-									"_id": "AAAAAAFi/LLqtuTXKQA=",
-									"_parent": {
-										"$ref": "AAAAAAFi/K2dVuSi5t0="
-									},
-									"name": "Notificación de Trabajo Evaluado",
-									"source": {
-										"$ref": "AAAAAAFjCV2FWe1xvJ4="
-									},
-									"target": {
-										"$ref": "AAAAAAFi/K9gIeSvEWg="
-									}
-								},
-								{
-									"_type": "FCFlow",
-									"_id": "AAAAAAFjAvxOuGlINgg=",
-									"_parent": {
-										"$ref": "AAAAAAFi/K2dVuSi5t0="
-									},
-									"name": "Detalles Congreso",
-									"source": {
-										"$ref": "AAAAAAFjCV2FWe1xvJ4="
-									},
-									"target": {
-										"$ref": "AAAAAAFi/LEz9eS5GDc="
 									}
 								}
 							]
