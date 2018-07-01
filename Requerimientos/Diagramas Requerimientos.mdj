@@ -13951,17 +13951,17 @@
 										"$ref": "AAAAAAFkRf+z2EqMrhs="
 									},
 									"font": "Arial;13;0",
-									"left": 536,
-									"top": 543,
-									"width": 81.65625,
+									"left": 520,
+									"top": 536,
+									"width": 153.92431640625,
 									"height": 13,
-									"alpha": -2.4149511775005044,
-									"distance": 12.041594578792296,
+									"alpha": 2.526929006027734,
+									"distance": 20.808652046684813,
 									"hostEdge": {
 										"$ref": "AAAAAAFkRf+z2UqQHOM="
 									},
 									"edgePosition": 1,
-									"text": "-Evaluaciones"
+									"text": "-Evaluaciones Individuales"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -62844,7 +62844,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFjty4f+asaQTE="
 							},
-							"name": "Evaluaciones",
+							"name": "Evaluaciones Individuales",
 							"end1": {
 								"_type": "UMLAssociationEnd",
 								"_id": "AAAAAAFkRf+z2EqN0TU=",
