@@ -10,6 +10,7 @@ USE Banco;
 
 #-------------------------------------------------------------------------
 #Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después, para Herencia, crear la entidad padre primero y los hijos despues
+#NOTA: VER TEMA CON LAS FECHAS, NO SE QUE TIPO DEBEN SER
 
 CREATE TABLE Ciudad(
 
@@ -23,7 +24,7 @@ CREATE TABLE Ciudad(
 
 CREATE TABLE Sucursal(
 
-	nro_suc INT,
+	nro_suc numeric(3,0) NOT NULL,
 	nombre VARCHAR(45),
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
@@ -32,36 +33,116 @@ CREATE TABLE Sucursal(
 
 	CONSTRAINT pk_suc
 	PRIMARY KEY (nro_suc),
+
+	CONSTRAINT FK_postal
+	FOREIGN KEY (cod_postal) REFERENCES Ciudad (cod_postal)
+		ON DELETE RESTRICT ON UPDATE CASCADE
 	
-
-)Engine = InnoDB;
-
-CREATE TABLE Persona(
-
-	Nombre VARCHAR(45) NOT NULL,
-	Tipo_Documento VARCHAR(10) NOT NULL,
-	Apellido VARCHAR(45) NOT NULL,
-	Telefono INT,
-	Nro_Documento INT NOT NULL,
-
-	CONSTRAINT pk_Documento
-	PRIMARY KEY (Nro_Documento)
 
 )Engine = InnoDB;
 
 CREATE TABLE Empleado(
 
-	cargo VARCHAR(45) NOT NULL,
-	password VARCHAR(45) NOT NULL,
-	Nro_Legajo INT NOT NULL,
-	Documento_Empleado INT NOT NULL,
+	legajo numeric(4,0) NOT NULL,
+	apellido VARCHAR(45),
+	nombre VARCHAR(45),
+	tipo_doc VARCHAR(45),
+	nro_doc numeric(8,0),
+	direccion VARCHAR(45),
+	telefono VARCHAR(45),
+	cargo VARCHAR(45),
+	password VARCHAR(32),
+	nro_suc numeric(3,0),
+
+	CONSTRAINT pk_Emp
+	PRIMARY KEY (legajo),
+
+	CONSTRAINT FK_suc
+	FOREIGN KEY (nro_suc) REFERENCES Sucursal (nro_suc)
+
+)Engine = InnoDB;
 
 
-	CONSTRAINT pk_Legajo
-	PRIMARY KEY (Nro_Legajo),
+CREATE TABLE Cliente(
 
-	CONSTRAINT FK_Docu
-	FOREIGN KEY (Documento_Empleado) REFERENCES Persona (Nro_Documento)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
+	nro_cliente numeric(5,0) NOT NULL,
+	apellido VARCHAR(45),
+	nombre VARCHAR(45),
+	tipo_doc VARCHAR(45),
+	direccion VARCHAR(45),
+	telefono VARCHAR(45),
+	nro_doc numeric(8,0),
+	fecha_nac VARCHAR(45),
+
+	CONSTRAINT pk_nro_cliente
+	PRIMARY KEY (nro_cliente),
+
+)Engine = InnoDB;
+
+
+
+CREATE TABLE Plazo_Fijo(
+
+	nro_plazo numeric(8,0) NOT NULL,
+	capital float(2),
+	fecha_inicio VARCHAR(45),
+	fecha_fin VARCHAR(45),
+	tasa_interes float(2),
+	interes float(2),
+	nro_suc INT NOT NULL,
+
+	CONSTRAINT pk_plazo
+	PRIMARY KEY (nro_plazo), 
+
+	CONSTRAINT FK_suc
+	FOREIGN KEY (nro_suc) REFERENCES Sucursal (nro_suc)
+
+)Engine = InnoDB;
+
+CREATE TABLE Tasa_Plazo_Fijo(
+
+	periodo numeric(3,0) NOT NULL,
+	monto_inf float(2) NOT NULL,
+	monto_sup float(2) NOT NULL,
+	tasa float(2)
+
+	CONSTRAINT pk_Tasa_Plazo
+	PRIMARY KEY (periodo,monto_sup,monto_inf) 
+
+)Engine = InnoDB;
+
+CREATE TABLE Plazo_Cliente(
+
+	nro_plazo numeric(8,0) NOT NULL,
+	nro_cliente numeric(5,0) NOT NULL,
+
+	CONSTRAINT FK_plazo
+	FOREIGN KEY (nro_plazo) REFERENCES	Plazo_Fijo (nro_plazo),
+
+	CONSTRAINT FK_cliente
+	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente)
 
 )Engine = InnoDB
+
+CREATE TABLE Prestamo(
+
+	nro_prestamo numeric(8,0) NOT NULL,
+	fecha VARCHAR(45),
+	cant_meses numeric(2,0),
+	monto float(2),
+	tasa_interes float(2),
+	interes float(2),
+	valor_cuota float(2),
+	legajo numeric(4,0) NOT NULL,
+	nro_cliente numeric(5,0) NOT NULL,
+
+	CONSTRAINT pk_nro_prestamo
+	PRIMARY KEY (nro_prestamo),
+
+	CONSTRAINT FK_nro_cliente_prestamo
+	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente),
+
+	CONSTRAINT FK_nro_legajo_prestamo
+	FOREIGN Key (legajo) REFERENCES Empleado (legajo)
+
+)Engine = InnoDB;
