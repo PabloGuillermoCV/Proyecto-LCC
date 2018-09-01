@@ -11,6 +11,31 @@ USE Banco;
 #-------------------------------------------------------------------------
 #Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después, para Herencia, crear la entidad padre primero y los hijos despues
 
+CREATE TABLE Ciudad(
+
+	cod_postal INT NOT NULL,
+	nombre VARCHAR(45),
+
+	CONSTRAINT pk_Ciudad
+	PRIMARY KEY (cod_postal)
+
+)Engine = InnoDB;
+
+CREATE TABLE Sucursal(
+
+	nro_suc INT,
+	nombre VARCHAR(45),
+	direccion VARCHAR(45),
+	telefono VARCHAR(45),
+	horario VARCHAR(45),
+	cod_postal INT NOT NULL,
+
+	CONSTRAINT pk_suc
+	PRIMARY KEY (nro_suc),
+	
+
+)Engine = InnoDB;
+
 CREATE TABLE Persona(
 
 	Nombre VARCHAR(45) NOT NULL,
