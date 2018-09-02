@@ -9,7 +9,7 @@ CREATE DATABASE Banco;
 USE Banco;
 
 #-------------------------------------------------------------------------
-#Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después, para Herencia, crear la entidad padre primero y los hijos despues
+#Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después
 #NOTA: VER TEMA CON LAS FECHAS, NO SE QUE TIPO DEBEN SER
 
 #ME GENERA DUDA CON PLAZO_CLIENTE, NO TIENE LLAVE PRIMARIA, TIENE FORANEAS PERO CREO QUE ESO NO SIGNIFICA QUE SEAN AUTOMATICAMENTE PRIMARIAS, LE PUSE PRIMARIAS POR LAS DUDAS
