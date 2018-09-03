@@ -364,3 +364,54 @@ CREATE TABLE Transferencia{
 	FOREIGN KEY (destino) REFERENCES Caja_Ahorro (nro_ca)
 	
 }Engine = InnoDB;
+
+#-------------------------------------------------------------------------
+
+#Creacion de vistas
+
+	CREATE VIEW trans_caja_ahorro AS
+	SELECT
+	FROM
+	WHERE ;
+
+#-------------------------------------------------------------------------
+
+#PARA CONSULTAR: NO SE SI EMPLEADO (Y ATM) NO TIENE QUE LLEVAR NADA A SU DERECHA PARA INDICAR QUE PUEDE ACCEDER DESDE CUALQUIER PARTE
+#LA FORMA DE PONER LOS PERMISMOS POSIBLEMENTE SE PUEDA HACER MAS CORTA
+#EL VIEW ESTA SIN TERMINAR, DUDO DE COMO HACERLO
+#NO SE SI ES IMPORTANTE PERO EL NOMBRE DEL ARCHIVO DEBERIA SER TODO EN MINUSCULAS
+#PRIVILEGIO DE LECTURA ES LO MISMO QUE SOLO REALIZAR CONSULTAS? (ES DECIR, USA SELECT?)
+
+#Creacion de usuarios y otorgamiento de privilegios.
+
+	DROP USER ''@'localhost';
+
+#Usuario admin con acceso total sobre todas las tablas y la posibilidad de crear usuarios y otorgar privilegios
+
+	CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+	
+	GRANT ALL PRIVILEGES ON banco.* TO 'admin'@'localhost' WITH GRANT OPTION;
+
+#Usuario empleado
+
+	CREATE USER 'empleado' IDENTIFIED BY 'empleado';
+	
+	GRANT SELECT ON banco.Empleado, banco.Sucursal, banco.Tasa_Plazo_Fijo, banco.Tasa_Prestamo TO 'empleado';
+	
+	GRANT SELECT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado';
+	
+	GRANT INSERT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado';
+	
+	GRANT SELECT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado';
+	
+	GRANT INSERT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado';
+	
+	GRANT UPDATE ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado';
+
+#Usuario atm
+
+	CREATE USER 'atm' IDENTIFIED BY 'atm';
+	
+	GRANT SELECT ON banco.trans_caja_ahorro TO 'atm';
+
+#-------------------------------------------------------------------------
