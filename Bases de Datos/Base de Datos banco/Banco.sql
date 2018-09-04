@@ -2,18 +2,16 @@
 
 #Creo la base de datos del Banco
 
-CREATE DATABASE Banco;
+CREATE DATABASE banco;
 
 #Selecciono la base de Datos recién creado
 
-USE Banco;
+USE banco;
 
 #-------------------------------------------------------------------------
-#Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después
-#NOTA: VER TEMA CON LAS FECHAS, NO SE QUE TIPO DEBEN SER
 
-#ME GENERA DUDA CON PLAZO_CLIENTE, NO TIENE LLAVE PRIMARIA, TIENE FORANEAS PERO CREO QUE ESO NO SIGNIFICA QUE SEAN AUTOMATICAMENTE PRIMARIAS, LE PUSE PRIMARIAS POR LAS DUDAS
-#NO ESTOY MUY SEGURO DEL MD5 EN TARJETA
+#Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después
+
 #LAS CLAVES QUE HEREDAN SE CLASIFICAN COMO FORANEAS EN SU PROPIA TABLA?
 
 CREATE TABLE Ciudad(
@@ -28,7 +26,7 @@ CREATE TABLE Ciudad(
 
 CREATE TABLE Sucursal(
 
-	nro_suc numeric(3,0) NOT NULL,
+	nro_suc numeric(3,0) UNSIGNED NOT NULL,
 	nombre VARCHAR(45),
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
@@ -47,16 +45,16 @@ CREATE TABLE Sucursal(
 
 CREATE TABLE Empleado(
 
-	legajo numeric(4,0) NOT NULL,
+	legajo numeric(4,0) UNSIGNED NOT NULL,
 	apellido VARCHAR(45),
 	nombre VARCHAR(45),
 	tipo_doc VARCHAR(45),
-	nro_doc numeric(8,0),
+	nro_doc numeric(8,0) UNSIGNED,
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
 	cargo VARCHAR(45),
 	password VARCHAR(32),
-	nro_suc numeric(3,0),
+	nro_suc numeric(3,0) NOT NULL,
 
 	CONSTRAINT pk_Emp
 	PRIMARY KEY (legajo),
@@ -74,7 +72,7 @@ CREATE TABLE Cliente(
 	tipo_doc VARCHAR(45),
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
-	nro_doc numeric(8,0),
+	nro_doc numeric(8,0) UNSIGNED,
 	fecha_nac DATE,
 
 	CONSTRAINT pk_nro_cliente
@@ -84,13 +82,13 @@ CREATE TABLE Cliente(
 
 CREATE TABLE Plazo_Fijo(
 
-	nro_plazo numeric(8,0) NOT NULL,
-	capital float(2),
-	fecha_inicio VARCHAR(45),
-	fecha_fin VARCHAR(45),
-	tasa_interes float(2),
-	interes float(2),
-	nro_suc INT NOT NULL,
+	nro_plazo numeric(8,0) UNSIGNED NOT NULL,
+	capital float(2) UNSIGNED,
+	fecha_inicio DATE,
+	fecha_fin DATE,
+	tasa_interes float(2) UNSIGNED,
+	interes float(2) UNSIGNED,
+	nro_suc INT UNSIGNED NOT NULL,
 
 	CONSTRAINT pk_plazo
 	PRIMARY KEY (nro_plazo), 
@@ -102,10 +100,10 @@ CREATE TABLE Plazo_Fijo(
 
 CREATE TABLE Tasa_Plazo_Fijo(
 
-	periodo numeric(3,0) NOT NULL,
-	monto_inf float(2) NOT NULL,
-	monto_sup float(2) NOT NULL,
-	tasa float(2)
+	periodo numeric(3,0) UNSIGNED NOT NULL,
+	monto_inf float(2) UNSIGNED NOT NULL,
+	monto_sup float(2) UNSIGNED NOT NULL,
+	tasa float(2),
 
 	CONSTRAINT pk_Tasa_Plazo
 	PRIMARY KEY (periodo,monto_sup,monto_inf) 
@@ -114,8 +112,8 @@ CREATE TABLE Tasa_Plazo_Fijo(
 
 CREATE TABLE Plazo_Cliente(
 
-	nro_plazo numeric(8,0) NOT NULL,
-	nro_cliente numeric(5,0) NOT NULL,
+	nro_plazo numeric(8,0) UNSIGNED NOT NULL,
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_plazo_cliente
 	PRIMARY KEY (nro_plazo,nro_cliente)
@@ -130,13 +128,13 @@ CREATE TABLE Plazo_Cliente(
 
 CREATE TABLE Prestamo(
 
-	nro_prestamo numeric(8,0) NOT NULL,
-	fecha VARCHAR(45),
-	cant_meses numeric(2,0),
-	monto float(2),
-	tasa_interes float(2),
-	interes float(2),
-	valor_cuota float(2),
+	nro_prestamo numeric(8,0) UNSIGNED NOT NULL,
+	fecha DATE,
+	cant_meses numeric(2,0) UNSIGNED,
+	monto float(2) UNSIGNED,
+	tasa_interes float(2) UNSIGNED,
+	interes float(2) UNSIGNED,
+	valor_cuota float(2) UNSIGNED,
 	legajo numeric(4,0) NOT NULL,
 	nro_cliente numeric(5,0) NOT NULL,
 
@@ -152,10 +150,11 @@ CREATE TABLE Prestamo(
 )Engine = InnoDB;
 
 CREATE TABLE Pago{
-	nro_prestamo numeric (8,0) NOT NULL,
-	nro_pago numeric (2,0) NOT NULL,
-	fecha_venc VARCHAR(45),
-	fecha_pago VARCHAR(45),
+
+	nro_prestamo numeric (8,0) UNSIGNED NOT NULL,
+	nro_pago numeric (2,0) UNSIGNED NOT NULL,
+	fecha_venc DATE,
+	fecha_pago DATE,
 	
 	CONSTRAINT pk_nro_pago
 	PRIMARY KEY (nro_pago),
@@ -169,10 +168,11 @@ CREATE TABLE Pago{
 }Engine = InnoDB;
 
 CREATE TABLE Tasa_Prestamo{
-	periodo numeric (3,0) NOT NULL,
-	monto_inf float (2),
-	monto_sup float (2),
-	tasa float (2),
+
+	periodo numeric (3,0) UNSIGNED NOT NULL,
+	monto_inf float (2) UNSIGNED,
+	monto_sup float (2) UNSIGNED,
+	tasa float (2) UNSIGNED,
 	
 	CONSTRAINT pk_tasa_prestamo
 	PRIMARY KEY (periodo,monto_inf,monto_sup)
@@ -180,9 +180,10 @@ CREATE TABLE Tasa_Prestamo{
 }Engine = InnoDB;
 
 CREATE TABLE Caja_Ahorro{
-	nro_ca numeric (8,0) NOT NULL,
-	CBU numeric (18,0) NOT NULL,
-	saldo float (2),
+
+	nro_ca numeric (8,0) UNSIGNED NOT NULL,
+	CBU numeric (18,0) UNSIGNED NOT NULL,
+	saldo float (2) UNSIGNED,
 	
 	CONSTRAINT pk_nro_ca
 	PRIMARY KEY (nro_ca)
@@ -190,8 +191,9 @@ CREATE TABLE Caja_Ahorro{
 }Engine = InnoDB;
 
 CREATE TABLE Cliente_CA{
-	nro_cliente numeric(5,0) NOT NULL,
-	nro_ca numeric (8,0) NOT NULL,
+
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
+	nro_ca numeric (8,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_cliente_ca
 	PRIMARY KEY (nro_cliente,nro_ca),
@@ -205,12 +207,13 @@ CREATE TABLE Cliente_CA{
 }Engine = InnoDB;
 
 CREATE TABLE Tarjeta{
-	nro_tarjeta numeric(16,0) NOT NULL,
+
+	nro_tarjeta numeric(16,0) UNSIGNED NOT NULL,
 	PIN VARCHAR(32),
 	CVT VARCHAR(32),
-	fecha_venc VARCHAR(45),
-	nro_cliente numeric(5,0) NOT NULL,
-	nro_ca numeric (8,0) NOT NULL,
+	fecha_venc DATE,
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
+	nro_ca numeric (8,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_tarjeta
 	PRIMARY KEY (nro_tarjeta),
@@ -224,7 +227,8 @@ CREATE TABLE Tarjeta{
 }Engine = InnoDB;
 
 CREATE TABLE Caja{
-	cod_caja numeric(5,0),
+
+	cod_caja numeric(5,0) UNSIGNED,
 	
 	CONSTRAINT pk_caja
 	PRIMARY KEY (cod_caja)
@@ -232,8 +236,9 @@ CREATE TABLE Caja{
 }Engine = InnoDB;
 
 CREATE TABLE Ventanilla{
-	cod_caja numeric(5,0),
-	nro_suc numeric(3,0) NOT NULL,
+
+	cod_caja numeric(5,0) UNSIGNED NOT NULL,
+	nro_suc numeric(3,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_ventanilla
 	PRIMARY KEY (cod_caja),
@@ -247,8 +252,9 @@ CREATE TABLE Ventanilla{
 }Engine = InnoDB;
 
 CREATE TABLE ATM{
-	cod_caja numeric(5,0),
-	cod_postal INT NOT NULL,
+
+	cod_caja numeric(5,0) UNSIGNED NOT NULL,
+	cod_postal INT UNSIGNED NOT NULL,
 	direccion VARCHAR(45),
 	
 	CONSTRAINT pk_atm
@@ -263,10 +269,11 @@ CREATE TABLE ATM{
 }Engine = InnoDB;
 
 CREATE TABLE Transaccion{
-	nro_trans numeric(10,0),
-	fecha VARCHAR(45),
+
+	nro_trans numeric(10,0) UNSIGNED NOT NULL,
+	fecha DATE,
 	hora VARCHAR(45),
-	monto float (2),
+	monto float (2) UNSIGNED,
 	
 	CONSTRAINT pk_transaccion
 	PRIMARY KEY (nro_trans)
@@ -274,10 +281,11 @@ CREATE TABLE Transaccion{
 }Engine = InnoDB;
 
 CREATE TABLE Debito{
-	nro_trans numeric(10,0),
+
+	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	descripcion VARCHAR(45),
-	nro_cliente numeric(5,0) NOT NULL,
-	nro_ca numeric (8,0) NOT NULL,
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
+	nro_ca numeric (8,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_debito
 	PRIMARY KEY (nro_trans),
@@ -294,8 +302,9 @@ CREATE TABLE Debito{
 }Engine = InnoDB;
 
 CREATE TABLE Transaccion_por_caja{
-	nro_trans numeric(10,0),
-	cod_caja numeric(5,0),
+
+	nro_trans numeric(10,0) UNSIGNED NOT NULL,
+	cod_caja numeric(5,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_transaccion_por_caja
 	PRIMARY KEY (nro_trans),
@@ -309,8 +318,9 @@ CREATE TABLE Transaccion_por_caja{
 }Engine = InnoDB;
 
 CREATE TABLE Deposito{
-	nro_trans numeric(10,0),
-	nro_ca numeric (8,0) NOT NULL,
+
+	nro_trans numeric(10,0) UNSIGNED NOT NULL,
+	nro_ca numeric (8,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_deposito
 	PRIMARY KEY (nro_trans),
@@ -324,9 +334,10 @@ CREATE TABLE Deposito{
 }Engine = InnoDB;
 
 CREATE TABLE Extraccion{
-	nro_trans numeric(10,0),
-	nro_cliente numeric(5,0) NOT NULL,
-	nro_ca numeric (8,0) NOT NULL,
+
+	nro_trans numeric(10,0) UNSIGNED NOT NULL,
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
+	nro_ca numeric (8,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_extraccion
 	PRIMARY KEY (nro_trans),
@@ -343,10 +354,11 @@ CREATE TABLE Extraccion{
 }Engine = InnoDB;
 
 CREATE TABLE Transferencia{
-	nro_trans numeric(10,0),
-	nro_cliente numeric(5,0) NOT NULL,
-	origen numeric (8,0) NOT NULL,
-	destino numeric (8,0) NOT NULL,
+
+	nro_trans numeric(10,0) UNSIGNED NOT NULL,
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
+	origen numeric (8,0) UNSIGNED NOT NULL,
+	destino numeric (8,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_transferencia
 	PRIMARY KEY (nro_trans),
@@ -374,15 +386,11 @@ CREATE TABLE Transferencia{
 	FROM
 	WHERE ;
 
-	#select 'debito' as tipo
+	#SELECT 'debito' AS tipo
 
 #-------------------------------------------------------------------------
 
-#PARA CONSULTAR: NO SE SI EMPLEADO (Y ATM) NO TIENE QUE LLEVAR NADA A SU DERECHA PARA INDICAR QUE PUEDE ACCEDER DESDE CUALQUIER PARTE
-#LA FORMA DE PONER LOS PERMISMOS POSIBLEMENTE SE PUEDA HACER MAS CORTA //asi esta bien
 #EL VIEW ESTA SIN TERMINAR, DUDO DE COMO HACERLO //consulta super compleja, hacer tp3, hacerla por partes, 4 vistas distintas, luego agrupar
-#NO SE SI ES IMPORTANTE PERO EL NOMBRE DEL ARCHIVO DEBERIA SER TODO EN MINUSCULAS /NO IMPORTA
-#PRIVILEGIO DE LECTURA ES LO MISMO QUE SOLO REALIZAR CONSULTAS? (ES DECIR, USA SELECT?) /SON LO MISMO
 
 #Creacion de usuarios y otorgamiento de privilegios.
 
@@ -398,22 +406,22 @@ CREATE TABLE Transferencia{
 
 	CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 	
-	GRANT SELECT ON banco.Empleado, banco.Sucursal, banco.Tasa_Plazo_Fijo, banco.Tasa_Prestamo TO 'empleado';
+	GRANT SELECT ON banco.Empleado, banco.Sucursal, banco.Tasa_Plazo_Fijo, banco.Tasa_Prestamo TO 'empleado'@'%';
 	
-	GRANT SELECT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado';
+	GRANT SELECT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado'@'%';
 	
-	GRANT INSERT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado';
+	GRANT INSERT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado'@'%';
 	
-	GRANT SELECT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado';
+	GRANT SELECT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado'@'%';
 	
-	GRANT INSERT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado';
+	GRANT INSERT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado'@'%';
 	
-	GRANT UPDATE ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado';
+	GRANT UPDATE ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado'@'%';
 
 #Usuario atm
 
 	CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 	
-	GRANT SELECT ON banco.trans_caja_ahorro TO 'atm';
+	GRANT SELECT ON banco.trans_caja_ahorro TO 'atm'@'%';
 
 #-------------------------------------------------------------------------
