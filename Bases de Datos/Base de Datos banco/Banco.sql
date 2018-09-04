@@ -68,14 +68,14 @@ CREATE TABLE Empleado(
 
 CREATE TABLE Cliente(
 
-	nro_cliente numeric(5,0) NOT NULL,
+	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
 	apellido VARCHAR(45),
 	nombre VARCHAR(45),
 	tipo_doc VARCHAR(45),
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
 	nro_doc numeric(8,0),
-	fecha_nac VARCHAR(45),
+	fecha_nac DATE,
 
 	CONSTRAINT pk_nro_cliente
 	PRIMARY KEY (nro_cliente),
@@ -206,8 +206,8 @@ CREATE TABLE Cliente_CA{
 
 CREATE TABLE Tarjeta{
 	nro_tarjeta numeric(16,0) NOT NULL,
-	PIN md5(VARCHAR(32)),
-	CVT md5(VARCHAR(32)),
+	PIN VARCHAR(32),
+	CVT VARCHAR(32),
 	fecha_venc VARCHAR(45),
 	nro_cliente numeric(5,0) NOT NULL,
 	nro_ca numeric (8,0) NOT NULL,
@@ -374,13 +374,15 @@ CREATE TABLE Transferencia{
 	FROM
 	WHERE ;
 
+	#select 'debito' as tipo
+
 #-------------------------------------------------------------------------
 
 #PARA CONSULTAR: NO SE SI EMPLEADO (Y ATM) NO TIENE QUE LLEVAR NADA A SU DERECHA PARA INDICAR QUE PUEDE ACCEDER DESDE CUALQUIER PARTE
-#LA FORMA DE PONER LOS PERMISMOS POSIBLEMENTE SE PUEDA HACER MAS CORTA
-#EL VIEW ESTA SIN TERMINAR, DUDO DE COMO HACERLO
-#NO SE SI ES IMPORTANTE PERO EL NOMBRE DEL ARCHIVO DEBERIA SER TODO EN MINUSCULAS
-#PRIVILEGIO DE LECTURA ES LO MISMO QUE SOLO REALIZAR CONSULTAS? (ES DECIR, USA SELECT?)
+#LA FORMA DE PONER LOS PERMISMOS POSIBLEMENTE SE PUEDA HACER MAS CORTA //asi esta bien
+#EL VIEW ESTA SIN TERMINAR, DUDO DE COMO HACERLO //consulta super compleja, hacer tp3, hacerla por partes, 4 vistas distintas, luego agrupar
+#NO SE SI ES IMPORTANTE PERO EL NOMBRE DEL ARCHIVO DEBERIA SER TODO EN MINUSCULAS /NO IMPORTA
+#PRIVILEGIO DE LECTURA ES LO MISMO QUE SOLO REALIZAR CONSULTAS? (ES DECIR, USA SELECT?) /SON LO MISMO
 
 #Creacion de usuarios y otorgamiento de privilegios.
 
@@ -394,7 +396,7 @@ CREATE TABLE Transferencia{
 
 #Usuario empleado
 
-	CREATE USER 'empleado' IDENTIFIED BY 'empleado';
+	CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 	
 	GRANT SELECT ON banco.Empleado, banco.Sucursal, banco.Tasa_Plazo_Fijo, banco.Tasa_Prestamo TO 'empleado';
 	
@@ -410,7 +412,7 @@ CREATE TABLE Transferencia{
 
 #Usuario atm
 
-	CREATE USER 'atm' IDENTIFIED BY 'atm';
+	CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 	
 	GRANT SELECT ON banco.trans_caja_ahorro TO 'atm';
 
