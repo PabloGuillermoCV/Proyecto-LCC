@@ -12,11 +12,9 @@ USE banco;
 
 #Creo Tablas para las Entidades, recordar, Entidades Primero, relaciones después
 
-#LAS CLAVES QUE HEREDAN SE CLASIFICAN COMO FORANEAS EN SU PROPIA TABLA?
-
 CREATE TABLE Ciudad(
 
-	cod_postal INT NOT NULL,
+	cod_postal INT UNSIGNED NOT NULL,
 	nombre VARCHAR(45),
 
 	CONSTRAINT pk_Ciudad
@@ -31,7 +29,7 @@ CREATE TABLE Sucursal(
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
 	horario VARCHAR(45),
-	cod_postal INT NOT NULL,
+	cod_postal INT UNSIGNED NOT NULL,
 
 	CONSTRAINT pk_suc
 	PRIMARY KEY (nro_suc),
@@ -59,7 +57,7 @@ CREATE TABLE Empleado(
 	CONSTRAINT pk_Emp
 	PRIMARY KEY (legajo),
 
-	CONSTRAINT FK_suc
+	CONSTRAINT FK_suc_E
 	FOREIGN KEY (nro_suc) REFERENCES Sucursal (nro_suc)
 
 )Engine = InnoDB;
@@ -76,7 +74,7 @@ CREATE TABLE Cliente(
 	fecha_nac DATE,
 
 	CONSTRAINT pk_nro_cliente
-	PRIMARY KEY (nro_cliente),
+	PRIMARY KEY (nro_cliente)
 
 )Engine = InnoDB;
 
@@ -88,12 +86,12 @@ CREATE TABLE Plazo_Fijo(
 	fecha_fin DATE,
 	tasa_interes float(2) UNSIGNED,
 	interes float(2) UNSIGNED,
-	nro_suc INT UNSIGNED NOT NULL,
+	nro_suc numeric(3,0) UNSIGNED NOT NULL,
 
 	CONSTRAINT pk_plazo
 	PRIMARY KEY (nro_plazo), 
 
-	CONSTRAINT FK_suc
+	CONSTRAINT FK_suc_PF
 	FOREIGN KEY (nro_suc) REFERENCES Sucursal (nro_suc)
 
 )Engine = InnoDB;
@@ -116,7 +114,7 @@ CREATE TABLE Plazo_Cliente(
 	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_plazo_cliente
-	PRIMARY KEY (nro_plazo,nro_cliente)
+	PRIMARY KEY (nro_plazo,nro_cliente),
 
 	CONSTRAINT FK_plazo
 	FOREIGN KEY (nro_plazo) REFERENCES	Plazo_Fijo (nro_plazo),
@@ -124,7 +122,7 @@ CREATE TABLE Plazo_Cliente(
 	CONSTRAINT FK_cliente
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente)
 
-)Engine = InnoDB
+)Engine = InnoDB;
 
 CREATE TABLE Prestamo(
 
@@ -149,25 +147,22 @@ CREATE TABLE Prestamo(
 
 )Engine = InnoDB;
 
-CREATE TABLE Pago{
+CREATE TABLE Pago(
 
 	nro_prestamo numeric (8,0) UNSIGNED NOT NULL,
 	nro_pago numeric (2,0) UNSIGNED NOT NULL,
 	fecha_venc DATE,
 	fecha_pago DATE,
 	
-	CONSTRAINT pk_nro_pago
-	PRIMARY KEY (nro_pago),
-	
-	CONSTRAINT po_nro_prestamo
-	PRIMARY KEY (nro_prestamo),
+	CONSTRAINT pk_pago
+	PRIMARY KEY (nro_pago, nro_prestamo),
 	
 	CONSTRAINT FK_nro_prestamo
 	FOREIGN KEY (nro_prestamo) REFERENCES Prestamo (nro_prestamo)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Tasa_Prestamo{
+CREATE TABLE Tasa_Prestamo(
 
 	periodo numeric (3,0) UNSIGNED NOT NULL,
 	monto_inf float (2) UNSIGNED,
@@ -177,9 +172,9 @@ CREATE TABLE Tasa_Prestamo{
 	CONSTRAINT pk_tasa_prestamo
 	PRIMARY KEY (periodo,monto_inf,monto_sup)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Caja_Ahorro{
+CREATE TABLE Caja_Ahorro(
 
 	nro_ca numeric (8,0) UNSIGNED NOT NULL,
 	CBU numeric (18,0) UNSIGNED NOT NULL,
@@ -188,9 +183,9 @@ CREATE TABLE Caja_Ahorro{
 	CONSTRAINT pk_nro_ca
 	PRIMARY KEY (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Cliente_CA{
+CREATE TABLE Cliente_CA(
 
 	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
 	nro_ca numeric (8,0) UNSIGNED NOT NULL,
@@ -198,15 +193,15 @@ CREATE TABLE Cliente_CA{
 	CONSTRAINT pk_cliente_ca
 	PRIMARY KEY (nro_cliente,nro_ca),
 	
-	CONSTRAINT FK_nro_cliente
+	CONSTRAINT FK_nro_cliente_CCA
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente),
 	
-	CONSTRAINT FK_nro_ca
+	CONSTRAINT FK_nro_ca_CCA
 	FOREIGN KEY (nro_ca) REFERENCES Caja_Ahorro (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Tarjeta{
+CREATE TABLE Tarjeta(
 
 	nro_tarjeta numeric(16,0) UNSIGNED NOT NULL,
 	PIN VARCHAR(32),
@@ -218,24 +213,24 @@ CREATE TABLE Tarjeta{
 	CONSTRAINT pk_tarjeta
 	PRIMARY KEY (nro_tarjeta),
 	
-	CONSTRAINT FK_nro_cliente
+	CONSTRAINT FK_nro_cliente_T
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente),
 	
 	CONSTRAINT FK_nro_ca
 	FOREIGN KEY (nro_ca) REFERENCES Caja_Ahorro (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Caja{
+CREATE TABLE Caja(
 
 	cod_caja numeric(5,0) UNSIGNED,
 	
 	CONSTRAINT pk_caja
 	PRIMARY KEY (cod_caja)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Ventanilla{
+CREATE TABLE Ventanilla(
 
 	cod_caja numeric(5,0) UNSIGNED NOT NULL,
 	nro_suc numeric(3,0) UNSIGNED NOT NULL,
@@ -243,15 +238,15 @@ CREATE TABLE Ventanilla{
 	CONSTRAINT pk_ventanilla
 	PRIMARY KEY (cod_caja),
 	
-	CONSTRAINT FK_cod_caja
+	CONSTRAINT FK_cod_caja_V
 	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja),
 	
 	CONSTRAINT FK_nro_suc
 	FOREIGN KEY (nro_suc) REFERENCES Sucursal (nro_suc)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE ATM{
+CREATE TABLE ATM(
 
 	cod_caja numeric(5,0) UNSIGNED NOT NULL,
 	cod_postal INT UNSIGNED NOT NULL,
@@ -260,15 +255,15 @@ CREATE TABLE ATM{
 	CONSTRAINT pk_atm
 	PRIMARY KEY (cod_caja),
 	
-	CONSTRAINT FK_cod_caja
+	CONSTRAINT FK_cod_caja_ATM
 	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja),
 	
 	CONSTRAINT FK_cod_postal
 	FOREIGN KEY (cod_postal) REFERENCES Ciudad (cod_postal)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Transaccion{
+CREATE TABLE Transaccion(
 
 	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	fecha DATE,
@@ -278,9 +273,9 @@ CREATE TABLE Transaccion{
 	CONSTRAINT pk_transaccion
 	PRIMARY KEY (nro_trans)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Debito{
+CREATE TABLE Debito(
 
 	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	descripcion VARCHAR(45),
@@ -290,18 +285,18 @@ CREATE TABLE Debito{
 	CONSTRAINT pk_debito
 	PRIMARY KEY (nro_trans),
 	
-	CONSTRAINT FK_nro_trans
+	CONSTRAINT FK_nro_trans_D
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans),
 	
-	CONSTRAINT FK_nro_cliente
+	CONSTRAINT FK_nro_cliente_D
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente),
 	
-	CONSTRAINT FK_nro_ca
+	CONSTRAINT FK_nro_ca_D
 	FOREIGN KEY (nro_ca) REFERENCES Cliente_CA (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Transaccion_por_caja{
+CREATE TABLE Transaccion_por_caja(
 
 	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	cod_caja numeric(5,0) UNSIGNED NOT NULL,
@@ -309,15 +304,15 @@ CREATE TABLE Transaccion_por_caja{
 	CONSTRAINT pk_transaccion_por_caja
 	PRIMARY KEY (nro_trans),
 	
-	CONSTRAINT FK_nro_trans
+	CONSTRAINT FK_nro_trans_TPC
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans),
 	
-	CONSTRAINT FK_cod_caja
+	CONSTRAINT FK_cod_caja_TPC
 	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Deposito{
+CREATE TABLE Deposito(
 
 	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	nro_ca numeric (8,0) UNSIGNED NOT NULL,
@@ -325,15 +320,15 @@ CREATE TABLE Deposito{
 	CONSTRAINT pk_deposito
 	PRIMARY KEY (nro_trans),
 	
-	CONSTRAINT FK_nro_trans
+	CONSTRAINT FK_nro_trans_DEP
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion_por_caja (nro_trans),
 	
-	CONSTRAINT FK_cod_caja
+	CONSTRAINT FK_cod_caja_DEP
 	FOREIGN KEY (nro_ca) REFERENCES Caja_Ahorro (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Extraccion{
+CREATE TABLE Extraccion(
 
 	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
@@ -342,18 +337,18 @@ CREATE TABLE Extraccion{
 	CONSTRAINT pk_extraccion
 	PRIMARY KEY (nro_trans),
 	
-	CONSTRAINT FK_nro_trans
+	CONSTRAINT FK_nro_trans_E
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion_por_caja (nro_trans),
 	
-	CONSTRAINT FK_nro_cliente
+	CONSTRAINT FK_nro_cliente_E
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente),
 	
-	CONSTRAINT FK_nro_ca
+	CONSTRAINT FK_nro_ca_E
 	FOREIGN KEY (nro_ca) REFERENCES Cliente_CA (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
-CREATE TABLE Transferencia{
+CREATE TABLE Transferencia(
 
 	nro_trans numeric(10,0) UNSIGNED NOT NULL,
 	nro_cliente numeric(5,0) UNSIGNED NOT NULL,
@@ -363,10 +358,10 @@ CREATE TABLE Transferencia{
 	CONSTRAINT pk_transferencia
 	PRIMARY KEY (nro_trans),
 	
-	CONSTRAINT FK_nro_trans
+	CONSTRAINT FK_nro_trans_TR
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion_por_caja (nro_trans),
 	
-	CONSTRAINT FK_nro_cliente
+	CONSTRAINT FK_nro_cliente_TR
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente),
 	
 	CONSTRAINT FK_origen
@@ -375,7 +370,7 @@ CREATE TABLE Transferencia{
 	CONSTRAINT FK_destino
 	FOREIGN KEY (destino) REFERENCES Caja_Ahorro (nro_ca)
 	
-}Engine = InnoDB;
+)Engine = InnoDB;
 
 #-------------------------------------------------------------------------
 
@@ -406,17 +401,34 @@ CREATE TABLE Transferencia{
 
 	CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 	
-	GRANT SELECT ON banco.Empleado, banco.Sucursal, banco.Tasa_Plazo_Fijo, banco.Tasa_Prestamo TO 'empleado'@'%';
+	GRANT SELECT ON banco.Empleado TO 'empleado'@'%';
+    GRANT SELECT ON banco.Sucursal TO 'empleado'@'%';
+    GRANT SELECT ON banco.Tasa_Plazo_Fijo TO 'empleado'@'%';
+    GRANT SELECT ON banco.Tasa_Prestamo TO 'empleado'@'%';
 	
-	GRANT SELECT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado'@'%';
+	GRANT SELECT ON banco.Prestamo TO 'empleado'@'%';
+    GRANT SELECT ON banco.Plazo_Fijo TO 'empleado'@'%';
+    GRANT SELECT ON banco.Plazo_Cliente TO 'empleado'@'%';
+    GRANT SELECT ON banco.Caja_Ahorro TO 'empleado'@'%';
+    GRANT SELECT ON banco.Tarjeta TO 'empleado'@'%';
 	
-	GRANT INSERT ON banco.Prestamo, banco.Plazo_Fijo, banco.Plazo_Cliente, banco.Caja_Ahorro, banco.Tarjeta TO 'empleado'@'%';
+	GRANT INSERT ON banco.Prestamo TO 'empleado'@'%';
+    GRANT INSERT ON banco.Plazo_Fijo TO 'empleado'@'%';
+    GRANT INSERT ON banco.Plazo_Cliente TO 'empleado'@'%';
+    GRANT INSERT ON banco.Caja_Ahorro TO 'empleado'@'%';
+    GRANT INSERT ON banco.Tarjeta TO 'empleado'@'%';
 	
-	GRANT SELECT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado'@'%';
+	GRANT SELECT ON banco.Cliente_CA TO 'empleado'@'%';
+    GRANT SELECT ON banco.Cliente TO 'empleado'@'%';
+    GRANT SELECT ON banco.Pago TO 'empleado'@'%';
 	
-	GRANT INSERT ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado'@'%';
+	GRANT INSERT ON banco.Cliente_CA TO 'empleado'@'%';
+    GRANT INSERT ON banco.Cliente TO 'empleado'@'%';
+    GRANT INSERT ON banco.Pago TO 'empleado'@'%';
 	
-	GRANT UPDATE ON banco.Cliente_CA, banco.Cliente, banco.Pago TO 'empleado'@'%';
+	GRANT UPDATE ON banco.Cliente_CA TO 'empleado'@'%';
+    GRANT UPDATE ON banco.Cliente TO 'empleado'@'%';
+    GRANT UPDATE ON banco.Pago TO 'empleado'@'%';
 
 #Usuario atm
 
