@@ -375,14 +375,65 @@ CREATE TABLE Transferencia(
 #-------------------------------------------------------------------------
 
 #Creacion de vistas
-
+	
+	CREATE VIEW datos_debito AS
+	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "debito" AS tipo, T.monto, NULL AS destino, NULL AS CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
+	FROM (Transaccion T JOIN Debito D ON T.nro_trans=D.nro_trans)
+			JOIN Cliente_CA CCA ON D.nro_cliente=CCA.nro_cliente) 
+			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
+			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
+	
+	CREATE VIEW datos_transferencia AS
+	SELECT CA.nro_ca, CA.saldo, TR.nro_trans, T.fecha, T.hora, "transferencia" AS tipo, T.monto, TR.destino, CA.CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
+	FROM (((Transaccion T JOIN Transferencia TR ON T.nro_trans=TR.nro_trans)
+			JOIN Cliente_CA CCA ON TR.nro_cliente=CCA.nro_cliente) 
+			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
+			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
+	
+	CREATE VIEW datos_extraccion AS
+	SELECT CA.nro_ca, CA.saldo, E.nro_trans, T.fecha, T.hora, "extraccion" AS tipo, T.monto, NULL AS destino, CA.CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
+	FROM (((Transaccion T JOIN Extraccion E ON T.nro_trans=E.nro_trans) 
+			JOIN Cliente_CA CCA ON E.nro_cliente=CCA.nro_cliente) 
+			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
+			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
+	
+	CREATE VIEW datos_deposito AS
+	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "deposito" AS tipo, T.monto, NULL AS destino, CA.CBU, NULL AS nro_cliente, NULL AS tipo_doc, 
+			NULL AS nro_doc, NULL AS nombre, NULL AS apellido
+	FROM (Transaccion T JOIN Deposito D ON T.nro_trans=D.nro_trans) 
+			JOIN Caja_Ahorro CA ON D.nro_ca=CA.nro_ca;
+	
 	CREATE VIEW trans_caja_ahorro AS
-	SELECT
-	FROM
-	WHERE ;
+	SELECT nro_ca, saldo, nro_trans, fecha, hora, tipo, monto, destino, CBU, nro_cliente, tipo_doc, nro_doc, nombre, apellido
+	FROM ((datos_debito DDeb JOIN datos_transferencia DT ON DDeb.nro_ca=DT.nro_ca)
+			JOIN datos_extraccion DE ON DT.nro_ca=DE.nro_ca)
+			JOIN datos_deposito DDep ON DE.nro_ca=DDep.nro_ca;
 
-	#SELECT 'debito' AS tipo
-
+	#HERENCIA DE ATRIBUTOS ES AUTOMATICA?
+	#A QUE SE REFIERE CON EL TIPO? COMO SE PONE?
+	#EL CODIGO DE LA CAJA DE LA TRANSACCION SE REFIERE AL CBU DE CAJA DE AHORRO??
+	#TIPO DE CLIENTE ES EL TIPO DE DOCUMENTO??
+	#COLUMNAS NULAS?
+	#AL HACER EL JOIN DE TODOS LOS VIEW, IMPORTA CUAL COLUMNA SE USE?
+	
+	#Numero de caja de ahorro
+	#Saldo de caja de ahorro
+	#Numero de transaccion
+	#Fecha de transaccion
+	#Hora de transaccion
+	#Tipo de transaccion
+	#Monto de transaccion
+	
+	#Si es Transferencia: Numero caja ahorro destino
+	
+	#Si es Transferencia, Extraccion o Deposito: Codigo de la caja de la Transaccion
+	
+	#Si es Transferencia, Extraccion o Debito: Numero de cliente
+	#Si es Transferencia, Extraccion o Debito: Tipo de cliente
+	#Si es Transferencia, Extraccion o Debito: Documento de cliente
+	#Si es Transferencia, Extraccion o Debito: Nombre de cliente
+	#Si es Transferencia, Extraccion o Debito: Apellido de cliente
+	
 #-------------------------------------------------------------------------
 
 #EL VIEW ESTA SIN TERMINAR, DUDO DE COMO HACERLO //consulta super compleja, hacer tp3, hacerla por partes, 4 vistas distintas, luego agrupar
@@ -435,5 +486,9 @@ CREATE TABLE Transferencia(
 	CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 	
 	GRANT SELECT ON banco.trans_caja_ahorro TO 'atm'@'%';
+	
+	GRANT SELECT ON banco.tarjeta TO 'atm'@'%';
+	
+	GRANT UPDATE ON banco.tarjeta TO 'atm'@'%';
 
 #-------------------------------------------------------------------------
