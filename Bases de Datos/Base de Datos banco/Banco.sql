@@ -68,9 +68,9 @@ CREATE TABLE Cliente(
 	apellido VARCHAR(45),
 	nombre VARCHAR(45),
 	tipo_doc VARCHAR(45),
+	nro_doc numeric(8,0) UNSIGNED,
 	direccion VARCHAR(45),
 	telefono VARCHAR(45),
-	nro_doc numeric(8,0) UNSIGNED,
 	fecha_nac DATE,
 
 	CONSTRAINT pk_nro_cliente
@@ -378,7 +378,7 @@ CREATE TABLE Transferencia(
 	
 	CREATE VIEW datos_debito AS
 	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "debito" AS tipo, T.monto, NULL AS destino, NULL AS CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
-	FROM (Transaccion T JOIN Debito D ON T.nro_trans=D.nro_trans)
+	FROM (((Transaccion T JOIN Debito D ON T.nro_trans=D.nro_trans)
 			JOIN Cliente_CA CCA ON D.nro_cliente=CCA.nro_cliente) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
 			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
@@ -404,7 +404,7 @@ CREATE TABLE Transferencia(
 			JOIN Caja_Ahorro CA ON D.nro_ca=CA.nro_ca;
 	
 	CREATE VIEW trans_caja_ahorro AS
-	SELECT nro_ca, saldo, nro_trans, fecha, hora, tipo, monto, destino, CBU, nro_cliente, tipo_doc, nro_doc, nombre, apellido
+	SELECT DT.nro_ca, DT.saldo, DT.nro_trans, DT.fecha, DT.hora, DT.tipo, DT.monto, DT.destino, DT.CBU, DT.nro_cliente, DT.tipo_doc, DT.nro_doc, DT.nombre, DT.apellido
 	FROM ((datos_debito DDeb JOIN datos_transferencia DT ON DDeb.nro_ca=DT.nro_ca)
 			JOIN datos_extraccion DE ON DT.nro_ca=DE.nro_ca)
 			JOIN datos_deposito DDep ON DE.nro_ca=DDep.nro_ca;
