@@ -215,10 +215,7 @@ CREATE TABLE Tarjeta(
 	PRIMARY KEY (nro_tarjeta),
 	
 	CONSTRAINT FK_nro_cliente_T
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_ca (nro_cliente),
-	
-	CONSTRAINT FK_nro_ca
-	FOREIGN KEY (nro_ca) REFERENCES Cliente_ca (nro_ca)
+	FOREIGN KEY (nro_cliente,nro_ca) REFERENCES Cliente_ca (nro_cliente,nro_ca)
 	
 )Engine = InnoDB;
 
@@ -290,10 +287,8 @@ CREATE TABLE Debito(
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans),
 	
 	CONSTRAINT FK_nro_cliente_D
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_ca (nro_cliente),
+	FOREIGN KEY (nro_cliente,nro_ca) REFERENCES Cliente_ca (nro_cliente,nro_ca)
 	
-	CONSTRAINT FK_nro_ca_D
-	FOREIGN KEY (nro_ca) REFERENCES Cliente_ca (nro_ca)
 	
 )Engine = InnoDB;
 
@@ -342,10 +337,7 @@ CREATE TABLE Extraccion(
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion_por_caja (nro_trans),
 	
 	CONSTRAINT FK_nro_cliente_E
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_ca (nro_cliente),
-	
-	CONSTRAINT FK_nro_ca_E
-	FOREIGN KEY (nro_ca) REFERENCES Cliente_ca (nro_ca)
+	FOREIGN KEY (nro_cliente,nro_ca) REFERENCES Cliente_ca (nro_cliente,nro_ca)
 	
 )Engine = InnoDB;
 
@@ -363,52 +355,56 @@ CREATE TABLE Transferencia(
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion_por_caja (nro_trans),
 	
 	CONSTRAINT FK_nro_cliente_TR
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_ca (nro_cliente),
-	
-	CONSTRAINT FK_origen
-	FOREIGN KEY (origen) REFERENCES Cliente_ca (nro_ca),
+	FOREIGN KEY (nro_cliente,origen) REFERENCES Cliente_ca (nro_cliente,nro_ca),
 	
 	CONSTRAINT FK_destino
 	FOREIGN KEY (destino) REFERENCES Caja_Ahorro (nro_ca)
 	
 )Engine = InnoDB;
-
+	
 #-------------------------------------------------------------------------
-
+	
 #Creacion de vistas
 	
 	CREATE VIEW datos_debito AS
-	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "debito" AS tipo, T.monto, NULL AS destino, NULL AS CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
+	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "debito" AS tipo, T.monto, NULL AS destino, NULL AS cod_caja, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
 	FROM (((Transaccion T JOIN Debito D ON T.nro_trans=D.nro_trans)
 			JOIN Cliente_CA CCA ON D.nro_cliente=CCA.nro_cliente) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
 			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
 	
 	CREATE VIEW datos_transferencia AS
-	SELECT CA.nro_ca, CA.saldo, TR.nro_trans, T.fecha, T.hora, "transferencia" AS tipo, T.monto, TR.destino, CA.CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
-	FROM (((Transaccion T JOIN Transferencia TR ON T.nro_trans=TR.nro_trans)
+	SELECT CA.nro_ca, CA.saldo, TR.nro_trans, T.fecha, T.hora, "transferencia" AS tipo, T.monto, TR.destino, TPC.cod_caja, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
+	FROM ((((Transaccion T JOIN Transferencia TR ON T.nro_trans=TR.nro_trans)
 			JOIN Cliente_CA CCA ON TR.nro_cliente=CCA.nro_cliente) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
-			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
+			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente)
+			JOIN Transaccion_por_caja TPC ON TPC.nro_trans=TR.nro_trans;
 	
 	CREATE VIEW datos_extraccion AS
-	SELECT CA.nro_ca, CA.saldo, E.nro_trans, T.fecha, T.hora, "extraccion" AS tipo, T.monto, NULL AS destino, CA.CBU, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
-	FROM (((Transaccion T JOIN Extraccion E ON T.nro_trans=E.nro_trans) 
+	SELECT CA.nro_ca, CA.saldo, E.nro_trans, T.fecha, T.hora, "extraccion" AS tipo, T.monto, NULL AS destino, TPC.cod_caja, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
+	FROM ((((Transaccion T JOIN Extraccion E ON T.nro_trans=E.nro_trans) 
 			JOIN Cliente_CA CCA ON E.nro_cliente=CCA.nro_cliente) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
-			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
+			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente)
+			JOIN Transaccion_por_caja TPC ON TPC.nro_trans=E.nro_trans;
 	
 	CREATE VIEW datos_deposito AS
-	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "deposito" AS tipo, T.monto, NULL AS destino, CA.CBU, NULL AS nro_cliente, NULL AS tipo_doc, 
+	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "deposito" AS tipo, T.monto, NULL AS destino, TPC.cod_caja, NULL AS nro_cliente, NULL AS tipo_doc, 
 			NULL AS nro_doc, NULL AS nombre, NULL AS apellido
-	FROM (Transaccion T JOIN Deposito D ON T.nro_trans=D.nro_trans) 
-			JOIN Caja_Ahorro CA ON D.nro_ca=CA.nro_ca;
+	FROM ((Transaccion T JOIN Deposito D ON T.nro_trans=D.nro_trans) 
+			JOIN Caja_Ahorro CA ON D.nro_ca=CA.nro_ca)
+			JOIN Transaccion_por_caja TPC ON TPC.nro_trans=D.nro_trans;
 	
-	CREATE VIEW trans_caja_ahorro AS
-	SELECT DT.nro_ca, DT.saldo, DT.nro_trans, DT.fecha, DT.hora, DT.tipo, DT.monto, DT.destino, DT.CBU, DT.nro_cliente, DT.tipo_doc, DT.nro_doc, DT.nombre, DT.apellido
-	FROM ((datos_debito DDeb JOIN datos_transferencia DT ON DDeb.nro_ca=DT.nro_ca)
-			JOIN datos_extraccion DE ON DT.nro_ca=DE.nro_ca)
-			JOIN datos_deposito DDep ON DE.nro_ca=DDep.nro_ca;
+	#CREATE VIEW trans_cajas_ahorro AS
+	#SELECT DT.nro_ca, DT.saldo, DT.nro_trans, DT.fecha, DT.hora, DT.tipo, DT.monto, DT.destino, DT.CBU, DT.nro_cliente, DT.tipo_doc, DT.nro_doc, DT.nombre, DT.apellido
+	#FROM datos_debito UNION datos_transferencia DT UNION datos_extraccion DE UNION datos_deposito DDep;
+	
+	CREATE VIEW trans_cajas_ahorro AS
+	SELECT * FROM datos_debito UNION 
+	SELECT * FROM datos_transferencia UNION
+	SELECT * FROM datos_extraccion UNION 
+	SELECT * FROM datos_deposito;
 	
 	#Numero de caja de ahorro
 	#Saldo de caja de ahorro
@@ -479,7 +475,7 @@ CREATE TABLE Transferencia(
 
 	CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 	
-	GRANT SELECT ON banco.trans_caja_ahorro TO 'atm'@'%';
+	GRANT SELECT ON banco.trans_cajas_ahorro TO 'atm'@'%';
 	
 	GRANT SELECT ON banco.tarjeta TO 'atm'@'%';
 	
