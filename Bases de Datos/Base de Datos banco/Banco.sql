@@ -409,13 +409,6 @@ CREATE TABLE Transferencia(
 	FROM ((datos_debito DDeb JOIN datos_transferencia DT ON DDeb.nro_ca=DT.nro_ca)
 			JOIN datos_extraccion DE ON DT.nro_ca=DE.nro_ca)
 			JOIN datos_deposito DDep ON DE.nro_ca=DDep.nro_ca;
-
-	#HERENCIA DE ATRIBUTOS ES AUTOMATICA?
-	#A QUE SE REFIERE CON EL TIPO? COMO SE PONE?
-	#EL CODIGO DE LA CAJA DE LA TRANSACCION SE REFIERE AL CBU DE CAJA DE AHORRO??
-	#TIPO DE CLIENTE ES EL TIPO DE DOCUMENTO??
-	#COLUMNAS NULAS?
-	#AL HACER EL JOIN DE TODOS LOS VIEW, IMPORTA CUAL COLUMNA SE USE?
 	
 	#Numero de caja de ahorro
 	#Saldo de caja de ahorro
