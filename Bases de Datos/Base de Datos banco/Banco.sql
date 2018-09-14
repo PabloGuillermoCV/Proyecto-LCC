@@ -396,10 +396,6 @@ CREATE TABLE Transferencia(
 			JOIN Caja_Ahorro CA ON D.nro_ca=CA.nro_ca)
 			JOIN Transaccion_por_caja TPC ON TPC.nro_trans=D.nro_trans;
 	
-	#CREATE VIEW trans_cajas_ahorro AS
-	#SELECT DT.nro_ca, DT.saldo, DT.nro_trans, DT.fecha, DT.hora, DT.tipo, DT.monto, DT.destino, DT.CBU, DT.nro_cliente, DT.tipo_doc, DT.nro_doc, DT.nombre, DT.apellido
-	#FROM datos_debito UNION datos_transferencia DT UNION datos_extraccion DE UNION datos_deposito DDep;
-	
 	CREATE VIEW trans_cajas_ahorro AS
 	SELECT * FROM datos_debito UNION 
 	SELECT * FROM datos_transferencia UNION
@@ -426,11 +422,11 @@ CREATE TABLE Transferencia(
 	
 #-------------------------------------------------------------------------
 
-#EL VIEW ESTA SIN TERMINAR, DUDO DE COMO HACERLO //consulta super compleja, hacer tp3, hacerla por partes, 4 vistas distintas, luego agrupar
+#consulta trans_cajas_ahorro: se hace por partes, 4 vistas distintas, 1 para cada tipo de transacción. 
+#Luego se agrupan en una sola vista
 
 #Creacion de usuarios y otorgamiento de privilegios.
 
-	DROP USER ''@'localhost';
 
 #Usuario admin con acceso total sobre todas las tablas y la posibilidad de crear usuarios y otorgar privilegios
 
