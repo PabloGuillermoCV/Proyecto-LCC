@@ -4,6 +4,7 @@
 #include <stdlib.h>
 using namespace std;
 
+typedef enum { false, true } bool; //Definición de un tipo bool
 
 /* Como seria la idea general para resolver el tester de Sudoku? 
    1) generar la matriz -> 1 Proceso separado del Padre
@@ -11,7 +12,7 @@ using namespace std;
 		1.2)Es necesario abrir el archivo de entrada (fopen()), leer caracter por caracter 
 			(al usar caracteres, estamos usando ASCII, ver esto)
 			1.2.1) mientras se lee el archivo (mientras NOT feof() -> fgetc(). Leer caracter a caracter), se carga la matriz
-			1.2.2) una vez leido el archio y cargada la matriz, se cierra el archivo (fclose())
+			1.2.2) una vez leido el archivo y cargada la matriz, se cierra el archivo (fclose())
 	2)Empezar a bifurcar en serio
 		2.1)la idea seria usar 3 procesos distintos y hacer que el Padre espere a los 3 hijos
 			2.1.1) Proceso que verifique las Filas del Sudoku
@@ -42,6 +43,7 @@ using namespace std;
 			3.10.1) Ver como chequear que esten todos lo números (se me ocurre un array de booleans/int 1-based, entonces, si hay un 1
 					en las 9 posiciones del arrgelo, la fila/columna/cuadrante es correcta, si hay algún número en 0 o hay un número 
 					con más de una aparición, la fila/columna/cuadrante es incorrecta)
+		3.11) Ver como era el pasaje de Arreglos a funciones
 
 */
 
@@ -70,11 +72,11 @@ void Lectura(FILE *Sud, char[][9] gril){
 *	gril, grilla del Sudoku
 *	F, Fila de Inicio del cuadrante
 *	C, Columna de Inicio del Cuadrante
-*	al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
+*	al retornar, devuelve Verdadero (la fila es correcta) o Falso (la Fila NO es válida, aquí se debe terminar todo)
 */
-int VerificarFila(char[][9] gril, int F){
+bool VerificarFila(char[][9] gril, int F){
 
-	return 0;
+	return true;
 }
 
 /* Función que verificará una Columna del Sudoku
@@ -82,31 +84,66 @@ int VerificarFila(char[][9] gril, int F){
 *	C, Columna de Inicio del Cuadrante
 *	al retornar, devuelve Verdadero (La Columna es correcta) o Falso (La Columna NO es válida, aquí se debe terminar todo)
 */
-int VerificarColumna(char[][9] gril, int C){
+bool VerificarColumna(char[][9] gril, int C){
 
 }
 
 /* Función que verificará un Cuadrante del Sudoku
 *	gril, grilla del Sudoku
-*	F, Fila de Inicio del cuadrante
-*	C, Columna de Inicio del Cuadrante
+*	X, Fila de Inicio del cuadrante
+*	Y, Columna de Inicio del Cuadrante
 *	al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
 */
-int VerificarCuadrante(char[][9] gril,int F, int C){
+bool VerificarCuadrante(char[][9] gril, int X, int Y){
 
+}
+
+/*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
+	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
+	es el tercero y le asigno revisar los cuadrantes con sus respectivas funciones especiales dentro de un loop while
+*/
+bool HacerTarea(int ProcNum){
+
+	int rec,Y = 0;
+	bool check = true;
+
+	switch(ProcNum){
+
+		case 0:
+			while(check && rec < 9){
+				check = VerificarFila(GrillaSudoku, rec);
+				rec++;
+			}
+			break;
+		case 1:
+			while(check && rec < 9){
+				check = VerificarColumna(GrillaSudoku, rec);
+				rec++;	
+			}
+			break;
+		case 2:
+			while(check && rec <= 6 && Y <= 6){
+				check = VerificarCuadrante(GrillaSudoku, rec, Y);
+				rec = rec + 3;
+				if(rec == 6 && Y != 6){
+					rec = 0;
+					Y = Y + 3;
+				}	
+			}
+			break;
+	}
+	return check;
 }
 
 int main(){
 
 	//Variable para manejar el archivo
 	FILE *SudokuR;
-	//Enteros que harán de booleans para los procesos
-	int Proc1 = 0;
-	int Proc2 = 0;
-	int Proc3 = 0;
 	//Matriz de 9x9 donde se guardará el sudoku
 	char[9][9] GrillaSudoku;
-
+	int processCount = 2;
+	bool check1 = true;
+	int pid = 0;
 	//Abro el archivo, para lectura (por el enunciado, debe llamarse "sudoku.txt").
 	SudokuR = fopen("sudoku.txt", "r");
 
@@ -120,13 +157,13 @@ int main(){
 	 El Padre debe esperar a este Hijo
 	*/
 	else{
-		int PID = fork();
+		pid = fork();
 
-		if(PID == -1){
+		if(pid == -1){
 			//Hubo un error al crear el hijo, reporto dicha ocurrencia (reportar)
 		}
 		else{
-			if(PID > 0){
+			if(pid > 0){
 				//Estoy en el Padre, en este caso, debo esperar a que mi hijo termine y devuelva
 				wait(NULL);
 			}
@@ -137,17 +174,33 @@ int main(){
 				//terminado el proceso, yo como hijo debo reportar que terminé
 				exit(0);
 			}
+
 			//asumiendo que terminé de leer todo correctamente, deberia tener la matriz totalmente cargada
 			//ya no necesito más el archivo, puedo cerrarlo y continuar
 			fclose(SudokuR);
-			//Creo el primer proceso de tres, este chequeará las filas
-			PID = fork();
-			//Acá habria que hacer el mismo chequeo que hice arriba para saber donde estoy
 		}
 	}
-
-
-
+	/*
+		Ciclo FOR que crea todos los procesos necesarios, luego, si estoy en el Hijo,
+		Entro a un método especial que le asigna un trabajo a realizar
+	*/
+	for(int i=0; i<processCount && check1; i++){
+    	pid=fork();
+    	if(pid == -1){
+    		//tirar error, algo salió mal al crear el hijo
+    	}
+    	else{
+    		if(pid != 0){
+        		check1 = HacerTarea(i); //Entro al método para saber que hacer yo como Hijo
+        		//OJO, ver donde meter el exit() para terminar el hijo
+        		break;
+    		}
+    	}
+    	
+	}
+	if (pid == 0){
+    	wait(NULL);
+	}
 
 	return 0;
 }
