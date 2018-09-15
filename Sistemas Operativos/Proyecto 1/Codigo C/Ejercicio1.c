@@ -68,6 +68,45 @@ void Lectura(FILE *Sud, char[][9] gril){
 	}
 }
 
+
+/*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
+	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
+	es el tercero y le asigno revisar los cuadrantes con sus respectivas funciones especiales dentro de un loop while
+*/
+bool HacerTarea(int ProcNum){
+
+	int rec,Y = 0;
+	bool check = true;
+
+	switch(ProcNum){
+
+		case 0:
+			while(check && rec < 9){
+				check = VerificarFila(GrillaSudoku, rec);
+				rec++;
+			}
+			break;
+		case 1:
+			while(check && rec < 9){
+				check = VerificarColumna(GrillaSudoku, rec);
+				rec++;
+			}
+			break;
+		case 2:
+			while(check && rec <= 6 && Y <= 6){
+				check = VerificarCuadrante(GrillaSudoku, rec, Y);
+				rec = rec + 3;
+				if(rec == 6 && Y != 6){
+					rec = 0;
+					Y = Y + 3;
+				}
+			}
+			break;
+	}
+	return check;
+}
+
+
 /* Función que verificará un Cuadrante del Sudoku
 *	gril, grilla del Sudoku
 *	F, Fila de Inicio del cuadrante
@@ -165,42 +204,6 @@ bool VerificarCuadrante(char[][9] gril, int X, int Y){
     return true;
 }
 
-/*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
-	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
-	es el tercero y le asigno revisar los cuadrantes con sus respectivas funciones especiales dentro de un loop while
-*/
-bool HacerTarea(int ProcNum){
-
-	int rec,Y = 0;
-	bool check = true;
-
-	switch(ProcNum){
-
-		case 0:
-			while(check && rec < 9){
-				check = VerificarFila(GrillaSudoku, rec);
-				rec++;
-			}
-			break;
-		case 1:
-			while(check && rec < 9){
-				check = VerificarColumna(GrillaSudoku, rec);
-				rec++;
-			}
-			break;
-		case 2:
-			while(check && rec <= 6 && Y <= 6){
-				check = VerificarCuadrante(GrillaSudoku, rec, Y);
-				rec = rec + 3;
-				if(rec == 6 && Y != 6){
-					rec = 0;
-					Y = Y + 3;
-				}
-			}
-			break;
-	}
-	return check;
-}
 
 int main(){
 
@@ -260,6 +263,7 @@ int main(){
     		if(pid != 0){
         		check1 = HacerTarea(i); //Entro al método para saber que hacer yo como Hijo
         		//OJO, ver donde meter el exit() para terminar el hijo
+        		exit(); //una vez que yo, POroceso Hijo, termino mi tarea, hago Exit.
         		break;
     		}
     	}
