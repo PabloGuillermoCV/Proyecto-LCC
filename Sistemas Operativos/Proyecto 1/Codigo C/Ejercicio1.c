@@ -6,10 +6,10 @@ using namespace std;
 
 typedef enum { false, true } bool; //Definición de un tipo bool
 
-/* Como seria la idea general para resolver el tester de Sudoku? 
+/* Como seria la idea general para resolver el tester de Sudoku?
    1) generar la matriz -> 1 Proceso separado del Padre
    		1.1)sabemos que la Matriz es de 9x9, asi que un arreglo bi-dimensional cuadrado de caracteres bastará
-		1.2)Es necesario abrir el archivo de entrada (fopen()), leer caracter por caracter 
+		1.2)Es necesario abrir el archivo de entrada (fopen()), leer caracter por caracter
 			(al usar caracteres, estamos usando ASCII, ver esto)
 			1.2.1) mientras se lee el archivo (mientras NOT feof() -> fgetc(). Leer caracter a caracter), se carga la matriz
 			1.2.2) una vez leido el archivo y cargada la matriz, se cierra el archivo (fclose())
@@ -18,11 +18,11 @@ typedef enum { false, true } bool; //Definición de un tipo bool
 			2.1.1) Proceso que verifique las Filas del Sudoku
 				Este verificará fila por fila que en esa fila esten los números del 1 al 9 (SIN REPETICIÓN)
 			2.1.2) Proceso que verifique las Columnas del Sudoku
-				Este verificará Columna por Columna que en esa columna esten los números del 1 al 9 (SIN REPETICIÓN) 
+				Este verificará Columna por Columna que en esa columna esten los números del 1 al 9 (SIN REPETICIÓN)
 			2.1.3) Proceso que verifique los cuadrantes 3x3 del Sudoku
-				Este verificará por Cuadrante (hay 9 cuadrantes, empezando en las posiciones (0,0), (0,3)  (0,6) 
+				Este verificará por Cuadrante (hay 9 cuadrantes, empezando en las posiciones (0,0), (0,3)  (0,6)
 				(3,0), (3,3), (3,6) , (6,0) , (6,3) , (6,6))
-		2.2) Estos Procesos deben reportar si su tarea falló en caso de que la jugada sea inválida, al primero que lo hace, se 
+		2.2) Estos Procesos deben reportar si su tarea falló en caso de que la jugada sea inválida, al primero que lo hace, se
 			 debe cortar TODO, el padre debe matar a los hijos restantes (se podria hacer con una variable global, pero lo dudo)
 		2.3) si NINGUNO falla y TODOS terminan, entonces la jugada de Sudoku era válida, entonces, el Padre reporta que la jugada era válida
 	3) Consideraciones
@@ -38,10 +38,10 @@ typedef enum { false, true } bool; //Definición de un tipo bool
 			 un par de funciones llamadas <int atexit (void (* function) (void))> y <int on_exit(void (*function)(int , void *), void *arg)>
 			 que permiten ejecutar funciones cuando se llama a exit(), preguntar sobre su uso y como hacer el pasaje
 			 (ya que requiere pasajes de función por punteros, lo que hicimos en Orga para el Primer Proyecto)
-		3.9) El Chequeo para saber donde estoy al hacer fork() se repite siempre, preguntar si no se puede modularizar en un función 
+		3.9) El Chequeo para saber donde estoy al hacer fork() se repite siempre, preguntar si no se puede modularizar en un función
 		3.10) Mientras se está chequeando las Filas y Columnas, siempre avanzar para adelante
 			3.10.1) Ver como chequear que esten todos lo números (se me ocurre un array de booleans/int 1-based, entonces, si hay un 1
-					en las 9 posiciones del arrgelo, la fila/columna/cuadrante es correcta, si hay algún número en 0 o hay un número 
+					en las 9 posiciones del arrgelo, la fila/columna/cuadrante es correcta, si hay algún número en 0 o hay un número
 					con más de una aparición, la fila/columna/cuadrante es incorrecta)
 		3.11) Ver como era el pasaje de Arreglos a funciones
 
@@ -64,18 +64,38 @@ void Lectura(FILE *Sud, char[][9] gril){
 			} //buscar cuanto era EOF en Linux
 			C = 0;
 			F++;
-		}	
+		}
 	}
 }
 
 /* Función que verificará un Cuadrante del Sudoku
 *	gril, grilla del Sudoku
 *	F, Fila de Inicio del cuadrante
-*	C, Columna de Inicio del Cuadrante
 *	al retornar, devuelve Verdadero (la fila es correcta) o Falso (la Fila NO es válida, aquí se debe terminar todo)
 */
 bool VerificarFila(char[][9] gril, int F){
-
+    bool Lista [9];
+    int I;
+    for (I = 0; I < 9; I++) {
+        int X = gril[F][I] - '0';
+        if (X < 1 || X > 9) {
+            //Tengo un valor no posible
+            return false;
+        }
+        if (Lista[X] == true) {
+            //Me encuentro con un valor repetido
+            return false;
+        }
+        Lista[X] = true;
+    }
+    for (I = 0; I < 9; I++) {
+        //Verifico que esten todos los numeros
+        int X = I + 1;
+        if (Lista[X] == false) {
+            //Faltaba un valor en la lista
+            return false;
+        }
+    }
 	return true;
 }
 
@@ -85,7 +105,29 @@ bool VerificarFila(char[][9] gril, int F){
 *	al retornar, devuelve Verdadero (La Columna es correcta) o Falso (La Columna NO es válida, aquí se debe terminar todo)
 */
 bool VerificarColumna(char[][9] gril, int C){
-
+    bool Lista [9];
+    int I;
+    for (I = 0; I < 9; I++) {
+        int X = gril[I][C] - '0';
+        if (X < 1 || X > 9) {
+            //Tengo un valor no posible
+            return false;
+        }
+        if (Lista[X] == true) {
+            //Me encuentro con un valor repetido
+            return false;
+        }
+        Lista[X] = true;
+    }
+    for (I = 0; I < 9; I++) {
+        //Verifico que esten todos los numeros
+        int X = I + 1;
+        if (Lista[X] == false) {
+            //Faltaba un valor en la lista
+            return false;
+        }
+    }
+	return true;
 }
 
 /* Función que verificará un Cuadrante del Sudoku
@@ -95,7 +137,32 @@ bool VerificarColumna(char[][9] gril, int C){
 *	al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
 */
 bool VerificarCuadrante(char[][9] gril, int X, int Y){
-
+    bool Lista [9];
+    int I;
+    int J;
+    for (I = X; I < X+3; I++) {
+        for (J = Y; J < Y+3; J++) {
+            int X = gril[I][J] - '0';
+            if (X < 1 || X > 9) {
+                //Tengo un valor no posible
+                return false;
+            }
+            if (Lista[X] == true) {
+                //Me encuentro con un valor repetido
+                return false;
+            }
+            Lista[X] = true;
+        }
+    }
+    for (I = 0; I < 9; I++) {
+        //Verifico que esten todos los numeros
+        int X = I + 1;
+        if (Lista[X] == false) {
+            //Faltaba un valor en la lista
+            return false;
+        }
+    }
+    return true;
 }
 
 /*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
@@ -118,7 +185,7 @@ bool HacerTarea(int ProcNum){
 		case 1:
 			while(check && rec < 9){
 				check = VerificarColumna(GrillaSudoku, rec);
-				rec++;	
+				rec++;
 			}
 			break;
 		case 2:
@@ -128,7 +195,7 @@ bool HacerTarea(int ProcNum){
 				if(rec == 6 && Y != 6){
 					rec = 0;
 					Y = Y + 3;
-				}	
+				}
 			}
 			break;
 	}
@@ -169,7 +236,7 @@ int main(){
 			}
 			else{
 				//Estoy en el hijo, debo leer el archivo y cargar la matriz, delego en un procedimiento
-				//para modularizar 
+				//para modularizar
 				Lectura(SudokuR, GrillaSudoku);
 				//terminado el proceso, yo como hijo debo reportar que terminé
 				exit(0);
@@ -196,7 +263,7 @@ int main(){
         		break;
     		}
     	}
-    	
+
 	}
 	if (pid == 0){
     	wait(NULL);
