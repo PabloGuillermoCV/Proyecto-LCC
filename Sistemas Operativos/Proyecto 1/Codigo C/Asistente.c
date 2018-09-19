@@ -7,7 +7,7 @@
 
 /*Algoritmo
 
-	NOTA: Es necesario implementar una ED Cola
+	NOTA: Es necesario implementar una ED Cola (tal vez? creo que se puede hacer con Semáforos de Conteo)
 
 	para el Estudiante:
 
