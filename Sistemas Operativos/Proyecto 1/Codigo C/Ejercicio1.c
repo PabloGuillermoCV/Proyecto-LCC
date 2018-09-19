@@ -58,13 +58,13 @@ void Lectura(FILE *Sud, char[][9] gril){
 	while(!feof(Sud) && F < 9){
 		while(C < 9){
 			char num = fgetc(SudokuR); //obtengo el caracter
-			if(num != EOF && num != ','){
+			if(num != EOF && num != ',' && num != EOL){
 				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," (la grilla esta separada por comas), lo añado a la matriz
 				C++;
 			} //buscar cuanto era EOF en Linux
-			C = 0;
-			F++;
 		}
+		F++;
+		C = 0;
 	}
 }
 
@@ -209,6 +209,9 @@ int main(){
 
 	//Variable para manejar el archivo
 	FILE *SudokuR;
+	FILE *Proc1;
+	FILE *Proc2;
+	FILE *Proc3;
 	//Matriz de 9x9 donde se guardará el sudoku
 	char[9][9] GrillaSudoku;
 	int processCount = 2;
