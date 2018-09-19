@@ -118,7 +118,7 @@ int main(){
 	for(int j = 0; j < NUM_THREADS; j++){
 		rc = pthread_create(&Hilos[j], NULL, VerificarParte, (void *) &thread_Data[j]);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
-        	printf("ERROR; return code from pthread_create() is %d\n", rc);
+        	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
 	}
