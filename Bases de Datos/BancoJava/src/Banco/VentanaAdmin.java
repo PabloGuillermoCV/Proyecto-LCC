@@ -7,8 +7,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Types;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,6 +34,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private DBTable tabla;    
 	private JScrollPane scrConsulta;
 	private JList list;
+	protected Connection conexionBD = null;
 	
 	public VentanaAdmin () {
 		super ();
@@ -106,11 +111,34 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	         {
 	         	list = new JList();
 	         	getContentPane().add(list, BorderLayout.CENTER);
+	         	DefaultListModel model = new DefaultListModel();
+	         	list.setModel(model);
+	         	llenarLista();
+	         	//se usa model.add(pos, item) para agregar items a la lista
 	         }
 	    } 
 		catch (Exception e) {
 	        e.printStackTrace();
 	    }
+	}
+	/**
+	 * Método privado para poblar la lista con las tablas de la BD
+	 */
+	private void llenarLista(){
+		try{
+		 Statement stmt = this.conexionBD.createStatement();
+		 String sql = "SHOW TABLES FROM banco";
+		 stmt.execute(sql);
+		}
+		catch(SQLException e){
+			 JOptionPane.showMessageDialog(this,
+                     "Se produjo un error al intentar obtener las Tablas de la BD.\n" + e.getMessage(),
+                     "Error",
+                     JOptionPane.ERROR_MESSAGE);
+				System.out.println("SQLException: " + e.getMessage());
+				System.out.println("SQLState: " + e.getSQLState());
+				System.out.println("VendorError: " + e.getErrorCode());
+		}
 	}
 	
 	private void thisComponentShown (ComponentEvent evt) {
