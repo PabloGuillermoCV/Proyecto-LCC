@@ -5,7 +5,7 @@
 #include<sys/sem.h>
 #include<semaphore.h>
 
-#define NUM_Threads 6
+#define NUM_THREADS 6
 
 /*Algoritmo
 
@@ -19,8 +19,11 @@
 
 */
 
+//Semaforo para las dos impresoras
 sem_t impresoras;
 
+//Variable Global para obtener los Argumentos para cada Thread
+struct datos_thread thread_Data[NUM_THREADS];
 
 void *Imprimir(void *threadarg){
 
@@ -39,9 +42,6 @@ void *Imprimir(void *threadarg){
 
 }
 
-//Variable Global para obtener los Argumentos para cada Thread
-struct datos_thread thread_Data[NUM_THREADS];
-
 int main(){
 	
 	sem_init(&impresoras, 0, 2);
@@ -54,11 +54,8 @@ int main(){
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
-                             	
 	}
-
-	for(int j ){
-
+	for(int j = 0; j < NUM_THREADS; j++){
 		pthread_join(Hilos[i], NULL);
 	}
 	sem_destroy(&impresoras);
