@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import quick.dbtable.*;
+import javax.swing.JList;
 
 @SuppressWarnings("serial")
 public class VentanaAdmin extends javax.swing.JInternalFrame {
@@ -28,6 +29,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JButton btnEjecutar;
 	private DBTable tabla;    
 	private JScrollPane scrConsulta;
+	private JList list;
 	
 	public VentanaAdmin () {
 		super ();
@@ -42,7 +44,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	        this.setBounds(0, 0, 800, 600);
 	        setVisible(true);
 	        BorderLayout thisLayout = new BorderLayout();
-	        this.setTitle("Consultas (Utilizando DBTable)");
+	        this.setTitle("Consultas Admin (Utilizando DBTable)");
 	        getContentPane().setLayout(thisLayout);
 	        this.setClosable(true);
 	        this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -65,11 +67,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	                    txtConsulta.setTabSize(3);
 	                    txtConsulta.setColumns(80);
 	                    txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
-	                    txtConsulta.setText("SELECT t.fecha, t.nombre_batalla, b.nombre_barco, b.id, b.capitan, r.resultado \n" +
-	                                      "FROM batallas t, resultados r, barcos b \n" +
-	                                      "WHERE t.nombre_batalla = r.nombre_batalla \n" +
-	                                      "AND r.nombre_barco = b.nombre_barco \n" +
-	                                      "ORDER BY t.fecha, t.nombre_batalla, b.nombre_barco");
+	                    txtConsulta.setText("SELECT\r\nFROM \r\nWHERE\r\n");
 	                    txtConsulta.setFont(new java.awt.Font("Monospaced",0,12));
 	                    txtConsulta.setRows(10);
 	                 }
@@ -100,10 +98,14 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	             tabla = new DBTable();
 	              
 	        	 // Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-	             getContentPane().add(tabla, BorderLayout.CENTER);           
+	             getContentPane().add(tabla, BorderLayout.WEST);           
 	                      
 	             // setea la tabla para solo lectura (no se puede editar su contenido)  
 	             tabla.setEditable(false);
+	         }
+	         {
+	         	list = new JList();
+	         	getContentPane().add(list, BorderLayout.CENTER);
 	         }
 	    } 
 		catch (Exception e) {
