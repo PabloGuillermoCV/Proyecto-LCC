@@ -22,71 +22,107 @@
 		liberar a la prioridad bloqueada mas alta
 */
 
-//Semaforo para las dos impresoras
-sem_t impresoras;
-
 //Semaforos que le permiten o bloquean el paso a cada hilo
 sem_t prioridades [NUM_THREADS];
 
-struct datos_hilo{
+//Semaforos que indican si un hilo esta esperando o no a que la impresora termine su trabajo
+sem_t esperandoImpresion [NUM_THREADS];
+
+//Semaforo que se encarga de bloquearle el paso a una impresora cuando la otra esta trabajando
+sem_t bloquearImpresora;
+
+struct datos_hilo {
 	int Thread_id;
 	int prioridad;
 };
 
+/*
+	Para el que no tiene prioridades, sigo teniendo dos hilos de impresoras, pero no voy a tener arreglos
+	de semaforos. Simplemente va a ser un pedir, que la impresora trabaje y le avisa que termino.
+	El primero que llega toma el wait para volver a solicitar
+*/
+
 //Variable Global para obtener los Argumentos para cada Thread
 struct datos_hilo thread_Data[NUM_THREADS];
 
-//Busca la prioridad mas alta bloqueada y le permite el paso
-void liberarMasAlta(sem_t *P []) {
-	bool Encontre = false;
-	int Valor;
-	for (int i = NUM_THREADS-1; i > -1 && !Encontre; i--) {
-		sem_getvalue(&P[i],Valor);
-		if (Valor == 0) {
-			sem_post(&P[i]);
-			Encontre = true;
+//Funcion que usa una impresora para responder a los pedidos de un usario
+void *Imprimir() {
+	bool Encontre;
+	for (int C = 0; C < 60; C++) { //Esta impresora trabajara durante 60 ciclos
+		sem_wait(&bloquearImpresora);
+		Encontre = false;
+		for (int I = NUM_THREADS - 1; I > -1 && !Encontre; I--) {
+			sem_trywait(&prioridades[I]) { //Verifica si este usuario necesita la impresora
+				sem_post(&bloquearImpresora);
+				printf ("Imprimiendo Para El Usuario.");
+				sem_post(&esperandoImpresion[I]); //Le aviso al usuario que la impresora termino de imprimir
+				Encontre = true;
+			}
+		}
+		if (Encontre == false) {
+			sem_post(&bloquearImpresora); //En caso de no encontrar ningun pedido, le deja intentar a la otra impresora
 		}
 	}
+	exit (1);
 }
 
-void *Imprimir(void *threadarg){
+//Funcion que usa un usuario para solicitar una impresora
+void *Requerir(void *threadarg){
 	
 	struct datos_thread *misDatos;
-	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
+	misDatos = (struct thread_data *) threadarg; //Obtengo la estructura de argumentos que posee el Thread
 	
-	//Esperar
-	sem_wait(&prioridades[misDatos.prioridad]);
-	sem_wait(&impresoras);
-	printf("\n entrando a SC...\n");
-
-	//Sección Crítica
-	//esto es para debuggear, al terminar se saca
-	sleep(4);
-
-	//liberar
-	printf("\n Saliendo de la SC \n");
-	sem_post(&impresoras);
-	liberarMasAlta(&prioridades);
+	for (int C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
+		sem_post(&prioridades[misDatos.prioridad]); //Entra en la cola para solicitar una impresora
+		sem_wait(&esperandoImpresion[misDatos.prioridad]); //Espera a que la impresora termine de imprimir
+	}
+	exit (1);
 }
 
 int main(){
-	
-	sem_init(&impresoras, 0, 2);
-	
+
+	sem_init(&bloquearImpresora,0,1);
+
 	pthread_t Hilos[NUM_THREADS];
+
+	pthread_t Impresora1;
+	pthread_t Impresora2;
+
+	int rc;
+
+	rc = pthread_create(Impresora1,NULL,Imprimir,NULL);
+	if (rc){ //ocurrió un error al crear el Thread, reportar
+        	printf("ERROR; Código de retorno: %d\n", rc);
+        	exit(-1);
+    }
+	rc = pthread_create(Impresora2,NULL,Imprimir,NULL);
+	if (rc){ //ocurrió un error al crear el Thread, reportar
+        	printf("ERROR; Código de retorno: %d\n", rc);
+        	exit(-1);
+    }
 
 	for(int i = 0; i < NUM_THREADS; i++){
 		thread_Data[i].prioridad = i;
-		sem_init(&prioridades[i],0,1);
-		rc = pthread_create(&Hilos[j], NULL, Imprimir, (void *) &thread_Data[i]);
+		sem_init(&prioridades[i],0,0);
+		sem_init(&esperandoImpresion[i],0,0);
+
+		rc = pthread_create(&Hilos[j], NULL, Requerir, (void *) &thread_Data[i]);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
 	}
-	for(int j = 0; j < NUM_THREADS; j++){
+
+	for(int i = 0; i < NUM_THREADS; i++){
 		pthread_join(Hilos[i], NULL);
 	}
-	sem_destroy(&impresoras);
+	pthread_join(Impresora1,NULL);
+	pthread_join(Impresora2,NULL);
+
+	sem_destroy(&bloquearImpresora);
+	for (int i = 0; i < NUM_THREADS; i++) {
+		sem_destroy(&prioridades);
+		sem_destroy(&esperandoImpresion);
+	}
 	return 0;
 }

@@ -20,44 +20,77 @@
 */
 
 //Semaforo para las dos impresoras
-sem_t impresoras;
+sem_t impresorasDisponibles;
+
+//Semaforos que indican si un hilo esta esperando o no a que la impresora termine su trabajo
+sem_t esperandoImpresion [NUM_THREADS];
+
+struct datos_hilo {
+	int Thread_id;
+	int orden;
+};
 
 //Variable Global para obtener los Argumentos para cada Thread
-struct datos_thread thread_Data[NUM_THREADS];
+struct datos_hilo thread_Data[NUM_THREADS];
 
-void *Imprimir(void *threadarg){
+//Funcion que usa una impresora para responder a los pedidos de un usario
+void Imprimir() {
+	for (int C = 0; C < 60; C++) { //Esta impresora trabajara durante 60 ciclos
+		
+	}
+	exit (1);
+}
 
-	//Esperar
-	sem_wait(&impresoras);
-	printf("\n entrando a SC...\n");
+//Funcion que usa un usuario para solicitar una impresora
+void *Requerir(void *threadarg){
 
-	//Sección Crítica
-	//esto es para debuggear, al terminar se saca
-	sleep(4);
+	struct datos_thread *misDatos;
+	//no son necesarios las impresoras hilos, es simplemente que entre aca, haga la zona critica aca y salga para que le deje el paso a otro usuario, es un proceso normal, solo tengo esto
+	misDatos = (struct thread_data *) threadarg; //Obtengo la estructura de argumentos que posee el Thread
 
-	//liberar
-	printf("\n Saliendo de la SC \n");
-	sem_post(&impresoras);
-
-
+	for (int C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
+		sem_wait(&impresorasDisponibles); //El usuario solicita una impresora
+		sem_wait(&esperandoImpresion[misDatos.orden]);
+		sleep (4);
+	}
+	exit (1);
 }
 
 int main(){
 	
-	sem_init(&impresoras, 0, 2);
+	sem_init(&impresorasDisponibles,0,2);
 
 	pthread_t Hilos[NUM_THREADS];
 
+	pthread_t Impresora1;
+	pthread_t Impresora2;
+
+	int rc;
+
+	rc = pthread_create(Impresora1,NULL,Imprimir,NULL);
+	if (rc){ //ocurrió un error al crear el Thread, reportar
+        	printf("ERROR; Código de retorno: %d\n", rc);
+        	exit(-1);
+    }
+	rc = pthread_create(Impresora2,NULL,Imprimir,NULL);
+	if (rc){ //ocurrió un error al crear el Thread, reportar
+        	printf("ERROR; Código de retorno: %d\n", rc);
+        	exit(-1);
+    }    
+
 	for(int i = 0; i < NUM_THREADS; i++){
-		rc = pthread_create(&Hilos[j], NULL, Imprimir, NULL);
+		rc = pthread_create(&Hilos[i], NULL, Imprimir, NULL);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
 	}
-	for(int j = 0; j < NUM_THREADS; j++){
+	for(int i = 0; i < NUM_THREADS; i++){
 		pthread_join(Hilos[i], NULL);
 	}
-	sem_destroy(&impresoras);
+	pthread_join(Impresora1,NULL);
+	pthread_join(Impresora2,NULL);
+
+	sem_destroy(&impresorasDisponibles);
 	return 0;
 }
