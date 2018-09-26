@@ -276,5 +276,11 @@ int main(){
     	wait(NULL);
 	}
 
+	//Chequeo que todo esté bien, esto es, leo los 3 archivos y si todos tienen "true", entonces estaba todo bien.
+	Proc1 = fopen("Proceso1.txt","r");
+	Proc2 = fopen("Proceso2.txt", "r");
+	Proc3 = fopen("Proceso3.txt", "r");
+	//getline(&linea,&buffer,&Proc1);
+
 	return 0;
 }
