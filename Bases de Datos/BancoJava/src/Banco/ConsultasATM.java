@@ -25,6 +25,7 @@ import javax.swing.text.MaskFormatter;
 import EjemploClase.Fechas;
 import quick.dbtable.DBTable;
 
+@SuppressWarnings("serial")
 public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   private JPanel pnlInferior;
@@ -166,7 +167,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	      }
 	   }
 	   
- private void thisComponentShown(ComponentEvent evt) 
+	   private void thisComponentShown(ComponentEvent evt) 
 	   {
 	      this.conectarBD();
 	      this.refrescar();

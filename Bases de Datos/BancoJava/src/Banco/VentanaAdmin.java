@@ -24,7 +24,7 @@ import javax.swing.border.BevelBorder;
 import quick.dbtable.*;
 import javax.swing.JList;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial","rawtypes","unchecked"})
 public class VentanaAdmin extends javax.swing.JInternalFrame {
 	
 	private JPanel pnlConsulta;

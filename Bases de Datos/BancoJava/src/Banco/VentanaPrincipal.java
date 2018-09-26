@@ -36,6 +36,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private JButton btnCerrar, loginATM, loginAdmin, loginEmpleado;
 	private JPasswordField passwordField;
 	private JTextField textField;
+	private JMenuItem mniSalir, mniAdmin, mniEmpleado, mniATM;
+	private JDesktopPane jDesktopPane1;
+	private JMenuBar jMenuBar1;
+	private JMenu mnuEjemplos;
+	private JSeparator jSeparator1;
 	
 	/*Por lo que entiendo seria:
 	 * Desde aca se accede con uno de los 3 usuarios posibles (admin, empleado y atm),
@@ -62,7 +67,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		getContentPane().setLayout(null);
 		
 		passwordField = new JPasswordField();
-		passwordField.setToolTipText("Contrase\u00F1a");
+		passwordField.setToolTipText("Contrasena");
 		passwordField.setBounds(236, 223, 198, 27);
 		getContentPane().add(passwordField);
 		
@@ -84,7 +89,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		button.setBounds(26, 10, 116, 27);
 		getContentPane().add(button);
 		
-		JLabel lblContrasea = new JLabel("Contrase\u00F1a");
+		JLabel lblContrasea = new JLabel("Contrasena");
 		lblContrasea.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblContrasea.setEnabled(false);
 		lblContrasea.setHorizontalAlignment(SwingConstants.CENTER);
@@ -107,14 +112,89 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	}
 	
 	private void initGUI () {
-		
+		try 
+	      {
+	         javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+	      } 
+	      catch(Exception e) 
+	      {
+	         e.printStackTrace();
+	      }
+		try {
+	         {
+	            this.setTitle("Java y MySQL");
+	            this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	         }
+	         {
+	            jDesktopPane1 = new JDesktopPane();
+	            getContentPane().add(jDesktopPane1, BorderLayout.CENTER);
+	            jDesktopPane1.setPreferredSize(new java.awt.Dimension(800, 600));
+	         }
+	         {
+	            jMenuBar1 = new JMenuBar();
+	            setJMenuBar(jMenuBar1);
+	            {
+	               mnuEjemplos = new JMenu();
+	               jMenuBar1.add(mnuEjemplos);
+	               mnuEjemplos.setText("Opciones");
+	               {
+	                  mniEmpleado = new JMenuItem();
+	                  mnuEjemplos.add(mniEmpleado);
+	                  mniEmpleado.setText("Busqueda para Empleados (Utilizando JTable)");
+	                  mniEmpleado.addActionListener(new ActionListener() {
+	                     public void actionPerformed(ActionEvent evt) {
+	                        mniEmpleadoActionPerformed(evt);
+	                     }
+	                  });
+	               }
+	               {
+	                  mniATM = new JMenuItem();
+	                  mnuEjemplos.add(mniATM);
+	                  mniATM.setText("Busqueda para ATM (Utilizando DBTable)");
+	                  mniATM.addActionListener(new ActionListener() {
+	                     public void actionPerformed(ActionEvent evt) {
+	                        mniATMActionPerformed(evt);
+	                     }
+	                  });
+	               }
+	               {
+	                  mniAdmin = new JMenuItem();
+	                  mnuEjemplos.add(mniAdmin);
+	                  mniAdmin.setText("Busqueda para Admin (Utilizando DBTable)");
+	                  mniAdmin.addActionListener(new ActionListener() {
+	                     public void actionPerformed(ActionEvent evt) {
+	                        mniAdminActionPerformed(evt);
+	                     }
+	                  });
+	               }
+	               {
+	                  jSeparator1 = new JSeparator();
+	                  mnuEjemplos.add(jSeparator1);
+	               }
+	               {
+	                  mniSalir = new JMenuItem();
+	                  mnuEjemplos.add(mniSalir);
+	                  mniSalir.setText("Salir");
+	                  mniSalir.addActionListener(new ActionListener() {
+	                     public void actionPerformed(ActionEvent evt) {
+	                        mniSalirActionPerformed(evt);
+	                     }
+	                  });
+	               }
+	            }
+	         }
+	         this.setSize(800, 600);
+	         pack();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
 	}
 	
 	private void mniSalirActionPerformed (ActionEvent evt) {
 	    this.dispose();
 	}
 	   
-	private void mniBarcosActionPerformed (ActionEvent evt) {
+	private void mniAdminActionPerformed (ActionEvent evt) {
 	    try {
 	        this.ventanaAdmin.setMaximum (true);
 	    }
@@ -122,7 +202,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	    this.ventanaAdmin.setVisible (true);      
 	}
 	   
-    private void mniConsultasActionPerformed (ActionEvent evt) {
+    private void mniEmpleadoActionPerformed (ActionEvent evt) {
 	    try {
 	        this.ventanaEmpleado.setMaximum (true);
 	    }
@@ -130,7 +210,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	    this.ventanaEmpleado.setVisible (true);      
 	}
 	   
-    private void mniAbmBatallasActionPerformed (ActionEvent evt) {
+    private void mniATMActionPerformed (ActionEvent evt) {
 	    try {
 	        this.ventanaATM.setMaximum (true);
 	    }
