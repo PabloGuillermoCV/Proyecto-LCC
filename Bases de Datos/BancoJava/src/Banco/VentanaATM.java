@@ -162,6 +162,7 @@ public class VentanaATM extends javax.swing.JInternalFrame {
 	    try {    
 	        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
 	    	tabla.setSelectSql(this.txtConsulta.getText().trim());
+	    	//aca iria las consultas sql generadas a partir de lo que eligio el usuario, lo ponemos nosotros y el dbtable se encarga de pasarlo a sql
 	    	// obtenemos el modelo de la tabla a partir de la consulta para 
 	    	// modificar la forma en que se muestran de algunas columnas  
 	    	tabla.createColumnModelFromQuery();    	    
@@ -174,6 +175,7 @@ public class VentanaATM extends javax.swing.JInternalFrame {
 	    		if (tabla.getColumn(i).getType()==Types.DATE) {
 	    		    tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
 	    		}
+	    		//al entrar, pido el pin de tarjeta y compruebo que exista ese pin en la tabla
 	        }  
 	    	// actualizamos el contenido de la tabla.   	     	  
 	    	tabla.refresh();

@@ -369,14 +369,14 @@ CREATE TABLE Transferencia(
 	CREATE VIEW datos_debito AS
 	SELECT CA.nro_ca, CA.saldo, D.nro_trans, T.fecha, T.hora, "debito" AS tipo, T.monto, NULL AS destino, NULL AS cod_caja, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
 	FROM (((Transaccion T JOIN Debito D ON T.nro_trans=D.nro_trans)
-			JOIN Cliente_CA CCA ON D.nro_cliente=CCA.nro_cliente) 
+			JOIN Cliente_CA CCA ON (D.nro_cliente=CCA.nro_cliente AND D.nro_ca=CCA.nro_ca)) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
 			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente;
 	
 	CREATE VIEW datos_transferencia AS
 	SELECT CA.nro_ca, CA.saldo, TR.nro_trans, T.fecha, T.hora, "transferencia" AS tipo, T.monto, TR.destino, TPC.cod_caja, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
 	FROM ((((Transaccion T JOIN Transferencia TR ON T.nro_trans=TR.nro_trans)
-			JOIN Cliente_CA CCA ON TR.nro_cliente=CCA.nro_cliente) 
+			JOIN Cliente_CA CCA ON (TR.nro_cliente=CCA.nro_cliente AND CCA.nro_ca=TR.origen)) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
 			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente)
 			JOIN Transaccion_por_caja TPC ON TPC.nro_trans=TR.nro_trans;
@@ -384,7 +384,7 @@ CREATE TABLE Transferencia(
 	CREATE VIEW datos_extraccion AS
 	SELECT CA.nro_ca, CA.saldo, E.nro_trans, T.fecha, T.hora, "extraccion" AS tipo, T.monto, NULL AS destino, TPC.cod_caja, C.nro_cliente, C.tipo_doc, C.nro_doc, C.nombre, C.apellido
 	FROM ((((Transaccion T JOIN Extraccion E ON T.nro_trans=E.nro_trans) 
-			JOIN Cliente_CA CCA ON E.nro_cliente=CCA.nro_cliente) 
+			JOIN Cliente_CA CCA ON (E.nro_cliente=CCA.nro_cliente AND E.nro_ca=CCA.nro_ca)) 
 			JOIN Caja_Ahorro CA ON CCA.nro_ca=CA.nro_ca) 
 			JOIN Cliente C ON CCA.nro_cliente=C.nro_cliente)
 			JOIN Transaccion_por_caja TPC ON TPC.nro_trans=E.nro_trans;

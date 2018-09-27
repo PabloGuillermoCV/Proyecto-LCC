@@ -155,11 +155,12 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	
 	private void conectarBD () {
 		try {
+			//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
 	        String driver ="com.mysql.cj.jdbc.Driver";
 	        String servidor = "localhost:3306";
 	        String baseDatos = "banco";
 	        String usuario = "admin";
-	        String clave = "admin";
+	        //String clave = "admin"; se toma de lo que ingreso el usuario
 	        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
 	        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
 	        tabla.connectDatabase (driver, uriConexion, usuario, clave);
