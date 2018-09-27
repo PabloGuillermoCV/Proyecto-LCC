@@ -7,19 +7,26 @@
 
 #define NUM_THREADS 6
 
-/*Algoritmo
+/*Algoritmo Requerir
 	
-	//Entry
-		Requerir(Prioridades[prioridad propia])
-		Requerir(Impresora)
-		mientras no tengo el lock{
-			dormir 1 segund
-		}
-	//Sección Critica, obtuve el lock
-		Trabajar
-	//Exit
-		liberar(id);
-		liberar a la prioridad bloqueada mas alta
+	//Durante 20 ciclos, hacer
+		//Liberar(Prioridades propia) para entrar en la lista de pedidos
+		//Requerir(EsperandoImpresion propia) para esperar a que termine de imprimir
+*/
+
+/*Algoritmo Imprimir
+
+	//Durante 60 ciclos, hacer
+		//Requerir(BloquearImpresora) para evitar que ambas impresoras se sobrepongan
+		//Encontre<-false
+		//Para cada usuario, comenzando desde la prioridad mas alta, se recupera el primer pedido disponible encontrado y mientras Encontre=false
+			//Intentar Requerir(Prioridades)
+				//Si se puede, Liberar(BloquearImpresora) para que la otra busque un pedido
+				//Realizar trabajo impresion
+				//Liberar(EsperandoImpresion) para que el usuario continue su trabajo
+				//Encontre<-true
+		//Si no Encontre pedido disponible
+			//Liberar(BloquearImpresora) para que la otra impresora realize su busqueda
 */
 
 //Semaforos que le permiten o bloquean el paso a cada hilo
@@ -36,14 +43,8 @@ struct datos_hilo {
 	int prioridad;
 };
 
-/*
-	Para el que no tiene prioridades, sigo teniendo dos hilos de impresoras, pero no voy a tener arreglos
-	de semaforos. Simplemente va a ser un pedir, que la impresora trabaje y le avisa que termino.
-	El primero que llega toma el wait para volver a solicitar
-*/
-
 //Variable Global para obtener los Argumentos para cada Thread
-struct datos_hilo thread_Data[NUM_THREADS];
+struct datos_hilo thread_Data [NUM_THREADS];
 
 //Funcion que usa una impresora para responder a los pedidos de un usario
 void *Imprimir() {
@@ -83,7 +84,7 @@ int main(){
 
 	sem_init(&bloquearImpresora,0,1);
 
-	pthread_t Hilos[NUM_THREADS];
+	pthread_t Hilos [NUM_THREADS];
 
 	pthread_t Impresora1;
 	pthread_t Impresora2;
@@ -124,5 +125,6 @@ int main(){
 		sem_destroy(&prioridades);
 		sem_destroy(&esperandoImpresion);
 	}
+	
 	return 0;
 }
