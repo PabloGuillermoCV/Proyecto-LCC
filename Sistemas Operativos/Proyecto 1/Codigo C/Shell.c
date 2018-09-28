@@ -154,6 +154,7 @@ int Ejecutar(char **args){
 	}
 	else{
 		if(PID < 0){
+			fprintf(stderr, "Error al crear el Proceso Hijo\n");
 			//Error al hacer Fork, reportar
 
 		}

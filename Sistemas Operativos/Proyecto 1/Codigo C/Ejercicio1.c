@@ -119,10 +119,12 @@ bool VerificarFila(char[][9] gril, int F){
         int X = gril[F][I] - '0';
         if (X < 1 || X > 9) {
             //Tengo un valor no posible
+            fputs("false",Proc1);
             return false;
         }
         if (Lista[X] == true) {
             //Me encuentro con un valor repetido
+            fputs("false",Proc1);
             return false;
         }
         Lista[X] = true;
@@ -132,9 +134,11 @@ bool VerificarFila(char[][9] gril, int F){
         int X = I + 1;
         if (Lista[X] == false) {
             //Faltaba un valor en la lista
+            fputs("false",Proc1);
             return false;
         }
     }
+    fputs("true",Proc1);
 	return true;
 }
 
@@ -150,10 +154,12 @@ bool VerificarColumna(char[][9] gril, int C){
         int X = gril[I][C] - '0';
         if (X < 1 || X > 9) {
             //Tengo un valor no posible
+            fputs("false",Proc2);
             return false;
         }
         if (Lista[X] == true) {
             //Me encuentro con un valor repetido
+            fputs("false",Proc2);
             return false;
         }
         Lista[X] = true;
@@ -163,9 +169,11 @@ bool VerificarColumna(char[][9] gril, int C){
         int X = I + 1;
         if (Lista[X] == false) {
             //Faltaba un valor en la lista
+            fputs("false",Proc2);
             return false;
         }
     }
+    fputs("true",Proc2);
 	return true;
 }
 
@@ -184,10 +192,12 @@ bool VerificarCuadrante(char[][9] gril, int X, int Y){
             int X = gril[I][J] - '0';
             if (X < 1 || X > 9) {
                 //Tengo un valor no posible
-                return false;
+                fputs("false",Proc3);
+                return false; //usar fputs()
             }
             if (Lista[X] == true) {
                 //Me encuentro con un valor repetido
+                fputs("false",Proc3);
                 return false;
             }
             Lista[X] = true;
@@ -198,20 +208,23 @@ bool VerificarCuadrante(char[][9] gril, int X, int Y){
         int X = I + 1;
         if (Lista[X] == false) {
             //Faltaba un valor en la lista
+            fputs("false",Proc3);
             return false;
         }
     }
+    fputs("true",Proc3);
     return true;
 }
 
+//Hago los archivos resultado globales para acceder facilmente 
+FILE *Proc1 = fopen("Proceso1.txt","w");
+FILE *Proc2 = fopen("Proceso2.txt","w");
+FILE *Proc3 = fopen("Proceso3.txt","w");
 
 int main(){
 
 	//Variable para manejar el archivo
 	FILE *SudokuR;
-	FILE *Proc1;
-	FILE *Proc2;
-	FILE *Proc3;
 	//Matriz de 9x9 donde se guardará el sudoku
 	char[9][9] GrillaSudoku;
 	int processCount = 2;
@@ -275,12 +288,18 @@ int main(){
 	if (pid == 0){
     	wait(NULL);
 	}
-
+	char res[100]; //Buffer para leer los archivos
 	//Chequeo que todo esté bien, esto es, leo los 3 archivos y si todos tienen "true", entonces estaba todo bien.
 	Proc1 = fopen("Proceso1.txt","r");
 	Proc2 = fopen("Proceso2.txt", "r");
 	Proc3 = fopen("Proceso3.txt", "r");
-	//getline(&linea,&buffer,&Proc1);
+	if(Proc1 && Proc2 && Proc3){
+		if(fscanf(Proc1,"%s",res) == "true" && fscanf(Proc2,"%s",res) == "true" && fscanf(Proc3,"%s",res) == "true");
+			printf("La jugada de Sudoku era Valida");
+		else{
+			printf("La jugada de Sudoku NO era Valida");
+		}
+	}
 
 	return 0;
 }

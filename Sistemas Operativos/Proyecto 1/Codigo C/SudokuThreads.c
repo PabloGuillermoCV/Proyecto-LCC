@@ -47,17 +47,27 @@ typedef enum { false, true } bool; //Definición de un tipo bool
 */
 void *VerificarParte(void *threadarg){
 	
-	bool nums[9]; //arreglo para comprobar existencia de los números
+	bool nums[11]; //arreglo para comprobar existencia de los números, lo hago de 11 para hacerlo 1-Based
 	struct datos_thread *misDatos;
 	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
 
 	for(int F = misDatos-> FilaI; F < misDatos->FilaF && check[pos]; F++){
 		for(int C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[pos]; C++){
 			//Verificar parte que me corresponde del Sudoku
+			if(nums[C] != false){
+				check[pos] = false; //si hay números repetidos mientras leo, corto
+			}
+			else{
+				nums[C] = true; //si el valor es nuevo, subo el flag de que encontré ese número
+			}
 
 		}
 	}
-
+	for(int i = 1; i <= 11 && check[pos]; i++){
+		if(nums[i] != true){ //Si falta un número, corto, la jugada es invalida
+			check[pos] = false;
+		}
+	}
 	pthread_exit(NULL);	
 }
 
@@ -87,6 +97,8 @@ struct datos_thread thread_Data[NUM_THREADS];
 //Arreglo de booleanos global para los Threads
 bool Check[10];
 
+//Hay que llenar el arreglo de thread_Data
+
 int main(){
 
 	//Variable para manejar el archivo
@@ -104,10 +116,11 @@ int main(){
 
 	if(!SudokuR){
 		//Ocurrió un error al abrir el archivo, reportar dicho error, por ahora solo devuelvo 1, mejorar
+		fprintf(stderr, "Ocurrió un error al Abrir el archivo del Sudoku");
 		return 1;
 	}
 	else{
-		Lectura(&SudokuR,GrillaSudoku); //ver si es correcto el psaje de parámetros
+		Lectura(&SudokuR,GrillaSudoku); 
 	}
 
 
