@@ -107,7 +107,7 @@ int main(){
 		sem_init(&prioridades[i],0,0);
 		sem_init(&esperandoImpresion[i],0,0);
 
-		rc = pthread_create(&Hilos[j], NULL, Requerir, (void *) &thread_Data[i]);
+		rc = pthread_create(&Hilos[i], NULL, Requerir, (void *) &thread_Data[i]);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
