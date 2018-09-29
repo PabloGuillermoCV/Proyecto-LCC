@@ -47,23 +47,26 @@ typedef enum { false, true } bool; //Definición de un tipo bool
 */
 void *VerificarParte(void *threadarg){
 	
-	bool nums[11]; //arreglo para comprobar existencia de los números, lo hago de 11 para hacerlo 1-Based
+	bool nums[10]; //arreglo para comprobar existencia de los números, lo hago de 10 para hacerlo 1-Based
 	struct datos_thread *misDatos;
 	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
 
 	for(int F = misDatos-> FilaI; F < misDatos->FilaF && check[pos]; F++){
 		for(int C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[pos]; C++){
 			//Verificar parte que me corresponde del Sudoku
-			if(nums[C] != false){
+			int num = GrillaSudoku[F][C] - '0';
+			if(num < 1 || num > 9)
+				check[pos] = false; //si el valor leido es ilegal(esto no deberia pasar, indica error de lectura, termino).
+			if(nums[num] != false){
 				check[pos] = false; //si hay números repetidos mientras leo, corto
 			}
 			else{
-				nums[C] = true; //si el valor es nuevo, subo el flag de que encontré ese número
+				nums[num] = true; //si el valor es nuevo, subo el flag de que encontré ese número
 			}
 
 		}
 	}
-	for(int i = 1; i <= 11 && check[pos]; i++){
+	for(int i = 1; i < 10 && check[pos]; i++){
 		if(nums[i] != true){ //Si falta un número, corto, la jugada es invalida
 			check[pos] = false;
 		}
@@ -82,7 +85,8 @@ void Lectura(FILE *Sud, char[][9] gril){
 	while(!feof(Sud) && F < 9){
 		while(C < 9){
 			char num = fgetc(SudokuR); //obtengo el caracter
-			if(num != EOF && num != ',' && num != EOL){
+			int x = num - '0';
+			if(num != EOF && num != ',' && num != EOL && !(x < 1 || x > 9)  ){
 				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," (la grilla esta separada por comas), lo añado a la matriz
 				C++;
 			} //buscar cuanto era EOF en Linux
@@ -98,6 +102,35 @@ struct datos_thread thread_Data[NUM_THREADS];
 bool Check[10];
 
 //Hay que llenar el arreglo de thread_Data
+void Cargar(){
+	datos_thread[0] = { 0, 0, 0,8,0,8};
+	datos_thread[1] = { 1, 1, 0, 0, 0, 8};
+	int[3] fi = {0,3,6};
+	int[3] ci = {0,3,6};
+	int[3] ff = {2,5,8};
+	int[3] cf = {2,5,8};
+	/* (A Efectos de comprobar que el triple ciclo de abajo genera los siguientes conjuntos)
+	datos_thread[2] = { 2, 2, fi[0], ci[0], ff[0], cf[0]};
+	datos_thread[3] = { 3, 3, fi[0], ci[1], fi[0], cf[1]};
+
+	datos_thread[4] = { 4, 4, fi[0], ci[2], fi[0], cf[2]};
+	datos_thread[5] = { 5, 5, fi[1], ci[0], fi[1], cf[0]};
+	datos_thread[6] = { 6, 6, fi[1], ci[1], fi[1], cf[1]};
+	datos_thread[7] = { 7, 7, fi[1], ci[2], fi[1], cf[2]};
+	datos_thread[8] = { 8, 8, fi[2], ci[0], fi[2], cf[0]};
+	datos_thread[9] = { 9, 9, fi[2], ci[1], fi[2], cf[1]};
+	datos_thread[10] = { 10, 10, fi[2], ci[2], fi[2], cf[2]};*/
+	int i = 2;
+	while(i < NUM_THREADS){
+		for(int f = 0; f < 3; f++){
+			for(int c = 0; c < 3; c++){
+				datos_thread[i] = {i, i, fi[f], ci[c], ff[f], cf[c]};
+				i++;
+			}
+		}
+	}
+	
+}
 
 int main(){
 
@@ -110,6 +143,7 @@ int main(){
 
 	pthread_t Hilos[NUM_THREADS];
 	//Cargar thread_Data en algún lado
+	Cargar();
 
 	//Abro el archivo, para lectura (por el enunciado, debe llamarse "sudoku.txt").
 	SudokuR = fopen("sudoku.txt", "r");
@@ -131,7 +165,7 @@ int main(){
 	for(int j = 0; j < NUM_THREADS; j++){
 		rc = pthread_create(&Hilos[j], NULL, VerificarParte, (void *) &thread_Data[j]);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
-        	printf("ERROR; Código de retorno: %d\n", rc);
+        	printf("ERROR AL CREAR HILOS; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
 	}

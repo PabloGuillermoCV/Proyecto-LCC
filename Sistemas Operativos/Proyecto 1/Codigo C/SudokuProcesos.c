@@ -58,8 +58,11 @@ void Lectura(FILE *Sud, char[][9] gril){
 	while(!feof(Sud) && F < 9){
 		while(C < 9){
 			char num = fgetc(SudokuR); //obtengo el caracter
-			if(num != EOF && num != ',' && num != EOL){
-				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," (la grilla esta separada por comas), lo añado a la matriz
+			if(num != EOF && num != ',' && num != EOL && !(x < 1 || x > 9) ){
+				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," o un caracter que NO se una Dígito numérico (la grilla esta separada por comas), lo añado a la matriz
+				
+				else{GrillaSudoku[F][C] = NULL;}  
+					
 				C++;
 			} //buscar cuanto era EOF en Linux
 		}
@@ -68,6 +71,23 @@ void Lectura(FILE *Sud, char[][9] gril){
 	}
 }
 
+/*Función adicional para chequear que  una vez llenada la matriz, la misma este completa, ya que si el input 
+	era incorrecto, puede haber lugares vacios 
+*/
+bool Completitud(char[][9] gril){
+
+	bool OK = true; 
+	for(int F = 0; F < 9 && OK; F++){
+		for(int C = 0; C < 9 && OK; C++){
+			/*Si porque habia un carcter que NO era un dígito, el lugar correspondiente en la Matriz quedó vacio,
+				entonces la "jugada" no era válida*/
+			if(gril[F][C] == NULL) 
+				OK = false;
+		}
+	}
+	return OK;
+
+}
 
 /*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
 	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
@@ -234,38 +254,25 @@ int main(){
 	SudokuR = fopen("sudoku.txt", "r");
 
 	if(!SudokuR){
-		//Ocurrió un error al abrir el archivo, reportar dicho error, por ahora solo devuelvo 1, mejorar
+		fprintf(stderr, "Ocurió un error al intentar abrir el archivo de Input, verifique que el mismo se
+							encuentra en la misma ubicación que el código fuente y vuelva a intentarlo");
 		return 1;
-	}
-	/*
-	 el archivo se abrió correctamente, hago el primer fork() para leer el archivo, mi hijo compartirá
-	 el archivo abierto por lo dicho en la teoria Y LA MATRIZ, además, ámbos ejecutan concurrentemente por UNIX
-	 El Padre debe esperar a este Hijo
-	*/
+		//Ocurrió un error al abrir el archivo, reportar dicho error
 	else{
-		pid = fork();
+		
+		Lectura(SudokuR, GrillaSudoku);
 
-		if(pid == -1){
-			//Hubo un error al crear el hijo, reporto dicha ocurrencia (reportar)
-		}
-		else{
-			if(pid > 0){
-				//Estoy en el Padre, en este caso, debo esperar a que mi hijo termine y devuelva
-				wait(NULL);
-			}
-			else{
-				//Estoy en el hijo, debo leer el archivo y cargar la matriz, delego en un procedimiento
-				//para modularizar
-				Lectura(SudokuR, GrillaSudoku);
-				//terminado el proceso, yo como hijo debo reportar que terminé
-				exit(0);
-			}
-
-			//asumiendo que terminé de leer todo correctamente, deberia tener la matriz totalmente cargada
-			//ya no necesito más el archivo, puedo cerrarlo y continuar
-			fclose(SudokuR);
+		//asumiendo que terminé de leer todo correctamente, deberia tener la matriz totalmente cargada
+		//ya no necesito más el archivo, puedo cerrarlo y continuar
+		fclose(SudokuR);
+		if(Completitud(GrillaSudoku) != true){
+			fprintf(stderr,"La jugada NO es correcta ya que el Input del mismo NO ERAN NÚMEROS EN SU TOTALIDAD\n");
+			return 1;
 		}
 	}
+
+			
+	
 	/*
 		Ciclo FOR que crea todos los procesos necesarios, luego, si estoy en el Hijo,
 		Entro a un método especial que le asigna un trabajo a realizar
@@ -273,13 +280,14 @@ int main(){
 	for(int i=0; i<processCount && check1; i++){
     	pid=fork();
     	if(pid == -1){
+    		fprintf(stderr,"Error al crear el Proceso Hijo Numero %d", i);
     		//tirar error, algo salió mal al crear el hijo
     	}
     	else{
     		if(pid != 0){
         		check1 = HacerTarea(i); //Entro al método para saber que hacer yo como Hijo
         		//OJO, ver donde meter el exit() para terminar el hijo
-        		exit(); //una vez que yo, POroceso Hijo, termino mi tarea, hago Exit.
+        		exit(); //una vez que yo, Proceso Hijo, termino mi tarea, hago Exit.
         		break;
     		}
     	}
