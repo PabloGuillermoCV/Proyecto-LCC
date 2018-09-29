@@ -40,7 +40,7 @@ sem_t atendido;
 sem_t asiento;
 
 //Semaforo que sirve para notificar cuando esta ocupada la oficina
-sem_t oficinaLibre
+sem_t oficinaLibre;
 
 void *Atender () {
 	
