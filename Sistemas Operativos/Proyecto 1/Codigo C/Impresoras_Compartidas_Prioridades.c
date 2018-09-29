@@ -7,13 +7,6 @@
 
 #define NUM_THREADS 6
 
-/*Algoritmo Requerir
-	
-	//Durante 20 ciclos, hacer
-		//Liberar(Prioridades propia) para entrar en la lista de pedidos
-		//Requerir(EsperandoImpresion propia) para esperar a que termine de imprimir
-*/
-
 /*Algoritmo Imprimir
 
 	//Durante 60 ciclos, hacer
@@ -27,6 +20,13 @@
 				//Encontre<-true
 		//Si no Encontre pedido disponible
 			//Liberar(BloquearImpresora) para que la otra impresora realize su busqueda
+*/
+
+/*Algoritmo Requerir
+	
+	//Durante 20 ciclos, hacer
+		//Liberar(Prioridades propia) para entrar en la lista de pedidos
+		//Requerir(EsperandoImpresion propia) para esperar a que termine de imprimir
 */
 
 //Semaforos que le permiten o bloquean el paso a cada hilo
@@ -48,6 +48,7 @@ struct datos_hilo thread_Data [NUM_THREADS];
 
 //Funcion que usa una impresora para responder a los pedidos de un usario
 void *Imprimir() {
+	
 	bool Encontre;
 	for (int C = 0; C < 60; C++) { //Esta impresora trabajara durante 60 ciclos
 		sem_wait(&bloquearImpresora);

@@ -11,12 +11,12 @@
 	
 	//Durante 20 ciclos, hacer
 		//Entry
-			Requerir(ImpresorasDisponibles)
-			Mientras no tengo el lock, esperar
+			//Requerir(ImpresorasDisponibles)
+			//Mientras no tengo el lock, esperar
 		//Sección Crítica, obtuve el lock
 			//Hacer trabajo de impresion
 		//Exit
-			Liberar(ImpresorasDisponibles)
+			//Liberar(ImpresorasDisponibles)
 
 */
 
