@@ -1,0 +1,3 @@
+#!/bin/bash
+-gcc -lpthread -o ImpPrioridades Impresoras_Compartidas_Prioridades.c
+./ImpPrioridades

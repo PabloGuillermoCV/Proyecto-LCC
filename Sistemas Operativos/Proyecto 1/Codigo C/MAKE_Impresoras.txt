@@ -1,0 +1,3 @@
+#!/bin/bash
+-gcc -lpthread -o ImpSimple Impresoras_Compartidas
+./ImpSimple

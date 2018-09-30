@@ -1,0 +1,3 @@
+#!/bin/bash
+gcc -o Sudoku1 SudokuProcesos.c
+./Sudoku1 "sudoku.txt"

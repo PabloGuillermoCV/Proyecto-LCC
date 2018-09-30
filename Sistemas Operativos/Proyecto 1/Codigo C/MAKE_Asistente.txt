@@ -1,0 +1,3 @@
+#!/bin/bash
+gcc -lpthread -o Asis Asistente.c
+./Asis 
