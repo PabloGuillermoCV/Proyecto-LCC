@@ -27,6 +27,10 @@ int num_Predeterminados(){
 	return sizeof(Comandos_Predeterminados) / sizeof(char*);
 }
 
+int num_Disponibles(){
+	return sizeof(Comandos_Disponibles) 7 sizeof(char*);
+}
+
 int help(** args){
 	printf("Shell en C para el Primer Proyecto de Sistemas Operativos\n");
 	printf("Ingrese alguno de los comandos disponibles y presione ENTER\n");
@@ -117,6 +121,7 @@ void **Separar_Argumentos(char *linea){
 	return tokens;
 }
 int lanzar(char **args){
+	bool legal = true;
 	if(args[0] == NULL){
 		//NO se ingresó nada, simplemente salir y volver a esperar stdin
 		return 1;
@@ -131,14 +136,21 @@ int lanzar(char **args){
 			return (*Comandos_Predeterminados[i])(args);
 		}
 	}
+	//Corroboro que el comando este entre los comandos disponibles ANTES de intentar ejecutar
+	for(int i = 0; i < num_Disponibles() && legal; i++){
+		legal = strcmp(args[0], Comandos_Disponibles[i] == 0);
+	}
+	if(legal = false){
+		fprintf(stderr, "El comando ingresado NO esta disponible,\n si desea obtener más ayuda sobre los comandos disponibles, use el comando help\n");
+	}
+
  return Ejecutar(args);
 }
 
 
 
 /*Tercer Función principal cuya función es, dado los argumentos, ejecutar el comando
-	OJO ACÁ, estoy asumiendo que me estan ingresando un comando válido
-		hay que hacer un chequeo adicional con Comandos_Disponibles[]
+	asumo que me estan ingresando un comando válido, ya que previamente corroboré que era un comando válido
 */
 int Ejecutar(char **args){
 
@@ -170,23 +182,7 @@ int Ejecutar(char **args){
 
 int main(void){
 
-
-		loop();
-
-		/*	Como seguir?
-		*	 	
-		*	1) Definir los comandos pedidos por el proyecto
-				1.1)cada comando deberia tener un pseudónimo asociado
-				1.2)cada comando deberia rederigir a una función/procedimiento
-				1.3)definir Argumentos legales para la shell y sus modificadores (archivos, '&' , '|', '-x' , etc)
-			2) Hacer que la shell lea el input dado
-				2.1) Debe darse cuenta que comando fue el llamado y NUESTRO Shell debe PROCESAR los modificadores asociados
-				2.2) Hecho esto, se delega en el System Call Correspondiente (mkdir, deldir, etc)
-					2.2.1) el shell debe crear un hijo con Fork(), y luego el hijo debe ejecutar execvp(char *command, char *params[])
-			3) Consideraciones
-				3.1) cuando el usuario ingrese "exit", debe_correr se setea a 0 y el programa debe terminar
-				3.2) char *argumentos guardará el contenido del comando ingresado por pantalla, un lugar por "token" 
-					(1 token es el nombre del comando, otro token es un modificador como "-la", etc)
-		*/
+	//Delego en la función Loop para entrar en un ciclo para que funcione el shell
+	loop();
 	
 }
