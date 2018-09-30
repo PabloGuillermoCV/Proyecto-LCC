@@ -1,3 +1,5 @@
 #!/bin/bash
+clear
+echo "Bienvenido a la Shell PR1"
 gcc -o PRShell Shell.c
 ./PRShell

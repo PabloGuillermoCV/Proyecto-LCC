@@ -1,3 +1,4 @@
 #!/bin/bash
+clear
 gcc -lpthread -o Sudoku2 SudokuThreads.c
 ./Sudoku2 "sudoku.txt"

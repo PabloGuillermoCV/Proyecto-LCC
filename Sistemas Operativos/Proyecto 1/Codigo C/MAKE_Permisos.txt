@@ -1,0 +1,9 @@
+#!/bin/bash
+clear
+chmod 755 MAKE_Asistente
+chmod 755 MAKE_Impresoras
+chmod 755 MAKE_ImpresorasPrioridades
+chmod 755 MAKE_Shell
+chmod 755 MAKE_SudokuProcesos
+chmod 755 MAKE_SudokuThread
+echo "AHora esta en condiciones de ejecutar los scripts del Proyecto"
