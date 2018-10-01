@@ -2,40 +2,43 @@
 #include <strings.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define MAX_LINE 80 //Largo máximo para un comando
 #define TOK_BUFSIZE 64 //Tamaño del buffer usado por strtok
 #define TOK_DELIM " \t\r\n\a" //Delimitadores legales para strtok
 
-char *Comandos_Disponibles[]{
-	"mkdir" //Crear directorio
-	"rmdir" //Eliminar Directorio
-	"cat" //Crear archivo / Mostrar el contenido de un archivo
-	"ls" //Listar contenidos de un directorio
-	"more" //Mostrar contenido de un archivo
-	"exit" //salir
+char *Comandos_Disponibles[] = {
+	"mkdir", //Crear directorio
+	"rmdir", //Eliminar Directorio
+	"cat", //Crear archivo / Mostrar el contenido de un archivo
+	"ls", //Listar contenidos de un directorio
+	"more", //Mostrar contenido de un archivo
+	"exit", //salir
 	"help" //comando ayuda
-}
+};
 
-char *Comandos_Predeterminados[]{
-	"help"
+char *Comandos_Predeterminados[] = {
+	"help",
 	"exit"
-}
+};
 
 int num_Predeterminados(){
 	return sizeof(Comandos_Predeterminados) / sizeof(char*);
 }
 
 int num_Disponibles(){
-	return sizeof(Comandos_Disponibles) 7 sizeof(char*);
+	return sizeof(Comandos_Disponibles) / sizeof(char*);
 }
 
-int help(** args){
+int help(void ** args){
 	printf("Shell en C para el Primer Proyecto de Sistemas Operativos\n");
 	printf("Ingrese alguno de los comandos disponibles y presione ENTER\n");
 	printf("A continuación se detallan los comandos disponibles\n");
 	printf("mkdir [NombreDir] Crea un directorio con Nombre NombreDir en la posición actual\n");
-	printf("rmdir [NombreDir] Intenta Eliminar un directorio con NombreDir, solo podrá eliminarse si el directorio esta vacio\n")
+	printf("rmdir [NombreDir] Intenta Eliminar un directorio con NombreDir, solo podrá eliminarse si el directorio esta vacio\n");
 	printf("cat [NombreAR] Intenta crear un Archivo con nombre NombreAR\n");
 	printf("ls [Args] Lista los contenidos del directorio actual, dependiendo de los Args dados\n");
 	printf("more [NombreAR] Muestra el contenido del archivo NombreAR\n");
@@ -43,27 +46,9 @@ int help(** args){
 	printf("help muestra el presente mensaje\n");
 }
 
-int exit(** args){
+int exitShell(void ** args){
 	//esta función deberia terminar todo
 	return 0;
-}
-
-void loop(void){
-	char *linea; //Linea del Shell
-	char **args; //Argumentos de la Linea dada
-	int Estado; //Estado actual para saber si se debe terminar o no
-
-	//Se hace un Do-While para ciclar una vez inicialmente
-	do{
-		printf("pr1>"); //imprimo una linea para nuestro shell
-		linea = Leer_Linea(); //Primer función, esta lee la linea ingresada
-		args = Separar_Argumentos(linea); //Segunda función, dada la linea, busca los argumentos y los separa
-		Estado = lanzar(args); //Tercer Función, dados los argumentos, ejecuta el comando
-
-		free(linea); //Libero el espacio
-		free(args);
-
-	}while(Estado);
 }
 
 /*Primer Función principal cuya función es leer la linea
@@ -109,7 +94,7 @@ void **Separar_Argumentos(char *linea){
 			if(!tokens){
 				//ocurrió un error al alocar espacio
 				fprintf(stderr, "Error en el buffer de lectura");
-				exit(EXIT_FAILURE);
+				exitShell(EXIT_FAILURE);
 			}
 			//hago un strtok con NULL para terminar
 			token = strtok(NULL, TOK_DELIM);
@@ -118,6 +103,37 @@ void **Separar_Argumentos(char *linea){
 	//Digo que la útima posición de tokens es un nulo para terminar
 	tokens[Pos] = NULL;
 	return tokens;
+}
+
+/*Tercer Función principal cuya función es, dado los argumentos, ejecutar el comando
+	asumo que me estan ingresando un comando válido, ya que previamente corroboré que era un comando válido
+*/
+int Ejecutar(char **args){
+
+	int PID, WPID, Estado;
+
+	PID = fork();
+	if(PID == 0){
+		//Estoy en el proceso Hijo, uso execvp para lanzar el proceso
+		if(execvp(args[0], args) == -1){
+			//tirar error
+		}
+		exitShell(EXIT_FAILURE);
+	}
+	else{
+		if(PID < 0){
+			fprintf(stderr, "Error al crear el Proceso Hijo\n");
+			//Error al hacer Fork, reportar
+
+		}
+		else{
+			//Estoy en el proceso Padre, espero a mi hijo
+			do{
+				WPID = waitpid(PID,&Estado,WUNTRACED);
+			}while (!WIFEXITED(Estado) && WIFSIGNALED(Estado));
+		}
+	}
+	return 1;
 }
 
 int lanzar(char **args){
@@ -134,7 +150,8 @@ int lanzar(char **args){
 				para hacer todo el tramite
 		*/
 		if(strcmp(args[0], Comandos_Predeterminados[i]) == 0){
-			return (*Comandos_Predeterminados[i])(args);
+			int Res = (*Comandos_Predeterminados[i])(**args);
+			return Res;
 		}
 	}
 	//Corroboro que el comando este entre los comandos disponibles ANTES de intentar ejecutar
@@ -145,40 +162,25 @@ int lanzar(char **args){
 		fprintf(stderr, "El comando ingresado NO esta disponible,\n si desea obtener más ayuda sobre los comandos disponibles, use el comando help\n");
 	}
 
- return Ejecutar(args);
+	return Ejecutar(args);
 }
 
+void loop(void){
+	char *linea; //Linea del Shell
+	char **args; //Argumentos de la Linea dada
+	int Estado; //Estado actual para saber si se debe terminar o no
 
+	//Se hace un Do-While para ciclar una vez inicialmente
+	do{
+		printf("pr1>"); //imprimo una linea para nuestro shell
+		linea = Leer_Linea(); //Primer función, esta lee la linea ingresada
+		args = Separar_Argumentos(linea); //Segunda función, dada la linea, busca los argumentos y los separa
+		Estado = lanzar(args); //Tercer Función, dados los argumentos, ejecuta el comando
 
-/*Tercer Función principal cuya función es, dado los argumentos, ejecutar el comando
-	asumo que me estan ingresando un comando válido, ya que previamente corroboré que era un comando válido
-*/
-int Ejecutar(char **args){
+		free(linea); //Libero el espacio
+		free(args);
 
-	int PID, WPID, Estado;
-
-	PID = fork();
-	if(PID == 0){
-		//Estoy en el proceso Hijo, uso execvp para lanzar el proceso
-		if(execvp(args[0], args) == -1){
-			//tirar error
-		}
-		exit(EXIT_FAILURE);
-	}
-	else{
-		if(PID < 0){
-			fprintf(stderr, "Error al crear el Proceso Hijo\n");
-			//Error al hacer Fork, reportar
-
-		}
-		else{
-			//Estoy en el proceso Padre, espero a mi hijo
-			do{
-				WPID = waitpid(PID,&Estado,WUNTRACED);
-			}while (!WIFEXITED(Estado) && WIFSIGNALED(Estado));
-		}
-	}
-	return 1;
+	}while(Estado);
 }
 
 int main(void){

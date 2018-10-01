@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-/* Estoy usando este tutorial para pthreads:
-	https://computing.llnl.gov/tutorials/pthreads/
-*/
-
 /*número máximo de Threads que estarán presentes
 	1 Thread para todas las filas
 	1 Thread para todas las columnas
@@ -68,10 +64,6 @@ void *VerificarParte(void *threadarg){
 			if(nums[num] != false){
 				Check[misDatos->pos] = false; //si hay números repetidos mientras leo, corto
 			}
-			else{
-				nums[num] = true; //si el valor es nuevo, subo el flag de que encontré ese número
-			}
-
 		}
 	}
 	int i;
