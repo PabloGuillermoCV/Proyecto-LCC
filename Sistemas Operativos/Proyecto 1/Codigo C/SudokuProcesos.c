@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 /* Como seria la idea general para resolver el tester de Sudoku?
    1) generar la matriz -> 1 Proceso separado del Padre
@@ -45,24 +47,31 @@
 
 */
 
+//Hago los archivos resultado globales para acceder facilmente
+FILE *Proc1;
+FILE *Proc2;
+FILE *Proc3;
+
 /*
 	Función para modularizar, esta se encarga de leer el archivo
 	COMPLETAR, hay que hacer chequeos adicionales y ver si realmente estaria leyendo y asignando el valor
 */
-void Lectura(FILE *Sud, char GrillaSudoku [][9]){
+void Lectura(FILE *SudokuR, char GrillaSudoku [][9]){
 
 	int F = 0;
 	int C = 0;
-	while(!feof(Sud) && F < 9){
+	while(!feof(SudokuR) && F < 9){
 		while(C < 9){
 			char num = fgetc(SudokuR); //obtengo el caracter
-			if(num != EOF && num != ',' && num != EOL && !(x < 1 || x > 9) ){
+			int x = num - '0';
+			if(num != EOF && num != ',' && num != '\n' && !(x < 1 || x > 9) ){
 				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," o un caracter que NO se una Dígito numérico (la grilla esta separada por comas), lo añado a la matriz
-
-				else{GrillaSudoku[F][C] = NULL;}
-
-				C++;
-			} //buscar cuanto era EOF en Linux
+			}
+			else{
+				GrillaSudoku[F][C] = NULL;
+			}
+			C++;
+			//buscar cuanto era EOF en Linux
 		}
 		F++;
 		C = 0;
@@ -88,44 +97,6 @@ bool Completitud(char GrillaSudoku [][9]){
 	return OK;
 
 }
-
-/*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
-	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
-	es el tercero y le asigno revisar los cuadrantes con sus respectivas funciones especiales dentro de un loop while
-*/
-bool HacerTarea(int ProcNum){
-
-	int rec,Y = 0;
-	bool check = true;
-
-	switch(ProcNum){
-
-		case 0:
-			while(check && rec < 9){
-				check = VerificarFila(GrillaSudoku, rec);
-				rec++;
-			}
-			break;
-		case 1:
-			while(check && rec < 9){
-				check = VerificarColumna(GrillaSudoku, rec);
-				rec++;
-			}
-			break;
-		case 2:
-			while(check && rec <= 6 && Y <= 6){
-				check = VerificarCuadrante(GrillaSudoku, rec, Y);
-				rec = rec + 3;
-				if(rec == 6 && Y != 6){
-					rec = 0;
-					Y = Y + 3;
-				}
-			}
-			break;
-	}
-	return check;
-}
-
 
 /* Función que verificará un Cuadrante del Sudoku
 *	gril, grilla del Sudoku
@@ -236,13 +207,49 @@ bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
     return true;
 }
 
-//Hago los archivos resultado globales para acceder facilmente
-FILE *Proc1 = fopen("Proceso1.txt","w");
-FILE *Proc2 = fopen("Proceso2.txt","w");
-FILE *Proc3 = fopen("Proceso3.txt","w");
+/*Método que, dependiendo del número pasado, discrimina la tarea a asignarle al proceso entrante
+	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
+	es el tercero y le asigno revisar los cuadrantes con sus respectivas funciones especiales dentro de un loop while
+*/
+bool HacerTarea(int ProcNum, char GrillaSudoku [][9]){
+
+	int rec,Y = 0;
+	bool check = true;
+
+	switch(ProcNum){
+
+		case 0:
+			while(check && rec < 9){
+				check = VerificarFila(GrillaSudoku, rec);
+				rec++;
+			}
+			break;
+		case 1:
+			while(check && rec < 9){
+				check = VerificarColumna(GrillaSudoku, rec);
+				rec++;
+			}
+			break;
+		case 2:
+			while(check && rec <= 6 && Y <= 6){
+				check = VerificarCuadrante(GrillaSudoku, rec, Y);
+				rec = rec + 3;
+				if(rec == 6 && Y != 6){
+					rec = 0;
+					Y = Y + 3;
+				}
+			}
+			break;
+	}
+	return check;
+}
 
 int main(){
-
+	
+	Proc1 = fopen("Proceso1.txt","w");
+	Proc2 = fopen("Proceso2.txt","w");
+	Proc3 = fopen("Proceso3.txt","w");
+	
 	//Variable para manejar el archivo
 	FILE *SudokuR;
 	//Matriz de 9x9 donde se guardará el sudoku
@@ -285,9 +292,9 @@ int main(){
     	}
     	else{
     		if(pid != 0){
-        		check1 = HacerTarea(i); //Entro al método para saber que hacer yo como Hijo
+        		check1 = HacerTarea(i,GrillaSudoku); //Entro al método para saber que hacer yo como Hijo
         		//OJO, ver donde meter el exit() para terminar el hijo
-        		exit(); //una vez que yo, Proceso Hijo, termino mi tarea, hago Exit.
+        		exit(0); //una vez que yo, Proceso Hijo, termino mi tarea, hago Exit.
         		break;
     		}
     	}
@@ -298,11 +305,14 @@ int main(){
 	}
 	char res[100]; //Buffer para leer los archivos
 	//Chequeo que todo esté bien, esto es, leo los 3 archivos y si todos tienen "true", entonces estaba todo bien.
-	Proc1 = fopen("Proceso1.txt","r");
+	Proc1 = fopen("Proceso1.txt", "r");
 	Proc2 = fopen("Proceso2.txt", "r");
 	Proc3 = fopen("Proceso3.txt", "r");
 	if(Proc1 && Proc2 && Proc3){
-		if(fscanf(Proc1,"%s",res) == "true" && fscanf(Proc2,"%s",res) == "true" && fscanf(Proc3,"%s",res) == "true"){
+	    fscanf(Proc1,"%s",res1);
+	    fscanf(Proc2,"%s",res2);
+	    fscanf(Proc3,"%s",res3);
+		if(res1 == "true" && res2 == "true" && res3 == "true"){
 			printf("La jugada de Sudoku era Valida");}
 		else{
 			printf("La jugada de Sudoku NO era Valida");
