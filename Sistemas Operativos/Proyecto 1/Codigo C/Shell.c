@@ -63,7 +63,7 @@ void *Leer_Linea(){
 
 /*Segunda Función principal cuya función es, dada la linea
 	Separar en Comando y Argumentos
-  ASUME QUE LOS ARGUMENTOS ESTAN SEPARADOS POR ESPACIOS, NO HAY COMAS NI NADA
+  ASUME QUE LOS ARGUMENTOS ESTAN SEPARADOS POR ESPACIOS
 */
 void **Separar_Argumentos(char *linea){
 	int size_Buffer = TOK_BUFSIZE;
@@ -136,17 +136,19 @@ int Ejecutar(char **args){
 	return 1;
 }
 
+/*Cuarta función principal que se encarga de lanzar el comando al hacer fork
+*/
 int lanzar(char **args){
 	bool legal = true;
 	if(args[0] == NULL){
-		//NO se ingresó nada, simplemente salir y volver a esperar stdin
+		//NO se ingresó nada, simplemente salir y volver a esperar input
 		return 1;
 	}
 	
 	int i;
 	for(i = 0; i < num_Predeterminados(); i++){
 		/*Si el comando ingresado es alguno de los comandos predeterminados
-			simplemente lo ejecuto yo con una función propia, sino, delego en Ejecutar(args) que creará el hijo
+			simplemente lo ejecuto con una función propia, sino, delego en Ejecutar(args) que creará el hijo
 				para hacer todo el tramite
 		*/
 		if(strcmp(args[0], Comandos_Predeterminados[i]) == 0){

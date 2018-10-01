@@ -7,10 +7,9 @@
 #include <sys/wait.h>
 
 /* Como seria la idea general para resolver el tester de Sudoku?
-   1) generar la matriz -> 1 Proceso separado del Padre
+   1) generar la matriz -> El Padre lo hace
    		1.1)sabemos que la Matriz es de 9x9, asi que un arreglo bi-dimensional cuadrado de caracteres bastará
 		1.2)Es necesario abrir el archivo de entrada (fopen()), leer caracter por caracter
-			(al usar caracteres, estamos usando ASCII, ver esto)
 			1.2.1) mientras se lee el archivo (mientras NOT feof() -> fgetc(). Leer caracter a caracter), se carga la matriz
 			1.2.2) una vez leido el archivo y cargada la matriz, se cierra el archivo (fclose())
 	2)Empezar a bifurcar en serio
@@ -25,25 +24,6 @@
 		2.2) Estos Procesos deben reportar si su tarea falló en caso de que la jugada sea inválida, al primero que lo hace, se
 			 debe cortar TODO, el padre debe matar a los hijos restantes (se podria hacer con una variable global, pero lo dudo)
 		2.3) si NINGUNO falla y TODOS terminan, entonces la jugada de Sudoku era válida, entonces, el Padre reporta que la jugada era válida
-	3) Consideraciones
-		3.1) Los Procesos pueden fallar por si solos en cualquier momento, hay que ver las excepciones que pueden tirar y sus códigos
-		3.2) Ver lo de la Variable Global para controlar que todo este en órden
-		3.3) Una vez hecho esto con procesos, pasarlo a Threads es tan fácil como reemplazar los Procesos por Threads
-		3.4) Verificar si es mejor usar char[][] o int[][], si es mejor usar int, hay que tener en cuenta que hay que traducir
-			 el ASCII del caracter al número INT
-		3.5) Preguntar sobre como reportar errores (códigos de error? Strings?)
-		3.6) Preguntar sobre input de funciones por Punteros (no recuerdo si asi como lo hice esta bien o va con "&" al llamar)
-		3.7) recordar que las funciones de archivos devuelven un int, ver que hacer con esto
-		3.8) parece que exit() no puede hacer más que devolver 0 (terminación normal) o 1 (terminación anormal), existen
-			 un par de funciones llamadas <int atexit (void (* function) (void))> y <int on_exit(void (*function)(int , void *), void *arg)>
-			 que permiten ejecutar funciones cuando se llama a exit(), preguntar sobre su uso y como hacer el pasaje
-			 (ya que requiere pasajes de función por punteros, lo que hicimos en Orga para el Primer Proyecto)
-		3.9) El Chequeo para saber donde estoy al hacer fork() se repite siempre, preguntar si no se puede modularizar en un función
-		3.10) Mientras se está chequeando las Filas y Columnas, siempre avanzar para adelante
-			3.10.1) Ver como chequear que esten todos lo números (se me ocurre un array de booleans/int 1-based, entonces, si hay un 1
-					en las 9 posiciones del arrgelo, la fila/columna/cuadrante es correcta, si hay algún número en 0 o hay un número
-					con más de una aparición, la fila/columna/cuadrante es incorrecta)
-		3.11) Ver como era el pasaje de Arreglos a funciones
 
 */
 
