@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
-using namespace std;
 
 /* Estoy usando este tutorial para pthreads:
 	https://computing.llnl.gov/tutorials/pthreads/
@@ -29,10 +28,7 @@ struct datos_thread{
 	int ColumnaI; //Columna donde empiezo a verificar
 	int FilaF; //Fila donde debo terminar (Asumiendo jugada válida)
 	int ColumnaF; //Columna donde debo terminar  (Asumiendo jugada válida)
-}
-
-typedef enum { false, true } bool; //Definición de un tipo bool
-
+};
 
 /*Función genérica para todos los threads para verificar una parte del Sudoku
 	la Estructura "misDatos" es el cjto de Datos que posee el Thread con el cual
@@ -53,9 +49,9 @@ void *VerificarParte(void *threadarg){
 	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
 
     int F;
-	for(F = misDatos-> FilaI; F < misDatos->FilaF && check[pos]; F++){
+	for(F = misDatos->FilaI; F < misDatos->FilaF && check[pos]; F++){
         int C;
-		for(C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[pos]; C++){
+		for(C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[midDatos->pos]; C++){
 			//Verificar parte que me corresponde del Sudoku
 			int num = GrillaSudoku[F][C] - '0';
 			if(num < 1 || num > 9)
@@ -69,7 +65,8 @@ void *VerificarParte(void *threadarg){
 
 		}
 	}
-	for(int i = 1; i < 10 && check[pos]; i++){
+	int i;
+	for(i = 1; i < 10 && check[pos]; i++){
 		if(nums[i] != true){ //Si falta un número, corto, la jugada es invalida
 			check[pos] = false;
 		}
@@ -81,15 +78,15 @@ void *VerificarParte(void *threadarg){
 	Función para modularizar, esta se encarga de leer el archivo
 	COMPLETAR, hay que hacer chequeos adicionales y ver si realmente estaria leyendo y asignando el valor
 */
-void Lectura(FILE *Sud, char[][9] gril){
+void Lectura(FILE *SudokuR, char GrillaSudoku [][9]){
 
 	int F = 0;
 	int C = 0;
-	while(!feof(Sud) && F < 9){
+	while(!feof(SudokuR) && F < 9){
 		while(C < 9){
 			char num = fgetc(SudokuR); //obtengo el caracter
 			int x = num - '0';
-			if(num != EOF && num != ',' && num != EOL && !(x < 1 || x > 9)  ){
+			if(num != EOF && num != ',' && num != '\n' && !(x < 1 || x > 9)  ){
 				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," (la grilla esta separada por comas), lo añado a la matriz
 				C++;
 			} //buscar cuanto era EOF en Linux
@@ -106,30 +103,30 @@ bool Check[10];
 
 //Hay que llenar el arreglo de thread_Data
 void Cargar(){
-	datos_thread[0] = { 0, 0, 0,8,0,8};
-	datos_thread[1] = { 1, 1, 0, 0, 0, 8};
-	int[3] fi = {0,3,6};
-	int[3] ci = {0,3,6};
-	int[3] ff = {2,5,8};
-	int[3] cf = {2,5,8};
+	thread_Data[0] = { 0, 0, 0, 8, 0, 8};
+	thread_Data[1] = { 1, 1, 0, 0, 0, 8};
+	int fi [3] = {0, 3, 6};
+	int ci [3] = {0, 3, 6};
+	int ff [3] = {2, 5, 8};
+	int cf [3] = {2, 5, 8};
 	/* (A Efectos de comprobar que el triple ciclo de abajo genera los siguientes conjuntos)
-	datos_thread[2] = { 2, 2, fi[0], ci[0], ff[0], cf[0]};
-	datos_thread[3] = { 3, 3, fi[0], ci[1], fi[0], cf[1]};
+	thread_Data[2] = { 2, 2, fi[0], ci[0], ff[0], cf[0]};
+	thread_Data[3] = { 3, 3, fi[0], ci[1], fi[0], cf[1]};
 
-	datos_thread[4] = { 4, 4, fi[0], ci[2], fi[0], cf[2]};
-	datos_thread[5] = { 5, 5, fi[1], ci[0], fi[1], cf[0]};
-	datos_thread[6] = { 6, 6, fi[1], ci[1], fi[1], cf[1]};
-	datos_thread[7] = { 7, 7, fi[1], ci[2], fi[1], cf[2]};
-	datos_thread[8] = { 8, 8, fi[2], ci[0], fi[2], cf[0]};
-	datos_thread[9] = { 9, 9, fi[2], ci[1], fi[2], cf[1]};
-	datos_thread[10] = { 10, 10, fi[2], ci[2], fi[2], cf[2]};*/
+	thread_Data[4] = { 4, 4, fi[0], ci[2], fi[0], cf[2]};
+	thread_Data[5] = { 5, 5, fi[1], ci[0], fi[1], cf[0]};
+	thread_Data[6] = { 6, 6, fi[1], ci[1], fi[1], cf[1]};
+	thread_Data[7] = { 7, 7, fi[1], ci[2], fi[1], cf[2]};
+	thread_Data[8] = { 8, 8, fi[2], ci[0], fi[2], cf[0]};
+	thread_Data[9] = { 9, 9, fi[2], ci[1], fi[2], cf[1]};
+	thread_Data[10] = { 10, 10, fi[2], ci[2], fi[2], cf[2]};*/
 	int i = 2;
 	while(i < NUM_THREADS){
         int f;
 		for(f = 0; f < 3; f++){
             int c;
 			for(c = 0; c < 3; c++){
-				datos_thread[i] = {i, i, fi[f], ci[c], ff[f], cf[c]};
+				thread_Data[i] = {i, i, fi[f], ci[c], ff[f], cf[c]};
 				i++;
 			}
 		}
@@ -142,7 +139,7 @@ int main(){
 	//Variable para manejar el archivo
 	FILE *SudokuR;
 	//Matriz de 9x9 donde se guardará el sudoku
-	char[9][9] GrillaSudoku;
+	char GrillaSudoku [9][9];
 	int rc;
 
 

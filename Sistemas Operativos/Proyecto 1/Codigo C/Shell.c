@@ -2,7 +2,6 @@
 #include <strings.h>
 #include <unistd.h>
 #include <stdlib.h>
-using namespace std;
 
 #define MAX_LINE 80 //Largo máximo para un comando
 #define TOK_BUFSIZE 64 //Tamaño del buffer usado por strtok
@@ -120,6 +119,7 @@ void **Separar_Argumentos(char *linea){
 	tokens[Pos] = NULL;
 	return tokens;
 }
+
 int lanzar(char **args){
 	bool legal = true;
 	if(args[0] == NULL){
@@ -128,7 +128,7 @@ int lanzar(char **args){
 	}
 	
 	int i;
-	for(i = 0; i < num_Predeterminados() ; i++){
+	for(i = 0; i < num_Predeterminados(); i++){
 		/*Si el comando ingresado es alguno de los comandos predeterminados
 			simplemente lo ejecuto yo con una función propia, sino, delego en Ejecutar(args) que creará el hijo
 				para hacer todo el tramite

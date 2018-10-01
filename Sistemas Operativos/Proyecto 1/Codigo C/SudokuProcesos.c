@@ -2,9 +2,7 @@
 #include <strings.h>
 #include <unistd.h>
 #include <stdlib.h>
-using namespace std;
-
-typedef enum { false, true } bool; //Definición de un tipo bool
+#include <stdbool.h>
 
 /* Como seria la idea general para resolver el tester de Sudoku?
    1) generar la matriz -> 1 Proceso separado del Padre
@@ -51,7 +49,7 @@ typedef enum { false, true } bool; //Definición de un tipo bool
 	Función para modularizar, esta se encarga de leer el archivo
 	COMPLETAR, hay que hacer chequeos adicionales y ver si realmente estaria leyendo y asignando el valor
 */
-void Lectura(FILE *Sud, char[][9] gril){
+void Lectura(FILE *Sud, char GrillaSudoku [][9]){
 
 	int F = 0;
 	int C = 0;
@@ -74,14 +72,16 @@ void Lectura(FILE *Sud, char[][9] gril){
 /*Función adicional para chequear que  una vez llenada la matriz, la misma este completa, ya que si el input
 	era incorrecto, puede haber lugares vacios
 */
-bool Completitud(char[][9] gril){
+bool Completitud(char GrillaSudoku [][9]){
 
 	bool OK = true;
-	for(int F = 0; F < 9 && OK; F++){
-		for(int C = 0; C < 9 && OK; C++){
+	int F;
+	for(F = 0; F < 9 && OK; F++){
+		int C;
+		for(C = 0; C < 9 && OK; C++){
 			/*Si porque habia un carcter que NO era un dígito, el lugar correspondiente en la Matriz quedó vacio,
 				entonces la "jugada" no era válida*/
-			if(gril[F][C] == NULL)
+			if(GrillaSudoku[F][C] == NULL)
 				OK = false;
 		}
 	}
@@ -132,11 +132,11 @@ bool HacerTarea(int ProcNum){
 *	F, Fila de Inicio del cuadrante
 *	al retornar, devuelve Verdadero (la fila es correcta) o Falso (la Fila NO es válida, aquí se debe terminar todo)
 */
-bool VerificarFila(char[][9] gril, int F){
+bool VerificarFila(char GrillaSudoku [][9], int F){
     bool Lista [9];
     int I;
     for (I = 0; I < 9; I++) {
-        int X = gril[F][I] - '0';
+        int X = GrillaSudoku [F][I] - '0';
         if (X < 1 || X > 9) {
             //Tengo un valor no posible
             fputs("false",Proc1);
@@ -167,11 +167,11 @@ bool VerificarFila(char[][9] gril, int F){
 *	C, Columna de Inicio del Cuadrante
 *	al retornar, devuelve Verdadero (La Columna es correcta) o Falso (La Columna NO es válida, aquí se debe terminar todo)
 */
-bool VerificarColumna(char[][9] gril, int C){
+bool VerificarColumna(char GrillaSudoku [][9], int C){
     bool Lista [9];
     int I;
     for (I = 0; I < 9; I++) {
-        int X = gril[I][C] - '0';
+        int X = GrillaSudoku[I][C] - '0';
         if (X < 1 || X > 9) {
             //Tengo un valor no posible
             fputs("false",Proc2);
@@ -203,13 +203,13 @@ bool VerificarColumna(char[][9] gril, int C){
 *	Y, Columna de Inicio del Cuadrante
 *	al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
 */
-bool VerificarCuadrante(char[][9] gril, int X, int Y){
+bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
     bool Lista [9];
     int I;
     int J;
     for (I = X; I < X+3; I++) {
         for (J = Y; J < Y+3; J++) {
-            int X = gril[I][J] - '0';
+            int X = GrillaSudoku[I][J] - '0';
             if (X < 1 || X > 9) {
                 //Tengo un valor no posible
                 fputs("false",Proc3);
@@ -246,7 +246,7 @@ int main(){
 	//Variable para manejar el archivo
 	FILE *SudokuR;
 	//Matriz de 9x9 donde se guardará el sudoku
-	char[9][9] GrillaSudoku;
+	char GrillaSudoku [9][9];
 	int processCount = 2;
 	bool check1 = true;
 	int pid = 0;
