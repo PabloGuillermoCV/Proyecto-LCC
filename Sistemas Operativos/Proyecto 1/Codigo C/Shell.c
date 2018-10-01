@@ -150,7 +150,7 @@ int lanzar(char **args){
 				para hacer todo el tramite
 		*/
 		if(strcmp(args[0], Comandos_Predeterminados[i]) == 0){
-			int Res = (*Comandos_Predeterminados[i])(**args);
+			int Res = (*Comandos_Predeterminados[i]);
 			return Res;
 		}
 	}
