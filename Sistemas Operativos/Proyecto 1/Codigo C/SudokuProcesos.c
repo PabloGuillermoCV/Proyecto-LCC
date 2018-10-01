@@ -180,18 +180,18 @@ bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
     int J;
     for (I = X; I < X+3; I++) {
         for (J = Y; J < Y+3; J++) {
-            int X = GrillaSudoku[I][J] - '0';
-            if (X < 1 || X > 9) {
+            int N = GrillaSudoku[I][J] - '0';
+            if (N < 1 || N > 9) {
                 //Tengo un valor no posible
                 fputs("false",Proc3);
                 return false; //usar fputs()
             }
-            if (Lista[X] == true) {
+            if (Lista[N] == true) {
                 //Me encuentro con un valor repetido
                 fputs("false",Proc3);
                 return false;
             }
-            Lista[X] = true;
+            Lista[N] = true;
         }
     }
     for (I = 0; I < 9; I++) {

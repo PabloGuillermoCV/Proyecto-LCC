@@ -2,8 +2,6 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<stdbool.h>
-#include<sys/ipc.h>
-#include<sys/sem.h>
 #include<pthread.h>
 #include<semaphore.h>
 
@@ -59,9 +57,11 @@ void *Imprimir() {
 		int I;
 		for (I = NUM_THREADS - 1; I > -1 && !Encontre; I--) {
             int P = sem_trywait(&prioridades[I]);
-            if (A > -1) { //Verifica si este usuario necesita la impresora
+            if (P > -1) { //Verifica si este usuario necesita la impresora
 				sem_post(&bloquearImpresora);
 				printf ("Imprimiendo Para El Usuario.\n");
+				sleep (4);
+				printf ("Fin De La Impresion.\n");
 				sem_post(&esperandoImpresion[I]); //Le aviso al usuario que la impresora termino de imprimir
 				Encontre = true;
 			}
@@ -82,8 +82,9 @@ void *Requerir(void *threadarg){
     int C;
 	for (C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
 		sem_post(&prioridades[misDatos->prioridad]); //Entra en la cola para solicitar una impresora
-		printf("Esperando a que termine la impresion.\n");
+		printf("Esperando Turno De La Impresion.\n");
 		sem_wait(&esperandoImpresion[misDatos->prioridad]); //Espera a que la impresora termine de imprimir
+		printf("Recibo Impresion Y Me Voy.\n");
 	}
 	exit (1);
 }
@@ -99,12 +100,12 @@ int main(){
 
 	int rc;
 
-	rc = pthread_create(Impresora1,NULL,Imprimir,NULL);
+	rc = pthread_create(&Impresora1,NULL,Imprimir,NULL);
 	if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
     }
-	rc = pthread_create(Impresora2,NULL,Imprimir,NULL);
+	rc = pthread_create(&Impresora2,NULL,Imprimir,NULL);
 	if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
