@@ -3,12 +3,13 @@
 #include<unistd.h>
 #include<sys/ipc.h>
 #include<sys/sem.h>
+#include<pthread.h>
 #include<semaphore.h>
 
-#define NUM_THREADS 3
+#define NUM_THREADS 6
 
 /*Algoritmo Atender
-	
+
 	//Durante 60 ciclos, hacer
 		//Esperar un turno de un alumno (wait(EsperarAlumno))
 		//Atender alumno
@@ -16,7 +17,7 @@
 */
 
 /*Algoritmo Solicitar
-	
+
 	//Durante 20 ciclos, hacer
 		//Verificar si hay asientos (trywait(Asiento))
 		//Si no hay Asientos
@@ -43,22 +44,27 @@ sem_t asiento;
 sem_t oficinaLibre;
 
 void *Atender () {
-	
-	for (int C = 0; C < 60; C++) { //El asistente atendera durante 60 ciclos
+
+	int C;
+	for (C = 0; C < 60; C++) { //El asistente atendera durante 60 ciclos
 		sem_wait (&esperarTurno); //El asistente espera hasta que alguien espere por su turno
-		printf ("Se atiende a un alumno.");
 		sleep (4); //Tiempo que tarda el asistente en atender a un alumno
+		printf ("Se atiende a un alumno.\n");
 		sem_post (&atendido); //El asistente le avisa al alumno que termino
 	}
 	exit (1);
 }
 
 void *Solicitar () {
-	
-	for (int C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
-		sem_trywait (&asiento) { //Si hay asientos disponibles espera su turno, sino se va
+
+    int C;
+	for (C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
+        int A = sem_trywait(&asiento);
+        if (A > -1) { //Si hay asientos disponibles espera su turno, sino se va
+            printf("Se ocupa un asiento.\n");
 			sem_post (&esperarTurno); //El alumno llega y pide el turno
 			sem_wait (&oficinaLibre); //El alumno espera a que le dejen pasar
+			printf("Se pasa a la oficina y se libera un asiento.\n");
 			sem_post (&asiento); //Atienden al alumno y deja libre el asiento para otro alumno
 			sem_wait (&atendido); //El alumno pasa de aca cuando el asistente termine
 			sem_post (&oficinaLibre); //El alumno deja libre la oficina para alguno de los que esta esperando
@@ -69,41 +75,44 @@ void *Solicitar () {
 }
 
 int main(){
-	
+
 	sem_init (&esperarTurno,0,0);
 	sem_init (&atendido,0,0);
 	sem_init (&asiento,0,3);
 	sem_init (&oficinaLibre,0,1);
-	
+
 	pthread_t Alumnos [NUM_THREADS];
-	
+
 	pthread_t Asistente;
-	
+
 	int rc;
-	
+
 	rc = pthread_create(&Asistente, NULL, Atender, NULL);
 	if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
-	
-	for(int i = 0; i < NUM_THREADS; i++){
-		rc = pthread_create(&Alumnos[i], NULL, Solicitar, NULL);
+
+    int I;
+	for(I = 0; I < NUM_THREADS; I++){
+		rc = pthread_create(&Alumnos[I], NULL, Solicitar, NULL);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR; Código de retorno: %d\n", rc);
         	exit(-1);
        	}
 	}
-	
-	for(int i = 0; i < NUM_THREADS; i++){
-		pthread_join (Alumnos[i], NULL);
+
+	for(I = 0; I < NUM_THREADS; I++){
+		pthread_join (Alumnos[I], NULL);
 	}
 	pthread_join (Asistente,NULL);
-	
+
 	sem_destroy (&esperarTurno);
 	sem_destroy (&atendido);
 	sem_destroy (&asiento);
 	sem_destroy (&oficinaLibre);
-	
+
+	printf("Terminaron Las Consultas.\n");
+
 	return 0;
 }
