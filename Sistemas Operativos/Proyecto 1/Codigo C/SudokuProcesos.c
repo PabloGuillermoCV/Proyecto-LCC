@@ -196,8 +196,8 @@ bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
     }
     for (I = 0; I < 9; I++) {
         //Verifico que esten todos los numeros
-        int X = I + 1;
-        if (Lista[X] == false) {
+        int N = I + 1;
+        if (Lista[N] == false) {
             //Faltaba un valor en la lista
             fputs("false",Proc3);
             return false;
@@ -313,7 +313,8 @@ int main(){
 	    fscanf(Proc2,"%s",res2);
 	    fscanf(Proc3,"%s",res3);
 		if(res1 == "true" && res2 == "true" && res3 == "true"){
-			printf("La jugada de Sudoku era Valida");}
+			printf("La jugada de Sudoku era Valida");
+		}
 		else{
 			printf("La jugada de Sudoku NO era Valida");
 		}

@@ -30,6 +30,14 @@ struct datos_thread{
 	int ColumnaF; //Columna donde debo terminar  (Asumiendo jugada válida)
 };
 
+//Variable Global para obtener los Argumentos para cada Thread
+struct datos_thread thread_Data[NUM_THREADS];
+//Arreglo de booleanos global para los Threads
+bool Check[10];
+
+//Matriz de 9x9 donde se guardará el sudoku
+char GrillaSudoku [9][9];
+
 /*Función genérica para todos los threads para verificar una parte del Sudoku
 	la Estructura "misDatos" es el cjto de Datos que posee el Thread con el cual
 		Se debe manejar para verificar, esta función es independiente de la fila y Columna
@@ -49,15 +57,16 @@ void *VerificarParte(void *threadarg){
 	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
 
     int F;
-	for(F = misDatos->FilaI; F < misDatos->FilaF && check[pos]; F++){
+	for(F = misDatos->FilaI; F < misDatos->FilaF && Check[misDatos->pos]; F++){
         int C;
-		for(C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[midDatos->pos]; C++){
+		for(C = misDatos-> ColumnaI; C < misDatos->ColumnaF && Check[misDatos->pos]; C++){
 			//Verificar parte que me corresponde del Sudoku
 			int num = GrillaSudoku[F][C] - '0';
-			if(num < 1 || num > 9)
-				check[pos] = false; //si el valor leido es ilegal(esto no deberia pasar, indica error de lectura, termino).
+			if(num < 1 || num > 9) {
+				Check[misDatos->pos] = false; //si el valor leido es ilegal(esto no deberia pasar, indica error de lectura, termino).
+			}
 			if(nums[num] != false){
-				check[pos] = false; //si hay números repetidos mientras leo, corto
+				Check[misDatos->pos] = false; //si hay números repetidos mientras leo, corto
 			}
 			else{
 				nums[num] = true; //si el valor es nuevo, subo el flag de que encontré ese número
@@ -66,9 +75,9 @@ void *VerificarParte(void *threadarg){
 		}
 	}
 	int i;
-	for(i = 1; i < 10 && check[pos]; i++){
+	for(i = 1; i < 10 && Check[misDatos->pos]; i++){
 		if(nums[i] != true){ //Si falta un número, corto, la jugada es invalida
-			check[pos] = false;
+			Check[misDatos->pos] = false;
 		}
 	}
 	pthread_exit(NULL);
@@ -78,7 +87,7 @@ void *VerificarParte(void *threadarg){
 	Función para modularizar, esta se encarga de leer el archivo
 	COMPLETAR, hay que hacer chequeos adicionales y ver si realmente estaria leyendo y asignando el valor
 */
-void Lectura(FILE *SudokuR, char GrillaSudoku [][9]){
+void Lectura(FILE *SudokuR){
 
 	int F = 0;
 	int C = 0;
@@ -96,15 +105,22 @@ void Lectura(FILE *SudokuR, char GrillaSudoku [][9]){
 	}
 }
 
-//Variable Global para obtener los Argumentos para cada Thread
-struct datos_thread thread_Data[NUM_THREADS];
-//Arreglo de booleanos global para los Threads
-bool Check[10];
-
 //Hay que llenar el arreglo de thread_Data
 void Cargar(){
-	thread_Data[0] = { 0, 0, 0, 8, 0, 8};
-	thread_Data[1] = { 1, 1, 0, 0, 0, 8};
+	thread_Data[0].thread_id = 0;
+	thread_Data[0].pos = 0;
+	thread_Data[0].FilaI = 0;
+	thread_Data[0].ColumnaI = 8;
+	thread_Data[0].FilaF = 0;
+	thread_Data[0].ColumnaF = 8;
+	
+	thread_Data[1].thread_id = 1;
+	thread_Data[1].pos = 1;
+	thread_Data[1].FilaI = 0;
+	thread_Data[1].ColumnaI = 0;
+	thread_Data[1].FilaF = 0;
+	thread_Data[1].ColumnaF = 8;
+	
 	int fi [3] = {0, 3, 6};
 	int ci [3] = {0, 3, 6};
 	int ff [3] = {2, 5, 8};
@@ -126,20 +142,23 @@ void Cargar(){
 		for(f = 0; f < 3; f++){
             int c;
 			for(c = 0; c < 3; c++){
-				thread_Data[i] = {i, i, fi[f], ci[c], ff[f], cf[c]};
+				thread_Data[i].thread_id = i;
+				thread_Data[i].pos = i;
+				thread_Data[i].FilaI = fi[f];
+				thread_Data[i].ColumnaI = ci[c];
+				thread_Data[i].FilaF = ff[f];
+				thread_Data[i].ColumnaF = cf[c];
 				i++;
 			}
 		}
 	}
-
 }
 
 int main(){
 
 	//Variable para manejar el archivo
 	FILE *SudokuR;
-	//Matriz de 9x9 donde se guardará el sudoku
-	char GrillaSudoku [9][9];
+	
 	int rc;
 
 
@@ -156,7 +175,7 @@ int main(){
 		return 1;
 	}
 	else{
-		Lectura(&SudokuR,GrillaSudoku);
+		Lectura(SudokuR);
 	}
 
     int i;
@@ -172,8 +191,19 @@ int main(){
         	exit(-1);
        	}
 	}
-
-
+	
+	int n;
+	bool TodoVerdadero = true;
+	for (n = 0; n < 10 && TodoVerdadero; n++) {
+		TodoVerdadero = Check[n];
+	}
+	if (TodoVerdadero == true) {
+		printf("La jugada de Sudoku era Valida");
+	}
+	else {
+		printf("La jugada de Sudoku NO era Valida");
+	}
+	
 	//Última cosa que el Main debe hacer, esto es para evitar Hilos Zombies
 	pthread_exit(NULL);
 
