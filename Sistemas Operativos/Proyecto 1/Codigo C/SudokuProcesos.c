@@ -60,9 +60,9 @@ void Lectura(FILE *Sud, char[][9] gril){
 			char num = fgetc(SudokuR); //obtengo el caracter
 			if(num != EOF && num != ',' && num != EOL && !(x < 1 || x > 9) ){
 				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," o un caracter que NO se una Dígito numérico (la grilla esta separada por comas), lo añado a la matriz
-				
-				else{GrillaSudoku[F][C] = NULL;}  
-					
+
+				else{GrillaSudoku[F][C] = NULL;}
+
 				C++;
 			} //buscar cuanto era EOF en Linux
 		}
@@ -71,17 +71,17 @@ void Lectura(FILE *Sud, char[][9] gril){
 	}
 }
 
-/*Función adicional para chequear que  una vez llenada la matriz, la misma este completa, ya que si el input 
-	era incorrecto, puede haber lugares vacios 
+/*Función adicional para chequear que  una vez llenada la matriz, la misma este completa, ya que si el input
+	era incorrecto, puede haber lugares vacios
 */
 bool Completitud(char[][9] gril){
 
-	bool OK = true; 
+	bool OK = true;
 	for(int F = 0; F < 9 && OK; F++){
 		for(int C = 0; C < 9 && OK; C++){
 			/*Si porque habia un carcter que NO era un dígito, el lugar correspondiente en la Matriz quedó vacio,
 				entonces la "jugada" no era válida*/
-			if(gril[F][C] == NULL) 
+			if(gril[F][C] == NULL)
 				OK = false;
 		}
 	}
@@ -236,7 +236,7 @@ bool VerificarCuadrante(char[][9] gril, int X, int Y){
     return true;
 }
 
-//Hago los archivos resultado globales para acceder facilmente 
+//Hago los archivos resultado globales para acceder facilmente
 FILE *Proc1 = fopen("Proceso1.txt","w");
 FILE *Proc2 = fopen("Proceso2.txt","w");
 FILE *Proc3 = fopen("Proceso3.txt","w");
@@ -254,12 +254,11 @@ int main(){
 	SudokuR = fopen("sudoku.txt", "r");
 
 	if(!SudokuR){
-		fprintf(stderr, "Ocurió un error al intentar abrir el archivo de Input, verifique que el mismo se
-							encuentra en la misma ubicación que el código fuente y vuelva a intentarlo");
-		return 1;
+		fprintf(stderr, "Ocurió un error al intentar abrir el archivo de Input, verifique que el mismo se encuentra en la misma ubicación que el código fuente y vuelva a intentarlo");
+		return 1;}
 		//Ocurrió un error al abrir el archivo, reportar dicho error
 	else{
-		
+
 		Lectura(SudokuR, GrillaSudoku);
 
 		//asumiendo que terminé de leer todo correctamente, deberia tener la matriz totalmente cargada
@@ -271,13 +270,14 @@ int main(){
 		}
 	}
 
-			
-	
+
+
 	/*
 		Ciclo FOR que crea todos los procesos necesarios, luego, si estoy en el Hijo,
 		Entro a un método especial que le asigna un trabajo a realizar
 	*/
-	for(int i=0; i<processCount && check1; i++){
+	int i;
+	for(i=0; i<processCount && check1; i++){
     	pid=fork();
     	if(pid == -1){
     		fprintf(stderr,"Error al crear el Proceso Hijo Numero %d", i);
@@ -302,8 +302,8 @@ int main(){
 	Proc2 = fopen("Proceso2.txt", "r");
 	Proc3 = fopen("Proceso3.txt", "r");
 	if(Proc1 && Proc2 && Proc3){
-		if(fscanf(Proc1,"%s",res) == "true" && fscanf(Proc2,"%s",res) == "true" && fscanf(Proc3,"%s",res) == "true");
-			printf("La jugada de Sudoku era Valida");
+		if(fscanf(Proc1,"%s",res) == "true" && fscanf(Proc2,"%s",res) == "true" && fscanf(Proc3,"%s",res) == "true"){
+			printf("La jugada de Sudoku era Valida");}
 		else{
 			printf("La jugada de Sudoku NO era Valida");
 		}

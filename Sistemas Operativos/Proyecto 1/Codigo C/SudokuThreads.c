@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <strings.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -15,10 +16,10 @@ using namespace std;
 	9 Threads, 1 para cada Cuadrante
 */
 
-#define NUM_THREADS 11 
+#define NUM_THREADS 11
 
 /*Estructura para pasar los Argumentos necesarios para verificar una parte del Sudoku
-	le paso tanto Fila y Columna Inicial como Fila y Columna Final ya que manejaré 
+	le paso tanto Fila y Columna Inicial como Fila y Columna Final ya que manejaré
 		a todos los Threads de forma anónima
 */
 struct datos_thread{
@@ -46,13 +47,15 @@ typedef enum { false, true } bool; //Definición de un tipo bool
 	ColumnaF = 8;
 */
 void *VerificarParte(void *threadarg){
-	
+
 	bool nums[10]; //arreglo para comprobar existencia de los números, lo hago de 10 para hacerlo 1-Based
 	struct datos_thread *misDatos;
 	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
 
-	for(int F = misDatos-> FilaI; F < misDatos->FilaF && check[pos]; F++){
-		for(int C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[pos]; C++){
+    int F;
+	for(F = misDatos-> FilaI; F < misDatos->FilaF && check[pos]; F++){
+        int C;
+		for(C = misDatos-> ColumnaI; C < misDatos->ColumnaF && check[pos]; C++){
 			//Verificar parte que me corresponde del Sudoku
 			int num = GrillaSudoku[F][C] - '0';
 			if(num < 1 || num > 9)
@@ -71,7 +74,7 @@ void *VerificarParte(void *threadarg){
 			check[pos] = false;
 		}
 	}
-	pthread_exit(NULL);	
+	pthread_exit(NULL);
 }
 
 /*
@@ -122,14 +125,16 @@ void Cargar(){
 	datos_thread[10] = { 10, 10, fi[2], ci[2], fi[2], cf[2]};*/
 	int i = 2;
 	while(i < NUM_THREADS){
-		for(int f = 0; f < 3; f++){
-			for(int c = 0; c < 3; c++){
+        int f;
+		for(f = 0; f < 3; f++){
+            int c;
+			for(c = 0; c < 3; c++){
 				datos_thread[i] = {i, i, fi[f], ci[c], ff[f], cf[c]};
 				i++;
 			}
 		}
 	}
-	
+
 }
 
 int main(){
@@ -139,7 +144,7 @@ int main(){
 	//Matriz de 9x9 donde se guardará el sudoku
 	char[9][9] GrillaSudoku;
 	int rc;
-	
+
 
 	pthread_t Hilos[NUM_THREADS];
 	//Cargar thread_Data en algún lado
@@ -154,15 +159,16 @@ int main(){
 		return 1;
 	}
 	else{
-		Lectura(&SudokuR,GrillaSudoku); 
+		Lectura(&SudokuR,GrillaSudoku);
 	}
 
-
-	for(int i = 0; i < NUM_THREADS; i++){
+    int i;
+	for(i = 0; i < NUM_THREADS; i++){
 		Check[i] = true; //empiezo inicializando el arreglo, asumiendo que la jugada es válida
 	}
 
-	for(int j = 0; j < NUM_THREADS; j++){
+    int j;
+	for(j = 0; j < NUM_THREADS; j++){
 		rc = pthread_create(&Hilos[j], NULL, VerificarParte, (void *) &thread_Data[j]);
 		if (rc){ //ocurrió un error al crear el Thread, reportar
         	printf("ERROR AL CREAR HILOS; Código de retorno: %d\n", rc);

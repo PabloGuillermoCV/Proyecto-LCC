@@ -58,10 +58,10 @@ void loop(void){
 	do{
 		printf("pr1>"); //imprimo una linea para nuestro shell
 		linea = Leer_Linea(); //Primer función, esta lee la linea ingresada
-		args = Separar_Argumentos(linea); //Segunda función, dada la linea, busca los argumentos y los separa 
+		args = Separar_Argumentos(linea); //Segunda función, dada la linea, busca los argumentos y los separa
 		Estado = lanzar(args); //Tercer Función, dados los argumentos, ejecuta el comando
 
-		free(line); //Libero el espacio
+		free(linea); //Libero el espacio
 		free(args);
 
 	}while(Estado);
@@ -84,7 +84,7 @@ void *Leer_Linea(){
 void **Separar_Argumentos(char *linea){
 	int size_Buffer = TOK_BUFSIZE;
 	int Pos = 0;
-	char **tokens = malloc(size_Buffer* sizeof(char*)); //"Arreglo" de Tokens 
+	char **tokens = malloc(size_Buffer* sizeof(char*)); //"Arreglo" de Tokens
 	char *token; //Token simple usado para leer la linea de a partes
 
 	if(!tokens){
@@ -93,7 +93,7 @@ void **Separar_Argumentos(char *linea){
 	}
 	/*Función strtok, lo hace es, dado un String y un delimitador, sistematicamente separar las lineas en sublineas
 		separadas por el delimitador dado
-		lo que hago aquí es sistematicamente separar la linea y cada "token" enviarlo a una posición especifica 
+		lo que hago aquí es sistematicamente separar la linea y cada "token" enviarlo a una posición especifica
 			del arrego de "Tokens", entonces, el primer "Token" SIEMPRE será el comando, y el resto serán los argumentos
 
 	*/
@@ -104,7 +104,7 @@ void **Separar_Argumentos(char *linea){
 		/*Que pasa? tokens es en realidad un Arreglo dinámico, entonces,
 			si por alguna razón la linea es demasiado larga, yo puedo darle más espacio a tokens para seguir leyendo
 		*/
-		if(pos >= size_Buffer){
+		if(Pos >= size_Buffer){
 			size_Buffer += TOK_BUFSIZE;
 			tokens = realloc(tokens, size_Buffer * sizeof(char*));
 			if(!tokens){
@@ -126,18 +126,19 @@ int lanzar(char **args){
 		//NO se ingresó nada, simplemente salir y volver a esperar stdin
 		return 1;
 	}
-
-	for(int i = 0; i < num_Predeterminados() ; i++){
+	
+	int i;
+	for(i = 0; i < num_Predeterminados() ; i++){
 		/*Si el comando ingresado es alguno de los comandos predeterminados
 			simplemente lo ejecuto yo con una función propia, sino, delego en Ejecutar(args) que creará el hijo
 				para hacer todo el tramite
 		*/
-		if(strcmp(args[0], Comandos_Predeterminados[i]) == 0){ 
+		if(strcmp(args[0], Comandos_Predeterminados[i]) == 0){
 			return (*Comandos_Predeterminados[i])(args);
 		}
 	}
 	//Corroboro que el comando este entre los comandos disponibles ANTES de intentar ejecutar
-	for(int i = 0; i < num_Disponibles() && legal; i++){
+	for(i = 0; i < num_Disponibles() && legal; i++){
 		legal = strcmp(args[0], Comandos_Disponibles[i] == 0);
 	}
 	if(legal = false){
@@ -157,7 +158,7 @@ int Ejecutar(char **args){
 	int PID, WPID, Estado;
 
 	PID = fork();
-	if(pid == 0){
+	if(PID == 0){
 		//Estoy en el proceso Hijo, uso execvp para lanzar el proceso
 		if(execvp(args[0], args) == -1){
 			//tirar error
@@ -184,5 +185,5 @@ int main(void){
 
 	//Delego en la función Loop para entrar en un ciclo para que funcione el shell
 	loop();
-	
+
 }
