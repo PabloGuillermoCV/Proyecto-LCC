@@ -40,30 +40,18 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private JTextField nf;
 	private JTextField Num_doc;
 	private JTextField Tipo_Doc;
-	private DBTable TablaPagoCuotas;
-	private DBTable Listado_Morosos;
+	private DBTable TablaEmpleado;
 	
 	public VentanaEmpleado () {
 		super ();
 		setTitle("Consultas Empleado");
 		getContentPane().setLayout(null);
 		
-		JPanel Pago_Cuotas = new JPanel();
-		Pago_Cuotas.setBounds(7, 161, 277, 326);
-		getContentPane().add(Pago_Cuotas);
 		
-		TablaPagoCuotas = new DBTable();
-		TablaPagoCuotas.setEditable(false);
-		Pago_Cuotas.add(TablaPagoCuotas);
-		
-		JPanel Morosos = new JPanel();
-		Morosos.setBounds(294, 161, 199, 326);
-		getContentPane().add(Morosos);
-		
-		Listado_Morosos = new DBTable();
-		Listado_Morosos.setEditable(false);
-		Morosos.add(Listado_Morosos);
-		
+		JPanel PaneTabla = new JPanel();
+		PaneTabla.setBounds(0, 161, 493, 326);
+		getContentPane().add(PaneTabla);
+			
 		Num_doc = new JTextField();
 		Num_doc.setBounds(10, 83, 129, 20);
 		getContentPane().add(Num_doc);
@@ -113,17 +101,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		btnVerMorosos.setBounds(351, 114, 107, 23);
 		getContentPane().add(btnVerMorosos);
 		
-		JLabel lblTablaCuotas = new JLabel("Tabla Cuotas");
-		lblTablaCuotas.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTablaCuotas.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblTablaCuotas.setBounds(7, 148, 89, 14);
-		getContentPane().add(lblTablaCuotas);
-		
-		JLabel LbTablaMorosos = new JLabel("Tabla Morosos");
-		LbTablaMorosos.setFont(new Font("Tahoma", Font.BOLD, 11));
-		LbTablaMorosos.setHorizontalAlignment(SwingConstants.CENTER);
-		LbTablaMorosos.setBounds(294, 148, 86, 14);
-		getContentPane().add(LbTablaMorosos);
+		TablaEmpleado = new DBTable();
+		PaneTabla.add(TablaEmpleado);
 		}
 	
 	//Métodos donde irian las consultas SQL
@@ -197,8 +176,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	        //String clave = "empleado";
 	        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
 	        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-	        Listado_Morosos.connectDatabase (driver, uriConexion, legajo, clave);
-	        TablaPagoCuotas.connectDatabase(driver, uriConexion, legajo, clave);   
+	        TablaEmpleado.connectDatabase (driver, uriConexion, legajo, clave);   
 	    }
 	    catch (SQLException ex) {
 	        JOptionPane.showMessageDialog (this,
@@ -216,8 +194,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	private void desconectarBD () {
 		try {
-			Listado_Morosos.close();
-			TablaPagoCuotas.close();  
+			TablaEmpleado.close();
 	    }
 	    catch (SQLException ex) {
 	        System.out.println("SQLException: " + ex.getMessage());
@@ -228,41 +205,24 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	private void refrescarTabla () {
 	    try {    
-	        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-	    	Listado_Morosos.setSelectSql(this.txtConsulta.getText().trim());
-	    	// obtenemos el modelo de la tabla a partir de la consulta para 
-	    	// modificar la forma en que se muestran de algunas columnas  
-	    	Listado_Morosos.createColumnModelFromQuery();    	    
-	    	for (int i = 0; i < Listado_Morosos.getColumnCount(); i++) { 
-	    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-	    		if (Listado_Morosos.getColumn(i).getType()==Types.TIME) {    		 
-	    		    Listado_Morosos.getColumn(i).setType(Types.CHAR);  
-	  	       	}
-	    		// cambiar el formato en que se muestran los valores de tipo DATE
-	    		if (Listado_Morosos.getColumn(i).getType()==Types.DATE) {
-	    		    Listado_Morosos.getColumn(i).setDateFormat("dd/MM/YYYY");
-	    		}
-	        }  
+	          
 	    	// seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-	    	TablaPagoCuotas.setSelectSql(this.txtConsulta.getText().trim());
+	    	TablaEmpleado.setSelectSql(this.txtConsulta.getText().trim());
 	    	// obtenemos el modelo de la tabla a partir de la consulta para 
 	    	// modificar la forma en que se muestran de algunas columnas  
-	    	TablaPagoCuotas.createColumnModelFromQuery();    	    
-	    	for (int i = 0; i < TablaPagoCuotas.getColumnCount(); i++) { 
+	    	TablaEmpleado.createColumnModelFromQuery();    	    
+	    	for (int i = 0; i < TablaEmpleado.getColumnCount(); i++) { 
 	    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-	    		if (TablaPagoCuotas.getColumn(i).getType()==Types.TIME) {    		 
-	    			TablaPagoCuotas.getColumn(i).setType(Types.CHAR);  
+	    		if (TablaEmpleado.getColumn(i).getType()==Types.TIME) {    		 
+	    			TablaEmpleado.getColumn(i).setType(Types.CHAR);  
 	  	       	}
 	    		// cambiar el formato en que se muestran los valores de tipo DATE
-	    		if (TablaPagoCuotas.getColumn(i).getType()==Types.DATE) {
-	    			TablaPagoCuotas.getColumn(i).setDateFormat("dd/MM/YYYY");
+	    		if (TablaEmpleado.getColumn(i).getType()==Types.DATE) {
+	    			TablaEmpleado.getColumn(i).setDateFormat("dd/MM/YYYY");
 	    		}
 	        }  
 	    	// actualizamos el contenido de la tabla.   	     	  
-	    	Listado_Morosos.refresh();
-	    	TablaPagoCuotas.refresh();
-	    	// actualizamos el contenido de la tabla.   	     	  
-	    	Listado_Morosos.refresh();
+	    	TablaEmpleado.refresh();
 	    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
 	    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
 	    	// patir de la conexion y la consulta seteadas con connectDatabase() y 

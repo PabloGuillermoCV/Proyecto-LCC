@@ -171,11 +171,11 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   private void thisComponentShown(ComponentEvent evt) {
-		   int okCxl = JOptionPane.showConfirmDialog(null, Card, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		   int okCxl = JOptionPane.showConfirmDialog(null, Card, "Ingresar nro de Tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (okCxl == JOptionPane.OK_OPTION) {
 				Tarj = Card.getPassword().toString(); 
 			}
-			int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Ingresar Pin", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (okCx2 == JOptionPane.OK_OPTION) {
 				Pin = PIN_Field.getPassword().toString(); 
 			}
