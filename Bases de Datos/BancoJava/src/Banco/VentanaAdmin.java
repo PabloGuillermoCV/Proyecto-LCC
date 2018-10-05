@@ -10,9 +10,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Types;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -24,11 +24,14 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.JSplitPane;
 
-@SuppressWarnings({"serial","rawtypes","unchecked"})
+@SuppressWarnings("serial")
 public class VentanaAdmin extends javax.swing.JInternalFrame {
 	
 	private JPanel pnlConsulta;
@@ -44,6 +47,9 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	protected int Seleccionado = -1;
 	private String clave;
 	private JPasswordField pf;
+	private JList <String> listaTablas;
+	private JList <String> listaAtributosTabla;
+	private DefaultListModel <String> modeloListaAtributos;
 	
 	
 	public VentanaAdmin () {
@@ -107,6 +113,42 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	            		}
 	            	});
 	            }	
+	            {
+	            	//Muestra todas las tablas en la base de datos
+	            	DefaultListModel <String> dlm = new DefaultListModel <String> ();
+	            	listaTablas = new JList <> (dlm);
+	            	JScrollPane panelLista = new JScrollPane (listaTablas);
+	            	pnlConsulta.add (panelLista);
+	            	
+	            	Statement stmt = this.conexionBD.createStatement ();
+	         		String sql = "SHOW TABLES";
+	         		ResultSet rs = stmt.executeQuery(sql);
+	         		
+	         		int I = 0;
+	         		String nombreTabla;
+	         		while (rs.next ()) {
+	         			nombreTabla = rs.getString(I);
+	         			dlm.addElement (nombreTabla);
+	         			I++;
+	         		}
+	         		
+	         		rs.close();
+	         		stmt.close();
+	         		
+	         		listaTablas.addListSelectionListener(new ListSelectionListener() {
+	         		      public void valueChanged(ListSelectionEvent evt) {
+	         		        mostrarAtributos();
+	         		      }
+	         		});
+	            }
+	            {
+	            	//Muestra todos los atributos de una tabla al seleccionarla
+	            	modeloListaAtributos = new DefaultListModel <String> ();
+	            	listaAtributosTabla = new JList <> (modeloListaAtributos);
+	            	JScrollPane panelLista = new JScrollPane (listaAtributosTabla);
+	            	pnlConsulta.add (panelLista);
+	            	listaAtributosTabla.setEnabled (false);
+	            }
 	         }
 	         {
 	             // crea la tabla  
@@ -283,4 +325,31 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	         
 	    }
     }
+	
+	private void mostrarAtributos () {
+		//Se encarga de ubicar cada atributo en listaAtributosTabla
+		try {
+			
+			Statement stmt = this.conexionBD.createStatement ();
+			String sql = "SHOW COLUMNS FROM " + listaTablas.getSelectedValue ();
+			ResultSet rs = stmt.executeQuery(sql);
+			
+			int I = 0;
+     		String nombreAtributo;
+     		while (rs.next ()) {
+     			nombreAtributo = rs.getString(I); 
+     			modeloListaAtributos.addElement (nombreAtributo);
+     			I++;
+     		}
+			
+			rs.close();
+     		stmt.close();
+     		
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+ 		
+ 		
+	}
 }
