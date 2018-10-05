@@ -197,7 +197,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private void mniAdminActionPerformed (ActionEvent evt) {
 	    try {
 	        this.ventanaAdmin.setMaximum (true);
-	        //al abrir, pido el password de admin para poder hacer el script de coneccion
+	        //al abrir, pido el password de admin para poder hacer el script de conexion
 	    }
 	    catch (PropertyVetoException e) {}
 	    this.ventanaAdmin.setVisible (true);      

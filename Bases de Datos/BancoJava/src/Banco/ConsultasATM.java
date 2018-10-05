@@ -18,6 +18,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
@@ -40,7 +41,9 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private JPanel pnlBotones;
 	   private JPanel pnlCampos;
 	   private DBTable tabla; 
-	   protected String NroTarjeta;
+	   private JPasswordField PIN_Field;
+		private JPasswordField Card;
+		private String Tarj,Pin;
 	   
 	   protected Connection conexionBD = null;
 	   
@@ -167,8 +170,15 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	      }
 	   }
 	   
-	   private void thisComponentShown(ComponentEvent evt) 
-	   {
+	   private void thisComponentShown(ComponentEvent evt) {
+		   int okCxl = JOptionPane.showConfirmDialog(null, Card, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			if (okCxl == JOptionPane.OK_OPTION) {
+				Tarj = Card.getPassword().toString(); 
+			}
+			int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			if (okCx2 == JOptionPane.OK_OPTION) {
+				Pin = PIN_Field.getPassword().toString(); 
+			}
 	      this.conectarBD();
 	      this.refrescar();
 	   }

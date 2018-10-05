@@ -27,6 +27,7 @@ import javax.swing.SwingConstants;
 import java.awt.Font;
 
 @SuppressWarnings({ "serial", "unused" })
+//NO seria necesaria, la dejo por las dudas hasta corroborar que las cosas funcionen
 public class VentanaATM extends javax.swing.JInternalFrame {
 	
 	private JPanel pnlConsulta;
@@ -37,6 +38,7 @@ public class VentanaATM extends javax.swing.JInternalFrame {
 	private JScrollPane scrConsulta;
 	private JPasswordField PIN_Field;
 	private JPasswordField Card;
+	private String Tarj,Pin;
 	
 	public VentanaATM () {
 		super ();
@@ -110,6 +112,14 @@ public class VentanaATM extends javax.swing.JInternalFrame {
 	}
 	
 	private void thisComponentShown (ComponentEvent evt) {
+		int okCxl = JOptionPane.showConfirmDialog(null, Card, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (okCxl == JOptionPane.OK_OPTION) {
+			Tarj = Card.getPassword().toString(); 
+		}
+		int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (okCx2 == JOptionPane.OK_OPTION) {
+			Pin = PIN_Field.getPassword().toString(); 
+		}
 		this.conectarBD();
 	}
 	   
@@ -126,11 +136,11 @@ public class VentanaATM extends javax.swing.JInternalFrame {
 	        String driver ="com.mysql.cj.jdbc.Driver";
 	        String servidor = "%";
 	        String baseDatos = "banco";
-	        String usuario = "atm";
-	        String clave = "atm";
+	        //String usuario = "atm";
+	        //String clave = "atm";
 	        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
 	        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-	        tabla.connectDatabase (driver, uriConexion, usuario, clave);
+	        tabla.connectDatabase (driver, uriConexion, Tarj, Pin);
 	           
 	    }
 	    catch (SQLException ex) {

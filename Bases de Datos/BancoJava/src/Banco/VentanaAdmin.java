@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Types;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,6 +18,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -23,6 +26,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import quick.dbtable.*;
 import javax.swing.JList;
+import javax.swing.JSplitPane;
 
 @SuppressWarnings({"serial","rawtypes","unchecked"})
 public class VentanaAdmin extends javax.swing.JInternalFrame {
@@ -33,8 +37,14 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JButton btnEjecutar;
 	private DBTable tabla;    
 	private JScrollPane scrConsulta;
-	private JList list;
 	protected Connection conexionBD = null;
+	private JSplitPane Listas;
+	private DBTable Tablas_Banco;
+	private DBTable Campos_Tablas;
+	protected int Seleccionado = -1;
+	private String clave;
+	private JPasswordField pf;
+	
 	
 	public VentanaAdmin () {
 		super ();
@@ -109,12 +119,29 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	             tabla.setEditable(false);
 	         }
 	         {
-	         	list = new JList();
-	         	getContentPane().add(list, BorderLayout.CENTER);
-	         	DefaultListModel model = new DefaultListModel();
-	         	list.setModel(model);
+	         	Listas = new JSplitPane();
+	         	getContentPane().add(Listas, BorderLayout.CENTER);
+	         	{
+	         		Tablas_Banco = new DBTable();
+	         		Tablas_Banco.setEditable(false);
+	         		Listas.setLeftComponent(Tablas_Banco);
+	         		Tablas_Banco.setToolTipText("Haga Doble click sobre un campo para ver los campos de esa Tabla");
+	         		Tablas_Banco.addMouseListener(new MouseAdapter() {
+	         			public void mouseClicked(MouseEvent evt) {
+	         				tablaClick(evt);
+	         			}
+	         		});
+	         	}
+	         	{
+	         		Campos_Tablas = new DBTable();
+	         		Campos_Tablas.setEditable(false);
+	         		Listas.setRightComponent(Campos_Tablas);
+	         	}
+	         }
+	         {
+	        
 	         	llenarLista();
-	         	//se usa model.add(pos, item) para agregar items a la lista
+	   
 	         }
 	    } 
 		catch (Exception e) {
@@ -126,9 +153,9 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	 */
 	private void llenarLista(){
 		try{
-		 Statement stmt = this.conexionBD.createStatement();
 		 String sql = "SHOW TABLES FROM banco";
-		 stmt.execute(sql);
+		 Tablas_Banco.setSelectSql(sql);
+		 Tablas_Banco.refresh();
 		}
 		catch(SQLException e){
 			 JOptionPane.showMessageDialog(this,
@@ -141,7 +168,35 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		}
 	}
 	
+	private void tablaClick(MouseEvent evt) {
+		if(Tablas_Banco.getSelectedRow() != -1 && (evt.getClickCount() == 2)){
+			Seleccionado = this.Tablas_Banco.getSelectedRow();
+			String nom = this.Tablas_Banco.getValueAt(this.tabla.getSelectedRow(), 0).toString();
+			Campos_Tablas.setSelectSql("DESCRIBE " + nom);
+			try {
+				Campos_Tablas.refresh();
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog (this,
+	        			"Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
+	                    "Error",
+	                    JOptionPane.ERROR_MESSAGE);
+	        System.out.println("SQLException: " + e.getMessage());
+	        System.out.println("SQLState: " + e.getSQLState());
+	        System.out.println("VendorError: " + e.getErrorCode());
+			}
+		}
+	}
+	
 	private void thisComponentShown (ComponentEvent evt) {
+		//Para manejar Logins, hago lo siguiente:
+		/*
+		 * uso JOptionPane.DialogPane para nombres de usuario,/Legajos
+		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para levantar el password ingresado
+		 */
+		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (okCxl == JOptionPane.OK_OPTION) {
+			clave = pf.getPassword().toString(); 
+		}
 		this.conectarBD();
 	}
 	   
