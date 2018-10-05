@@ -49,7 +49,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 		
 		JPanel PaneTabla = new JPanel();
-		PaneTabla.setBounds(0, 161, 493, 326);
+		PaneTabla.setBounds(0, 161, 828, 438);
 		getContentPane().add(PaneTabla);
 			
 		Num_doc = new JTextField();
@@ -66,11 +66,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JLabel Label_tipo_doc = new JLabel("Tipo de Documento");
 		Label_tipo_doc.setHorizontalAlignment(SwingConstants.CENTER);
 		Label_tipo_doc.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Label_tipo_doc.setBounds(336, 58, 122, 14);
+		Label_tipo_doc.setBounds(662, 58, 122, 14);
 		getContentPane().add(Label_tipo_doc);
 		
 		Tipo_Doc = new JTextField();
-		Tipo_Doc.setBounds(346, 83, 112, 20);
+		Tipo_Doc.setBounds(672, 83, 112, 20);
 		getContentPane().add(Tipo_Doc);
 		Tipo_Doc.setColumns(10);
 		
@@ -80,7 +80,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				CrearPrest(arg1);
 			}
 		});
-		CrearPrest.setBounds(7, 114, 107, 23);
+		CrearPrest.setBounds(20, 114, 107, 23);
 		getContentPane().add(CrearPrest);
 		
 		JButton CuotasBtn = new JButton("Ver Cuotas");
@@ -89,7 +89,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				verCuotas(arg0);
 			}
 		});
-		CuotasBtn.setBounds(179, 114, 107, 23);
+		CuotasBtn.setBounds(366, 114, 107, 23);
 		getContentPane().add(CuotasBtn);
 		
 		JButton btnVerMorosos = new JButton("Ver Morosos");
@@ -98,7 +98,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				verMor(e);
 			}
 		});
-		btnVerMorosos.setBounds(351, 114, 107, 23);
+		btnVerMorosos.setBounds(672, 114, 107, 23);
 		getContentPane().add(btnVerMorosos);
 		
 		TablaEmpleado = new DBTable();
@@ -112,7 +112,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e Action Event del botón, no se usa pa mucho
 	 */
 	private void verMor(ActionEvent e) {
-		
+		//Necesito los datos del cliente (Nro Cliente, Tipo y Nro de Doc, Apellido y nombre)
+		//Para cada cliente, neceisto los Prestamos en discordia (Nro de Prest, monto, cant_meses y valor cuota
+		//para cada Prestamo, neceisto saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
+		String SQL1 = "SELECT ";
 	}
 	
 	/**
@@ -120,6 +123,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del botón, no se usa pa mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void verCuotas(ActionEvent e) {
+		String nro = Num_doc.getText();
+		String tipo = Tipo_Doc.getText();
 		
 	}
 	
