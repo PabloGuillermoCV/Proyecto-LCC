@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import java.awt.Rectangle;
+import javax.swing.JList;
 
 @SuppressWarnings({ "serial", "unused" })
 public class VentanaEmpleado extends javax.swing.JInternalFrame {
@@ -51,6 +52,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private JTextField Num_doc;
 	private JTextField Tipo_Doc;
 	private DBTable TablaEmpleado;
+	private String nro;
+	private String tipo;
 	protected Connection conexionBD = null;
 	
 	public VentanaEmpleado () {
@@ -60,7 +63,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 		
 		JPanel PaneTabla = new JPanel();
-		PaneTabla.setBounds(0, 161, 828, 438);
+		PaneTabla.setBounds(0, 161, 248, 326);
 		getContentPane().add(PaneTabla);
 			
 		Num_doc = new JTextField();
@@ -114,6 +117,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 		TablaEmpleado = new DBTable();
 		PaneTabla.add(TablaEmpleado);
+		
+		JPanel Panel_Cuotas = new JPanel();
+		Panel_Cuotas.setBounds(258, 161, 235, 326);
+		getContentPane().add(Panel_Cuotas);
+		
+		JList Lista_Cuotas = new JList();
+		Panel_Cuotas.add(Lista_Cuotas);
 		}
 	
 	//Métodos donde irian las consultas SQL
@@ -125,12 +135,17 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void verMor(ActionEvent e) {
 		//Necesito los datos del cliente (Nro Cliente, Tipo y Nro de Doc, Apellido y nombre)
 		//Para cada cliente, neceisto los Prestamos en discordia (Nro de Prest, monto, cant_meses y valor cuota
-		//para cada Prestamo, neceisto saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
+		//para cada Prestamo, necesito saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
 		try {
 			Statement stmt = this.conexionBD.createStatement();
-			String SQL1 = "SELECT ";
+			String SQL1 = "SELECT nro_cliente, tipo_doc , nro_doc, apellido, nombre, nro_prestamo, monto, cant_meses,valor_cuota, COUNT(nro_pago)"
+					+ "FROM (cliente NATURAL JOIN prestamo) AS x, pago "
+					+ "WHERE x.nro_prestamo = pago.nro_prestamo and COUNT(nro_pago) >= 2"; // , verificar
 			ResultSet rs = stmt.executeQuery(SQL1);
-			
+			TablaEmpleado.refresh(rs);
+
+			//para que está esto de abajo? lo de arriba ^ deberia hacer todo automáticamente
+			//Aunque DBTable no tiene SetAutoCreateRowSorter, ver esto
 	        int I = 0;
 	        while (rs.next()) {
 	            TablaEmpleado.setValueAt(rs.getInt("nro_cliente"), I, 0);
@@ -148,12 +163,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	/**
-	 * llena la Tabla de Cuotas de un cliente
+	 * llena la Lista de Cuotas para un cliente
 	 * @param e ActionEvent del botón, no se usa pa mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void verCuotas(ActionEvent e) {
-		String nro = Num_doc.getText();
-		String tipo = Tipo_Doc.getText();
+		nro = Num_doc.getText();
+		tipo = Tipo_Doc.getText();
+		
 		
 	}
 	
@@ -162,21 +178,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del Botón, ne se usa para mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void CrearPrest(ActionEvent e) {
-		String nro = Num_doc.getText();
-		String tipo = Tipo_Doc.getText();
+		nro = Num_doc.getText();
+		tipo = Tipo_Doc.getText();
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			String dia,mes,anio;
 			noPrestActual(nro, tipo);
-				//Ver como obtener la fecha actual
-				R = stmt.executeQuery("SELECT DAY(getdate())");
-				dia = R.getString(1);
-				R = stmt.executeQuery("SELECT MONTH(getdate())");
-				mes = R.getString(1);
-				R = stmt.executeQuery("SELECT YEAR(getdate())");
-				GregorianCalendar hoy = new GregorianCalendar();
-				
 		}
 		catch(SQLException f) {
 			
@@ -228,7 +236,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	//cantidad de cuotas (Pagos en con fecha_pago = NULL) depende de la cantidad de Meses
 	//usar date_add(<Fecha_actual_mientras_se_Itera>, interval 1 month)
 	private void EjecutarCreacion(int plata, int periodo) {
-		int i = 1;
+		int i = 2;
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
@@ -240,13 +248,21 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			tasa_Int= R.getInt(1);
 			Interes = (plata + tasa_Int + periodo)/1200;
 			ValCuota = (plata + tasa_Int)/periodo;
+			R = stmt.executeQuery("SELECT nro_cliente FROM Cliente WHERE nro_doc = " + nro + "and tipo_doc = " + tipo);
+			int c = R.getInt(1);
 			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");  
-			 LocalDateTime now = LocalDateTime.now();  
-			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES"
-					+ ""); //falta terminar
-			while(i <= periodo) {
-				//Aca cargo las cuotas una por una
-			}
+			 LocalDateTime now = LocalDateTime.now(); 
+			 String d = now.toString();
+			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,"
+					+ "valor_cuota,legajo,nro_cliente) VALUES"
+					+ "STR_TO_DATE(" + d + ",\"%d-%m-%Y\")," + periodo + "," + plata + "," +
+					tasa_Int + "," + Interes + "," + ValCuota + "," + legajo + "," + c); //corroborar que los datos son correctos
+			
+			//Para cargar las cuotas necesito el nro de prestamo del prestamo recién creado
+			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + c);
+			int nro_pre = R.getInt(1);
+			cargarCuotas(c,d,nro_pre,periodo);
+			
 			stmt.close();
 			R.close();
 		} catch (SQLException e) {
@@ -255,6 +271,33 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 	}
 	
+	//Método auxiliar para cargar las cuotas
+	private void cargarCuotas(int c, String d, int nro_pre, int periodo) {
+		Statement stmt;
+		try {
+			stmt = this.conexionBD.createStatement();
+		 		ResultSet R;
+			int i = 2;
+			//Cargo la primera cuota
+			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES"
+					+ nro_pre + "," + 1 + ",STR_TO_DATE(" + d +",%d-%m-%Y)" + ", NULL");
+			//Cargo el resto de las cuotas
+			while(i <= periodo) {
+				R = stmt.executeQuery("SELECT DATE_ADD(" + d + "INTERVAL 1 month)");
+				//Aca cargo las cuotas una por una
+				stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES"
+						+ nro_pre + "," + i + ",STR_TO_DATE(" + d + ",%d-%m-%Y)" + ", NULL)"); 
+				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
+				d = R.getString(1);
+			}
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * Hace login del Empleado por medio de Pop Ups
 	 */
