@@ -22,7 +22,6 @@ import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
-
 import EjemploClase.Fechas;
 import quick.dbtable.DBTable;
 

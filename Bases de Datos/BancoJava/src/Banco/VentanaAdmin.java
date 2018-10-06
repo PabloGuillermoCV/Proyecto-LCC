@@ -24,7 +24,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.JSplitPane;
@@ -180,9 +179,10 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		 * uso JOptionPane.DialogPane para nombres de usuario,/Legajos
 		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para levantar el password ingresado
 		 */
+		pf = new JPasswordField();
 		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (okCxl == JOptionPane.OK_OPTION) {
-			clave = pf.getPassword().toString(); 
+			clave = pf.getPassword().toString();
 		}
 		this.conectarBD();
 	}

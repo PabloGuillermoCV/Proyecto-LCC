@@ -204,12 +204,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				int m = ven.getmon();
 				int p = ven.getper();
 				if(corroborar(m,p,mes,mon)) { //Los montos ingresados no superan los máximos establecidos por las tasas
-					EjecutarCreación(m,p);
+					EjecutarCreacion(m,p);
 				}
 			}
+			stmt.close();
+			R.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -226,7 +227,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	//Esto implica crear el prestamo y todas las cuotas asociadas al mismo
 	//cantidad de cuotas (Pagos en con fecha_pago = NULL) depende de la cantidad de Meses
 	//usar date_add(<Fecha_actual_mientras_se_Itera>, interval 1 month)
-	private void EjecutarCreación(int plata, int periodo) {
+	private void EjecutarCreacion(int plata, int periodo) {
 		int i = 1;
 		try {
 			Statement stmt = this.conexionBD.createStatement();
@@ -244,10 +245,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES"
 					+ ""); //falta terminar
 			while(i <= periodo) {
-				//Acá cargo las cuotas una por una
+				//Aca cargo las cuotas una por una
 			}
+			stmt.close();
+			R.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

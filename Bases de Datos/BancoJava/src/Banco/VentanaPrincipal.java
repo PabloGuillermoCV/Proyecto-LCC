@@ -42,11 +42,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private JMenu mnuEjemplos;
 	private JSeparator jSeparator1;
 	
-	/*Por lo que entiendo seria:
-	 * Desde aca se accede con uno de los 3 usuarios posibles (admin, empleado y atm),
-	 * despues se manda hacia la ventana correspondiente de cada usuario donde pondriamos
-	 * las cosas que puede y no puede hacer y sobre que tablas*/
-	
 	public static void main (String [] args) {
 	    SwingUtilities.invokeLater (new Runnable() {
 	        public void run () {

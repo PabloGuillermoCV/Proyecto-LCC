@@ -5,11 +5,11 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import java.awt.Font;
-import java.awt.Window.Type;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+@SuppressWarnings("serial")
 public class LoginNombre extends JFrame{
 	private JTextField textField;
 	public LoginNombre() {
