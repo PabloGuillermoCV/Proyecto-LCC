@@ -38,12 +38,10 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JTextArea txtConsulta;
 	private JButton botonBorrar;
 	private JButton btnEjecutar;
-	private DBTable tabla;    
+	private DBTable tabla = new DBTable();    
 	private JScrollPane scrConsulta;
 	protected Connection conexionBD = null;
 	private JSplitPane Listas;
-	private DBTable Tablas_Banco;
-	private DBTable Campos_Tablas;
 	protected int Seleccionado = -1;
 	private String clave;
 	private JPasswordField pf;
@@ -61,6 +59,11 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
     //Tiene elementos de la BD de la clase que hay que cambiar
 	private void initGUI () {
         try {
+        	 {
+ 	         	Listas = new JSplitPane();
+ 	         	getContentPane().add(Listas, BorderLayout.CENTER);
+ 	         	
+ 	         }
 	        setPreferredSize(new Dimension(800, 600));
 	        this.setBounds(0, 0, 800, 600);
 	        setVisible(true);
@@ -118,7 +121,8 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	            	DefaultListModel <String> dlm = new DefaultListModel <String> ();
 	            	listaTablas = new JList <> (dlm);
 	            	JScrollPane panelLista = new JScrollPane (listaTablas);
-	            	pnlConsulta.add (panelLista);
+	            	Listas.add (panelLista);
+	            	
 	            	
 	            	Statement stmt = this.conexionBD.createStatement ();
 	         		String sql = "SHOW TABLES";
@@ -146,13 +150,11 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	            	modeloListaAtributos = new DefaultListModel <String> ();
 	            	listaAtributosTabla = new JList <> (modeloListaAtributos);
 	            	JScrollPane panelLista = new JScrollPane (listaAtributosTabla);
-	            	pnlConsulta.add (panelLista);
+	            	Listas.add (panelLista);
 	            	listaAtributosTabla.setEnabled (false);
 	            }
 	         }
 	         {
-	             // crea la tabla  
-	             tabla = new DBTable();
 	              
 	        	 // Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 	             getContentPane().add(tabla, BorderLayout.WEST);           
@@ -160,29 +162,8 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	             // setea la tabla para solo lectura (no se puede editar su contenido)  
 	             tabla.setEditable(false);
 	         }
-	         {
-	         	Listas = new JSplitPane();
-	         	getContentPane().add(Listas, BorderLayout.CENTER);
-	         	{
-	         		Tablas_Banco = new DBTable();
-	         		Tablas_Banco.setEditable(false);
-	         		Listas.setLeftComponent(Tablas_Banco);
-	         		Tablas_Banco.setToolTipText("Haga Doble click sobre un campo para ver los campos de esa Tabla");
-	         		Tablas_Banco.addMouseListener(new MouseAdapter() {
-	         			public void mouseClicked(MouseEvent evt) {
-	         				tablaClick(evt);
-	         			}
-	         		});
-	         	}
-	         	{
-	         		Campos_Tablas = new DBTable();
-	         		Campos_Tablas.setEditable(false);
-	         		Listas.setRightComponent(Campos_Tablas);
-	         	}
-	         }
-	         {
 	        
-	         	llenarLista();
+	         {
 	   
 	         }
 	    } 
@@ -191,13 +172,12 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    }
 	}
 	/**
-	 * Método privado para poblar la lista con las tablas de la BD
+	 * Método privado para poblar la lista con las tablas de la BD 
+	 * (No seria necesario ya que vos ya llenas la lista al inicializar?)
 	 */
-	private void llenarLista(){
+	/*private void llenarLista(){
 		try{
 		 String sql = "SHOW TABLES FROM banco";
-		 Tablas_Banco.setSelectSql(sql);
-		 Tablas_Banco.refresh();
 		}
 		catch(SQLException e){
 			 JOptionPane.showMessageDialog(this,
@@ -208,26 +188,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 				System.out.println("SQLState: " + e.getSQLState());
 				System.out.println("VendorError: " + e.getErrorCode());
 		}
-	}
-	
-	private void tablaClick(MouseEvent evt) {
-		if(Tablas_Banco.getSelectedRow() != -1 && (evt.getClickCount() == 2)){
-			Seleccionado = this.Tablas_Banco.getSelectedRow();
-			String nom = this.Tablas_Banco.getValueAt(this.tabla.getSelectedRow(), 0).toString();
-			Campos_Tablas.setSelectSql("DESCRIBE " + nom);
-			try {
-				Campos_Tablas.refresh();
-			} catch (SQLException e) {
-				JOptionPane.showMessageDialog (this,
-	        			"Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
-	                    "Error",
-	                    JOptionPane.ERROR_MESSAGE);
-	        System.out.println("SQLException: " + e.getMessage());
-	        System.out.println("SQLState: " + e.getSQLState());
-	        System.out.println("VendorError: " + e.getErrorCode());
-			}
-		}
-	}
+	}*/
 	
 	private void thisComponentShown (ComponentEvent evt) {
 		//Para manejar Logins, hago lo siguiente:
@@ -331,7 +292,8 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		try {
 			
 			Statement stmt = this.conexionBD.createStatement ();
-			String sql = "SHOW COLUMNS FROM " + listaTablas.getSelectedValue ();
+			//DESCRIBE hace lo mismo, pero como son equivalentes lo dejo
+			String sql = "SHOW COLUMNS FROM " + listaTablas.getSelectedValue (); 
 			ResultSet rs = stmt.executeQuery(sql);
 			
 			int I = 0;

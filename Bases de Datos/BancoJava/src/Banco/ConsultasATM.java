@@ -185,12 +185,27 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private void btnUltimosMoviminetosActionPerformed(ActionEvent evt) {
 			//Mostrar las ultimas 15 transacciones
 		   try {
+			   //corroborar Query
+			   //PIN esta con md5, hay que ver como ejecutarlo acá -> ya deberia de estar
+			   //El NATURAL JOIN deberia ser correcto, estoy corroborando al ejecutar las queries en SQL
+			   //lo unico que dudo es el "AS CodigoCaja"... no me estaria funcionando
 			   Statement stm = this.conexionBD.createStatement();
-			   String sql = "SELECT  "
-			   		+ "FROM  "
-			   		+ "WHERE ";
+			   String sql = "SELECT  fecha,hora,monto,tipo,cod_caja AS CodigoCaja,destino"
+			   		+ "FROM  trans_cajas_ahorro NATURAL JOIN tarjeta AS x"
+			   		+ "WHERE " + Tarj + " = x.nro_tarjeta AND x.PIN = md5(" + Pin + ")" 
+			   		+ "ORDER BY fecha DESC , hora DESC";
 			   stm.execute(sql);
+			   ResultSet R = stm.getResultSet();
 			   stm.close();
+			   tabla.refresh(R); //No es la mejor solución, hay que ver de limitar a 15 resultados
+			
+			   /* int i = 1; Ver esto, aunque no se si se puede iterar manualmente con una DBTable 
+			   while(i <= 15 && R.next() != false) {
+				   R.
+			   }
+			   */
+			   
+			   
 		   }
 		   catch(SQLException ex) {
 			   JOptionPane.showMessageDialog(this,
@@ -202,14 +217,18 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   
 	   private void btnSaldoActionPerformed(ActionEvent evt) {
-			//Mostrar el Saldo del Usuario, ver como hacer la consulta
-		   	//ya que el saldo no es directamente accesible
+			//Mostrar el Saldo del Usuario
+		   //El query deberia funcionar
 		   try {
 			   Statement stmt = this.conexionBD.createStatement();
-		         String sql = "SELECT " +
-		                      "FROM "
-		                      + "WHERE " ;
+		         String sql = "SELECT DISTINCT saldo" +
+		                      "FROM trans_cajas_ahorro natural join tarjeta"
+		                      + "WHERE tarjeta.nro_tarjeta = " + Tarj + "and tarjeta.PIN = md5( " + Pin + ")" ;
 		         stmt.execute(sql);
+		         ResultSet R = stmt.getResultSet();
+		         int sal = R.getInt(1);
+		         //No necesito mostrar una tabla, solo piden el saldo de la tarjeta, lo muestro en un pop up
+		         JOptionPane.showMessageDialog(this, "El saldo de la Tarjeta es: " + sal);
 		         stmt.close();
 		   }
 		   catch(SQLException ex) {
@@ -227,10 +246,12 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   try {
 				   //Revisar Query, se me confunde un toque con tanta información en el View
 				   Statement stmt = this.conexionBD.createStatement();
-			         String sql = "SELECT Fecha,hora,tipo,monto,cod_caja,destino" +
+			         String sql = "SELECT Fecha,hora,tipo,monto,cod_caja AS codCaja,destino" +
 			                      "FROM trans_cajas_ahorro"
 			                      + "WHERE Fecha >= " + txtFechaInicio.getText().trim() + "and Fecha <=" + txtFechaFin.getText().trim() ;
 			         stmt.execute(sql);
+			         ResultSet R = stmt.getResultSet();
+			         tabla.refresh(R); //Obtenidas las tuplas, refresco la tabla con el ResultSet
 			         stmt.close();
 			   }
 			   catch(SQLException ex) {
@@ -266,11 +287,11 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		        	//Ver Esto
 		            String servidor = "localhost:3306";
 		            String baseDatos = "banco";
-		            String usuario = "admin_batallas";
-		            String clave = "pwadmin";
+		            //String usuario = "admin_batallas";
+		            //String clave = "pwadmin";
 		            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
 		   
-		            this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
+		            this.conexionBD = DriverManager.getConnection(uriConexion, Tarj, Pin);
 		         }
 		         catch (SQLException ex)
 		         {
@@ -303,7 +324,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      }
 		   }
 		   
-		 //Revisar, no me parece necesario todo el código que este método contiene  
+		 //Revisar, no me parece necesario todo el código que este método contiene 
+		 //Se usa la primera vez para mostrar todos los campos, medio raro de tener 
 		 private void refrescar()
 		   {
 		      try
@@ -312,7 +334,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 
 		         String sql = "SELECT *" + 
 		                      "FROM trans_cajas_ahorro " +
-		                      "ORDER BY nombre_batalla";
+		                      "ORDER BY nro_ca DESC";
 
 
 		         ResultSet rs = stmt.executeQuery(sql);

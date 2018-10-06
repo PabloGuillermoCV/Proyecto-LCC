@@ -66,35 +66,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		this.ventanaATM = new VentanaATM ();
 		getContentPane().setLayout(null);
 		
-		passwordField = new JPasswordField();
-		passwordField.setToolTipText("Contrasena");
-		passwordField.setBounds(236, 223, 198, 27);
-		getContentPane().add(passwordField);
-		
-		textField = new JTextField();
-		textField.setToolTipText("Nombre de Usuario");
-		textField.setBounds(236, 174, 198, 27);
-		getContentPane().add(textField);
-		textField.setColumns(10);
-		
-		JLabel lblNombreDeUsuario = new JLabel("Nombre de Usuario");
-		lblNombreDeUsuario.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblNombreDeUsuario.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNombreDeUsuario.setEnabled(false);
-		lblNombreDeUsuario.setBounds(26, 180, 132, 14);
-		getContentPane().add(lblNombreDeUsuario);
-		
 		Button button = new Button("Ingresar como Admin");
 		button.setBackground(new Color(135, 206, 250));
 		button.setBounds(26, 10, 116, 27);
 		getContentPane().add(button);
-		
-		JLabel lblContrasea = new JLabel("Contrasena");
-		lblContrasea.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblContrasea.setEnabled(false);
-		lblContrasea.setHorizontalAlignment(SwingConstants.CENTER);
-		lblContrasea.setBounds(47, 229, 95, 14);
-		getContentPane().add(lblContrasea);
 		
 		Button button_1 = new Button("Ingresar como Empleado");
 		button_1.setBackground(new Color(135, 206, 250));
@@ -122,7 +97,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	      }
 		try {
 	         {
-	            this.setTitle("Java y MySQL");
+	            this.setTitle("Proyecto 2 Ejercicio 2- Ceballos Vitale, Gomez");
 	            this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	         }
 	         {
@@ -183,7 +158,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	               }
 	            }
 	         }
-	         this.setSize(800, 600);
+	         this.setSize(154, 279);
 	         pack();
 	      } catch (Exception e) {
 	         e.printStackTrace();
@@ -197,7 +172,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private void mniAdminActionPerformed (ActionEvent evt) {
 	    try {
 	        this.ventanaAdmin.setMaximum (true);
-	        //al abrir, pido el password de admin para poder hacer el script de conexion
+	        //al abrir, pido el password de admin para poder hacer el script de conexion (?)
 	    }
 	    catch (PropertyVetoException e) {}
 	    this.ventanaAdmin.setVisible (true);      
