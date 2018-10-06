@@ -7,7 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Types;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,6 +24,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.table.DefaultTableModel;
+
 import quick.dbtable.*;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -41,6 +47,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private JTextField Num_doc;
 	private JTextField Tipo_Doc;
 	private DBTable TablaEmpleado;
+	protected Connection conexionBD = null;
 	
 	public VentanaEmpleado () {
 		super ();
@@ -115,7 +122,25 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		//Necesito los datos del cliente (Nro Cliente, Tipo y Nro de Doc, Apellido y nombre)
 		//Para cada cliente, neceisto los Prestamos en discordia (Nro de Prest, monto, cant_meses y valor cuota
 		//para cada Prestamo, neceisto saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
-		String SQL1 = "SELECT ";
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			String SQL1 = "SELECT ";
+			ResultSet rs = stmt.executeQuery(SQL1);
+			
+	        int I = 0;
+	        while (rs.next()) {
+	            TablaEmpleado.setValueAt(rs.getInt("nro_cliente"), I, 0);
+	            TablaEmpleado.setValueAt(rs.getString("tipo_doc"), I, 1);
+	            TablaEmpleado.setValueAt(rs.getInt("nro_doc"), I, 2);
+	            I++;
+	        }
+			
+			rs.close();
+	        stmt.close();
+		}
+		catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	/**
