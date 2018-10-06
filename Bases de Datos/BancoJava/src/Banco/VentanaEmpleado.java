@@ -7,7 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Types;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.GregorianCalendar;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -158,12 +162,95 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del Botón, ne se usa para mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void CrearPrest(ActionEvent e) {
-		
+		String nro = Num_doc.getText();
+		String tipo = Tipo_Doc.getText();
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			ResultSet R;
+			String dia,mes,anio;
+			noPrestActual(nro, tipo);
+				//Ver como obtener la fecha actual
+				R = stmt.executeQuery("SELECT DAY(getdate())");
+				dia = R.getString(1);
+				R = stmt.executeQuery("SELECT MONTH(getdate())");
+				mes = R.getString(1);
+				R = stmt.executeQuery("SELECT YEAR(getdate())");
+				GregorianCalendar hoy = new GregorianCalendar();
+				
+		}
+		catch(SQLException f) {
+			
+		}
 	}
 	
 	private void thisComponentShown (ComponentEvent evt) {
 		login();
 		this.conectarBD();
+	}
+	
+	private void noPrestActual(String doc, String typeDoc) {
+		int mon, mes;
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			ResultSet R;
+			//SQL para determinar los prestamos actuales de un cliente
+			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente = " + doc) ;
+			if(!R.first()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
+				R = stmt.executeQuery("SELECT MAX(periodo) FROM tasa_prestamo");
+				mes = R.getInt(1);
+				R = stmt.executeQuery("SELECT MAX(monto_sup) from tasa_prestamo");
+				mon = R.getInt(1); //Ojo, es un decimal, no se si anda
+				IngresoPrest ven = new IngresoPrest();
+				int m = ven.getmon();
+				int p = ven.getper();
+				if(corroborar(m,p,mes,mon)) { //Los montos ingresados no superan los máximos establecidos por las tasas
+					EjecutarCreación(m,p);
+				}
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	//Corroboro que lo ingresado no supere los máximos de las Tasas
+	private boolean corroborar(int mon, int mes,int monSup,int perSup) {
+		if(mon < monSup && mes < perSup)
+			return true;
+		else
+			return false;
+	}
+	
+	//Con todo corroborado, creo el Prestamo
+	//Esto implica crear el prestamo y todas las cuotas asociadas al mismo
+	//cantidad de cuotas (Pagos en con fecha_pago = NULL) depende de la cantidad de Meses
+	//usar date_add(<Fecha_actual_mientras_se_Itera>, interval 1 month)
+	private void EjecutarCreación(int plata, int periodo) {
+		int i = 1;
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			ResultSet R;
+			//cargo el Prestamo
+			int tasa_Int;
+			int Interes;
+			int ValCuota;
+			R = stmt.executeQuery("SELECT tasa FROM tasa_prestamo where tasa_prestamo.periodo = " + periodo); //revisar si esta bien
+			tasa_Int= R.getInt(1);
+			Interes = (plata + tasa_Int + periodo)/1200;
+			ValCuota = (plata + tasa_Int)/periodo;
+			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");  
+			 LocalDateTime now = LocalDateTime.now();  
+			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES"
+					+ ""); //falta terminar
+			while(i <= periodo) {
+				//Acá cargo las cuotas una por una
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
