@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,9 +27,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import quick.dbtable.*;
@@ -55,6 +60,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private String nro;
 	private String tipo;
 	protected Connection conexionBD = null;
+	int seleccionado = -1;
+	
 	
 	public VentanaEmpleado () {
 		super ();
@@ -63,7 +70,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 		
 		JPanel PaneTabla = new JPanel();
-		PaneTabla.setBounds(0, 161, 248, 326);
+		PaneTabla.setBounds(0, 161, 493, 326);
 		getContentPane().add(PaneTabla);
 			
 		Num_doc = new JTextField();
@@ -88,9 +95,20 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		getContentPane().add(Tipo_Doc);
 		Tipo_Doc.setColumns(10);
 		
+		TablaEmpleado = new DBTable();
+		PaneTabla.add(TablaEmpleado);
+		//hago que NO pueda ser seleccionable por defecto
+		TablaEmpleado.setEnabled(false);
+		TablaEmpleado.addMouseListener(new MouseAdapter() {
+			public void MouseListener(MouseEvent evt) {
+				TablaClick(evt);
+			}
+		});
+		
 		JButton CrearPrest = new JButton("Crear Prestamo");
 		CrearPrest.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg1) {
+				TablaEmpleado.setEnabled(false);
 				CrearPrest(arg1);
 			}
 		});
@@ -100,6 +118,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton CuotasBtn = new JButton("Ver Cuotas");
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				TablaEmpleado.setEnabled(true);
 				verCuotas(arg0);
 			}
 		});
@@ -109,27 +128,58 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton btnVerMorosos = new JButton("Ver Morosos");
 		btnVerMorosos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				TablaEmpleado.setEnabled(false);
 				verMor(e);
 			}
 		});
 		btnVerMorosos.setBounds(672, 114, 107, 23);
 		getContentPane().add(btnVerMorosos);
 		
-		TablaEmpleado = new DBTable();
-		PaneTabla.add(TablaEmpleado);
 		
-		JPanel Panel_Cuotas = new JPanel();
-		Panel_Cuotas.setBounds(258, 161, 235, 326);
-		getContentPane().add(Panel_Cuotas);
-		
-		JList Lista_Cuotas = new JList();
-		Panel_Cuotas.add(Lista_Cuotas);
 		}
+
+	private void TablaClick(MouseEvent evt) {
+		if ((this.TablaEmpleado.getSelectedRow() != -1) && (evt.getClickCount() == 2))
+	      {
+	         seleccionarFila();
+	      }
+	}
+	
+	private void seleccionarFila() {
+		this.seleccionado = this.TablaEmpleado.getSelectedRow();
+		//Obtengo los valores en la Tabla por la fila que se seleccionó
+		String nroCuota = TablaEmpleado.getValueAt(seleccionado, 1).toString().trim();
+		String valor = TablaEmpleado.getValueAt(seleccionado, 2).toString().trim();
+		//hago un pop up para que se confirme, si se confirma, se registra el pago
+		int ok = JOptionPane.showConfirmDialog(null, null,"Desea registrar el pago de la cuota numero " + nroCuota + " con valor " + valor + "?", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+		if(ok == JOptionPane.OK_OPTION) {
+			registrarPago(nroCuota,valor);
+		}
+	}
+	
+	private void registrarPago(String nroC, String money) {
+		try {
+			//Le tengo miedo al tema de las fechas, revisar
+			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
+			 LocalDateTime now = LocalDateTime.now(); 
+			 String d = now.toString();
+			Statement stmt = this.conexionBD.createStatement();
+			//Hago un UPDATE Query, revisar si esta bien
+			stmt.executeUpdate("UPDATE Pago SET fecha_pago = " +"STR_TO_DATE(" + d + ",\"%d-%m-%Y\")" + 
+						"WHERE Pago.nro_pago = " + nroC);
+			if(stmt.getUpdateCount() != -1) {
+				//El Update tuvo exito
+				JOptionPane.showInternalMessageDialog(null, "Se ha registrado el Pago de la Cuota con exito");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	//Métodos donde irian las consultas SQL
-	
 	/**
-	 * llena la Tabla de Clientes Morosos
+	 * llena la Tabla con Clientes Morosos
 	 * @param e Action Event del botón, no se usa pa mucho
 	 */
 	private void verMor(ActionEvent e) {
@@ -140,7 +190,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			String SQL1 = "SELECT nro_cliente, tipo_doc , nro_doc, apellido, nombre, nro_prestamo, monto, cant_meses,valor_cuota, COUNT(nro_pago)"
 					+ "FROM (cliente NATURAL JOIN prestamo) AS x, pago "
-					+ "WHERE x.nro_prestamo = pago.nro_prestamo and COUNT(nro_pago) >= 2"; // , verificar
+					+ "WHERE x.nro_prestamo = pago.nro_prestamo and COUNT(nro_pago) >= 2"; // , verificar, falta la condicion de moroso
 			ResultSet rs = stmt.executeQuery(SQL1);
 			TablaEmpleado.refresh(rs);
 
@@ -169,6 +219,20 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void verCuotas(ActionEvent e) {
 		nro = Num_doc.getText();
 		tipo = Tipo_Doc.getText();
+		Num_doc.setText("");
+		Tipo_Doc.setText("");
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			ResultSet R;
+			R = stmt.executeQuery("SELECT nro_pago AS Cuota_Nro,valor_cuota AS Valor,fecha_venc AS Vencimiento"
+					+ "FROM prestamo NATURAL JOIN pago NATURAL JOIN Cliente"
+					+ "WHERE Cliente.tipo_doc = " + tipo + "and Cliente.nro_doc =" + nro + 
+					"and pago.fecha_pago = NULL");
+		}
+		catch(SQLException f) {
+			
+		}
+		
 		
 		
 	}
@@ -183,7 +247,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			String dia,mes,anio;
 			noPrestActual(nro, tipo);
 		}
 		catch(SQLException f) {
@@ -244,13 +307,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			int tasa_Int;
 			int Interes;
 			int ValCuota;
-			R = stmt.executeQuery("SELECT tasa FROM tasa_prestamo where tasa_prestamo.periodo = " + periodo); //revisar si esta bien
+			R = stmt.executeQuery("SELECT tasa FROM tasa_prestamo WHERE tasa_prestamo.periodo = " + periodo); //revisar si esta bien
 			tasa_Int= R.getInt(1);
 			Interes = (plata + tasa_Int + periodo)/1200;
 			ValCuota = (plata + tasa_Int)/periodo;
 			R = stmt.executeQuery("SELECT nro_cliente FROM Cliente WHERE nro_doc = " + nro + "and tipo_doc = " + tipo);
 			int c = R.getInt(1);
-			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");  
+			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
 			 LocalDateTime now = LocalDateTime.now(); 
 			 String d = now.toString();
 			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,"
