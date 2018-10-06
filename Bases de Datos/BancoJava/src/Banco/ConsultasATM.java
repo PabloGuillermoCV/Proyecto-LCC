@@ -186,18 +186,20 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			//Mostrar las ultimas 15 transacciones
 		   try {
 			   //corroborar Query
-			   //PIN esta con md5, hay que ver como ejecutarlo acá -> ya deberia de estar
+			   //PIN esta con md5, hay que ver como ejecutarlo aca -> ya deberia de estar
 			   //El NATURAL JOIN deberia ser correcto, estoy corroborando al ejecutar las queries en SQL
 			   //lo unico que dudo es el "AS CodigoCaja"... no me estaria funcionando
 			   Statement stm = this.conexionBD.createStatement();
-			   String sql = "SELECT  fecha,hora,monto,tipo,cod_caja AS CodigoCaja,destino"
-			   		+ "FROM  trans_cajas_ahorro NATURAL JOIN tarjeta AS x"
-			   		+ "WHERE " + Tarj + " = x.nro_tarjeta AND x.PIN = md5(" + Pin + ")" 
-			   		+ "ORDER BY fecha DESC , hora DESC";
+			   String sql = "SELECT  fecha, hora, monto, tipo, (cod_caja AS CodigoCaja), destino"
+			   		+ "FROM  (trans_cajas_ahorro NATURAL JOIN tarjeta) AS x"
+			   		+ "WHERE " + Tarj + " = x.nro_tarjeta AND x.PIN = md5(" + Pin + ")"
+			   		+ "ORDER BY fecha DESC , hora DESC"
+			   		+ "LIMIT 15";
 			   stm.execute(sql);
 			   ResultSet R = stm.getResultSet();
+			   tabla.refresh(R);
 			   stm.close();
-			   tabla.refresh(R); //No es la mejor solución, hay que ver de limitar a 15 resultados
+			   R.close();
 			
 			   /* int i = 1; Ver esto, aunque no se si se puede iterar manualmente con una DBTable 
 			   while(i <= 15 && R.next() != false) {
@@ -217,7 +219,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   
 	   private void btnSaldoActionPerformed(ActionEvent evt) {
-			//Mostrar el Saldo del Usuario
+		   //Mostrar el Saldo del Usuario
 		   //El query deberia funcionar
 		   try {
 			   Statement stmt = this.conexionBD.createStatement();
@@ -230,6 +232,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		         //No necesito mostrar una tabla, solo piden el saldo de la tarjeta, lo muestro en un pop up
 		         JOptionPane.showMessageDialog(this, "El saldo de la Tarjeta es: " + sal);
 		         stmt.close();
+		         R.close();
 		   }
 		   catch(SQLException ex) {
 			   JOptionPane.showMessageDialog(this,
@@ -244,7 +247,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		   
 		   if(validarCampos()) {
 			   try {
-				   //Revisar Query, se me confunde un toque con tanta información en el View
+				   //Revisar Query, se me confunde un toque con tanta informacion en el View
 				   Statement stmt = this.conexionBD.createStatement();
 			         String sql = "SELECT Fecha,hora,tipo,monto,cod_caja AS codCaja,destino" +
 			                      "FROM trans_cajas_ahorro"
@@ -253,6 +256,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			         ResultSet R = stmt.getResultSet();
 			         tabla.refresh(R); //Obtenidas las tuplas, refresco la tabla con el ResultSet
 			         stmt.close();
+			         R.close();
 			   }
 			   catch(SQLException ex) {
 				   JOptionPane.showMessageDialog(this,
@@ -324,7 +328,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      }
 		   }
 		   
-		 //Revisar, no me parece necesario todo el código que este método contiene 
+		 //Revisar, no me parece necesario todo el codigo que este metodo contiene 
 		 //Se usa la primera vez para mostrar todos los campos, medio raro de tener 
 		 private void refrescar()
 		   {
@@ -366,7 +370,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      this.txtFechaInicio.setText("");
 		   }
 		 
-		 //Esta función es necesaria para validar el input ANTES de realizar los query
+		 //Esta funcion es necesaria para validar el input ANTES de realizar los query
 		 private boolean validarCampos()
 		   {
 		      String mensajeError = null;

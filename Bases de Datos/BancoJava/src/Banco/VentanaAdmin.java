@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.Types;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -46,6 +44,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private String clave;
 	private JPasswordField pf;
 	private JList <String> listaTablas;
+	private DefaultListModel <String> modeloTablas;
 	private JList <String> listaAtributosTabla;
 	private DefaultListModel <String> modeloListaAtributos;
 	
@@ -118,26 +117,12 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	            }	
 	            {
 	            	//Muestra todas las tablas en la base de datos
-	            	DefaultListModel <String> dlm = new DefaultListModel <String> ();
-	            	listaTablas = new JList <> (dlm);
-	            	JScrollPane panelLista = new JScrollPane (listaTablas);
-	            	Listas.add (panelLista);
-	            	
-	            	
-	            	Statement stmt = this.conexionBD.createStatement ();
-	         		String sql = "SHOW TABLES";
-	         		ResultSet rs = stmt.executeQuery(sql);
-	         		
-	         		int I = 0;
-	         		String nombreTabla;
-	         		while (rs.next ()) {
-	         			nombreTabla = rs.getString(I);
-	         			dlm.addElement (nombreTabla);
-	         			I++;
-	         		}
-	         		
-	         		rs.close();
-	         		stmt.close();
+	            	modeloTablas = new DefaultListModel <String> ();
+	            	listaTablas = new JList <> (modeloTablas);
+	            	JScrollPane panelLista = new JScrollPane (listaTablas,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+	            	//panelLista.setBounds(0, 20, 600, 600);
+	            	//panelLista.contains(1, 1);
+	            	pnlConsulta.add (panelLista);
 	         		
 	         		listaTablas.addListSelectionListener(new ListSelectionListener() {
 	         		      public void valueChanged(ListSelectionEvent evt) {
@@ -150,8 +135,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	            	modeloListaAtributos = new DefaultListModel <String> ();
 	            	listaAtributosTabla = new JList <> (modeloListaAtributos);
 	            	JScrollPane panelLista = new JScrollPane (listaAtributosTabla);
-	            	Listas.add (panelLista);
-	            	listaAtributosTabla.setEnabled (false);
+	            	pnlConsulta.add (panelLista);
 	            }
 	         }
 	         {
@@ -172,7 +156,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    }
 	}
 	/**
-	 * Método privado para poblar la lista con las tablas de la BD 
+	 * Metodo privado para poblar la lista con las tablas de la BD 
 	 * (No seria necesario ya que vos ya llenas la lista al inicializar?)
 	 */
 	/*private void llenarLista(){
@@ -212,41 +196,45 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
     }
 	
 	private void conectarBD () {
-		try {
-			//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
-	        String driver ="com.mysql.cj.jdbc.Driver";
-	        String servidor = "localhost:3306";
-	        String baseDatos = "banco";
-	        String usuario = "admin";
-	        //String clave = "admin"; se toma de lo que ingreso el usuario
-	        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
-	        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-	        tabla.connectDatabase (driver, uriConexion, usuario, clave);
-	           
-	    }
-	    catch (SQLException ex) {
-	        JOptionPane.showMessageDialog (this,
-	        			"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-	                    "Error",
-	                    JOptionPane.ERROR_MESSAGE);
-	        System.out.println("SQLException: " + ex.getMessage());
-	        System.out.println("SQLState: " + ex.getSQLState());
-	        System.out.println("VendorError: " + ex.getErrorCode());
-	    }
-	    catch (ClassNotFoundException e) {
-	        e.printStackTrace();
-	    }
+		if (conexionBD == null) {
+			try {
+				//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
+		        String driver ="com.mysql.cj.jdbc.Driver";
+		        String servidor = "localhost:3306";
+		        String baseDatos = "banco";
+		        String usuario = "admin";
+		        //String clave = "admin"; se toma de lo que ingreso el usuario
+		        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
+		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
+		        tabla.connectDatabase (driver, uriConexion, usuario, clave);
+		        mostrarTablas();
+		    }
+		    catch (SQLException ex) {
+		        JOptionPane.showMessageDialog (this,
+		        			"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+		                    "Error",
+		                    JOptionPane.ERROR_MESSAGE);
+		        System.out.println("SQLException: " + ex.getMessage());
+		        System.out.println("SQLState: " + ex.getSQLState());
+		        System.out.println("VendorError: " + ex.getErrorCode());
+		    }
+		    catch (ClassNotFoundException e) {
+		        e.printStackTrace();
+		    }
+		}
 	}
 	
 	private void desconectarBD () {
-		try {
-		    tabla.close();            
-	    }
-	    catch (SQLException ex) {
-	        System.out.println("SQLException: " + ex.getMessage());
-	        System.out.println("SQLState: " + ex.getSQLState());
-	        System.out.println("VendorError: " + ex.getErrorCode());
-	    }
+		if (conexionBD != null) {
+			try {
+			    tabla.close();            
+		    }
+		    catch (SQLException ex) {
+		        System.out.println("SQLException: " + ex.getMessage());
+		        System.out.println("SQLState: " + ex.getSQLState());
+		        System.out.println("VendorError: " + ex.getErrorCode());
+		    }
+		}
 	}
 	
 	private void refrescarTabla () {
@@ -287,6 +275,29 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    }
     }
 	
+	private void mostrarTablas () {
+		//Se encarga de poner el nombre de cada tabla en listaTablas
+		try {
+			Statement stmt = conexionBD.createStatement ();
+     		String sql = "SHOW TABLES";
+     		ResultSet rs = stmt.executeQuery(sql);
+     		
+     		int I = 0;
+     		String nombreTabla;
+     		while (rs.next ()) {
+     			nombreTabla = rs.getString(I);
+     			modeloTablas.addElement (nombreTabla);
+     			I++;
+     		}
+     		
+     		rs.close();
+     		stmt.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void mostrarAtributos () {
 		//Se encarga de ubicar cada atributo en listaAtributosTabla
 		try {
@@ -311,7 +322,5 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
- 		
- 		
 	}
 }

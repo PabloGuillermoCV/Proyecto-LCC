@@ -84,6 +84,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		this.ventanaEmpleado.setVisible(false);
 		this.ventanaATM.setVisible(false);
 		
+		this.jDesktopPane1.add(this.ventanaAdmin);
+		this.jDesktopPane1.add(this.ventanaEmpleado);
+		this.jDesktopPane1.add(this.ventanaATM);
 	}
 	
 	private void initGUI () {
