@@ -163,11 +163,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void registrarPago(String nroC, String money) {
 		try {
 			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			String d = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();
 			//Hago un UPDATE Query, revisar si esta bien
-			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d/%m/%Y %r')" + 
+			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d-%m-%Y')" + 
 						" WHERE Pago.nro_pago = " + nroC);
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
