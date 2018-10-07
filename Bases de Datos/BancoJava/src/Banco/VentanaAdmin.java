@@ -158,6 +158,42 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    }
 	}
 	
+	private void mostrarTablas () {
+		//Se encarga de poner el nombre de cada tabla en listaTablas
+		try {
+			Statement stmt = conexionBD.createStatement ();
+			ResultSet R = stmt.executeQuery ("SHOW TABLES FROM BANCO");
+			
+			String nombreTabla;
+	        while (R.next()) {
+	        	nombreTabla = R.getString ("Tables_in_banco");
+	        	modeloTablas.addElement (nombreTabla);
+	        }
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void mostrarAtributos () {
+		//Se encarga de ubicar cada atributo en listaAtributosTabla
+		try {
+			modeloListaAtributos.removeAllElements ();
+			
+			Statement stmt = conexionBD.createStatement ();
+			ResultSet R = stmt.executeQuery ("SHOW COLUMNS FROM " + listaTablas.getSelectedValue ());
+			
+			String nombreAtributo;
+	        while (R.next()) {
+	        	nombreAtributo = R.getString ("Field");
+	        	modeloListaAtributos.addElement (nombreAtributo);
+	        }
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void thisComponentShown (ComponentEvent evt) {
 		//Para manejar Logins, hago lo siguiente:
 		/*
@@ -260,40 +296,4 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	                            JOptionPane.ERROR_MESSAGE);
 	    }
     }
-	
-	private void mostrarTablas () {
-		//Se encarga de poner el nombre de cada tabla en listaTablas
-		try {
-			Statement stmt = conexionBD.createStatement ();
-			ResultSet R = stmt.executeQuery ("SHOW TABLES FROM BANCO");
-			
-			String nombreTabla;
-	        while (R.next()) {
-	        	nombreTabla = R.getString ("Tables_in_banco");
-	        	modeloTablas.addElement (nombreTabla);
-	        }
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void mostrarAtributos () {
-		//Se encarga de ubicar cada atributo en listaAtributosTabla
-		try {
-			modeloListaAtributos.removeAllElements ();
-			
-			Statement stmt = conexionBD.createStatement ();
-			ResultSet R = stmt.executeQuery ("SHOW COLUMNS FROM " + listaTablas.getSelectedValue ());
-			
-			String nombreAtributo;
-	        while (R.next()) {
-	        	nombreAtributo = R.getString ("Field");
-	        	modeloListaAtributos.addElement (nombreAtributo);
-	        }
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
 }

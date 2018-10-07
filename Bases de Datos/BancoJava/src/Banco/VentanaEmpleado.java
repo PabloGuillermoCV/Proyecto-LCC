@@ -1,51 +1,33 @@
 package Banco;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Types;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.GregorianCalendar;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import quick.dbtable.*;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
-import java.awt.Rectangle;
-import javax.swing.JList;
 
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial","unused"})
 public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	private JPanel pnlConsulta;
-	private JTextArea txtConsulta;
 	private JButton botonBorrar;
 	private JButton btnEjecutar;   
 	private JScrollPane scrConsulta;
@@ -394,7 +376,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        String driver ="com.mysql.cj.jdbc.Driver";
 		        String usuario = "empleado";
 		        String password = "empleado";
-		        String urlConexion = "jdbc:mysql://%25/banco?serverTimezone=UTC";
+		        String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
 		        tabla.connectDatabase (driver, urlConexion, usuario, password);
 		        conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
@@ -430,39 +412,31 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	private void refrescarTabla () {
-	    try {    
-	          
-	    	// seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-	    	tabla.setSelectSql(this.txtConsulta.getText().trim());
-	    	// obtenemos el modelo de la tabla a partir de la consulta para 
-	    	// modificar la forma en que se muestran de algunas columnas  
-	    	tabla.createColumnModelFromQuery();    	    
-	    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
-	    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-	    		if (tabla.getColumn(i).getType()==Types.TIME) {    		 
-	    			tabla.getColumn(i).setType(Types.CHAR);  
-	  	       	}
-	    		// cambiar el formato en que se muestran los valores de tipo DATE
-	    		if (tabla.getColumn(i).getType()==Types.DATE) {
-	    			tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-	    		}
-	        }  
-	    	// actualizamos el contenido de la tabla.   	     	  
-	    	tabla.refresh();
-	    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
-	    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
-	    	// patir de la conexion y la consulta seteadas con connectDatabase() y 
-	        // setSelectSql() respectivamente.
-	    }
-	    catch (SQLException ex) {
-	        // en caso de error, se muestra la causa en la consola
-	        System.out.println("SQLException: " + ex.getMessage());
-	        System.out.println("SQLState: " + ex.getSQLState());
-	        System.out.println("VendorError: " + ex.getErrorCode());
-	        JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-	                            ex.getMessage() + "\n", 
-	                            "Error al ejecutar la consulta.",
-	                            JOptionPane.ERROR_MESSAGE);
-	    }
+		 try {
+	         Statement stmt = this.conexionBD.createStatement();
+
+	         String sql = "SELECT *" + 
+	                      "FROM trans_cajas_ahorro " +
+	                      "ORDER BY nro_ca DESC";
+
+
+	         ResultSet rs = stmt.executeQuery(sql);
+	       
+	                 
+	        //actualiza el contenido de la tabla con los datos del result set rs
+	         tabla.refresh(rs);
+
+	        //setea el formato de visualizacion de la columna "fecha" a dia/mes/ano
+	         tabla.getColumnByDatabaseName("fecha").setDateFormat("dd/MM/YYYY");
+	         
+	         tabla.getColumnByDatabaseName("fecha").setMinWidth(80);       
+	         rs.close();
+	         stmt.close();
+	      }
+	      catch (SQLException ex) {
+	         System.out.println("SQLException: " + ex.getMessage());
+	         System.out.println("SQLState: " + ex.getSQLState());
+	         System.out.println("VendorError: " + ex.getErrorCode());
+	      }
     }
 }
