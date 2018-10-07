@@ -7,10 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Types;
-import java.sql.Connection;
-import java.sql.ResultSet;
+import java.util.Arrays;
 import java.sql.SQLException;
-import java.sql.Statement;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -37,7 +35,6 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JButton btnEjecutar;
 	private DBTable tabla = new DBTable();    
 	private JScrollPane scrConsulta;
-	protected Connection conexionBD = null;
 	private JSplitPane Listas;
 	protected int Seleccionado = -1;
 	private String clave;
@@ -53,15 +50,12 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		initGUI ();
 	}
 	
-	//Utilizo el initGUI de VentanaConsultas por el momento
-    //Tiene elementos de la BD de la clase que hay que cambiar
 	private void initGUI () {
         try {
-        	 {
+        	{
  	         	Listas = new JSplitPane();
  	         	getContentPane().add(Listas, BorderLayout.CENTER);
- 	         	
- 	         }
+ 	        }
 	        setPreferredSize(new Dimension(800, 600));
 	        this.setBounds(0, 0, 800, 600);
 	        setVisible(true);
@@ -89,7 +83,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	                    txtConsulta.setTabSize(3);
 	                    txtConsulta.setColumns(80);
 	                    txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
-	                    txtConsulta.setText("SELECT\r\nFROM \r\nWHERE\r\n");
+	                    txtConsulta.setText("SELECT \r\nFROM \r\nWHERE \r\n");
 	                    txtConsulta.setFont(new java.awt.Font("Monospaced",0,12));
 	                    txtConsulta.setRows(10);
 	                 }
@@ -145,33 +139,11 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	             // setea la tabla para solo lectura (no se puede editar su contenido)  
 	             tabla.setEditable(false);
 	         }
-	        
-	         {
-	   
-	         }
 	    } 
 		catch (Exception e) {
 	        e.printStackTrace();
 	    }
 	}
-	/**
-	 * Metodo privado para poblar la lista con las tablas de la BD 
-	 * (No seria necesario ya que vos ya llenas la lista al inicializar?)
-	 */
-	/*private void llenarLista(){
-		try{
-		 String sql = "SHOW TABLES FROM banco";
-		}
-		catch(SQLException e){
-			 JOptionPane.showMessageDialog(this,
-                     "Se produjo un error al intentar obtener las Tablas de la BD.\n" + e.getMessage(),
-                     "Error",
-                     JOptionPane.ERROR_MESSAGE);
-				System.out.println("SQLException: " + e.getMessage());
-				System.out.println("SQLState: " + e.getSQLState());
-				System.out.println("VendorError: " + e.getErrorCode());
-		}
-	}*/
 	
 	private void thisComponentShown (ComponentEvent evt) {
 		//Para manejar Logins, hago lo siguiente:
@@ -179,10 +151,13 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		 * uso JOptionPane.DialogPane para nombres de usuario,/Legajos
 		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para levantar el password ingresado
 		 */
+		char [] pass = {'a','d','m','i','n'};
 		pf = new JPasswordField();
 		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (okCxl == JOptionPane.OK_OPTION) {
-			clave = pf.getPassword().toString();
+			if(Arrays.equals(pf.getPassword(),pass)) {
+				clave = "admin";
+			}
 		}
 		this.conectarBD();
 	}
@@ -196,44 +171,37 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
     }
 	
 	private void conectarBD () {
-		if (conexionBD == null) {
-			try {
-				//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
-		        String driver ="com.mysql.cj.jdbc.Driver";
-		        String servidor = "localhost:3306";
-		        String baseDatos = "banco";
-		        String usuario = "admin";
-		        //String clave = "admin"; se toma de lo que ingreso el usuario
-		        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
-		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-		        tabla.connectDatabase (driver, uriConexion, usuario, clave);
-		        mostrarTablas();
-		    }
-		    catch (SQLException ex) {
-		        JOptionPane.showMessageDialog (this,
-		        			"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-		                    "Error",
-		                    JOptionPane.ERROR_MESSAGE);
-		        System.out.println("SQLException: " + ex.getMessage());
-		        System.out.println("SQLState: " + ex.getSQLState());
-		        System.out.println("VendorError: " + ex.getErrorCode());
-		    }
-		    catch (ClassNotFoundException e) {
-		        e.printStackTrace();
-		    }
+		try {
+			//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
+		    String driver = "com.mysql.cj.jdbc.Driver";
+		    String usuario = "admin";
+		    String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
+		    //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable
+		    tabla.connectDatabase (driver, urlConexion, usuario, clave);
+		    mostrarTablas();
+		}
+		catch (SQLException ex) {
+		    JOptionPane.showMessageDialog (this,
+		        		"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+		                "Error",
+		                JOptionPane.ERROR_MESSAGE);
+		    System.out.println("SQLException: " + ex.getMessage());
+		    System.out.println("SQLState: " + ex.getSQLState());
+		    System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		catch (ClassNotFoundException e) {
+		    e.printStackTrace();
 		}
 	}
 	
 	private void desconectarBD () {
-		if (conexionBD != null) {
-			try {
-			    tabla.close();            
-		    }
-		    catch (SQLException ex) {
-		        System.out.println("SQLException: " + ex.getMessage());
-		        System.out.println("SQLState: " + ex.getSQLState());
-		        System.out.println("VendorError: " + ex.getErrorCode());
-		    }
+		try {
+			tabla.close();
+		}
+		catch (SQLException ex) {
+		    System.out.println("SQLException: " + ex.getMessage());
+		    System.out.println("SQLState: " + ex.getSQLState());
+		    System.out.println("VendorError: " + ex.getErrorCode());
 		}
 	}
 	
@@ -243,7 +211,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	tabla.setSelectSql(this.txtConsulta.getText().trim());
 	    	// obtenemos el modelo de la tabla a partir de la consulta para 
 	    	// modificar la forma en que se muestran de algunas columnas  
-	    	tabla.createColumnModelFromQuery();    	    
+	    	tabla.createColumnModelFromQuery();
 	    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
 	    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
 	    		if (tabla.getColumn(i).getType()==Types.TIME) {    		 
@@ -271,27 +239,21 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	                            ex.getMessage() + "\n", 
 	                            "Error al ejecutar la consulta.",
 	                            JOptionPane.ERROR_MESSAGE);
-	         
 	    }
     }
 	
 	private void mostrarTablas () {
 		//Se encarga de poner el nombre de cada tabla en listaTablas
 		try {
-			Statement stmt = conexionBD.createStatement ();
-     		String sql = "SHOW TABLES";
-     		ResultSet rs = stmt.executeQuery(sql);
-     		
-     		int I = 0;
-     		String nombreTabla;
-     		while (rs.next ()) {
-     			nombreTabla = rs.getString(I);
-     			modeloTablas.addElement (nombreTabla);
-     			I++;
-     		}
-     		
-     		rs.close();
-     		stmt.close();
+			tabla.setSelectSql("SHOW TABLES FROM BANCO");
+			
+			tabla.createColumnModelFromQuery();
+			
+			String nombreTabla;
+			for (int I = 0; I < tabla.getRowCount(); I++) {
+				nombreTabla = (String) tabla.getRowObject(I);
+				modeloTablas.addElement (nombreTabla);
+			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -301,23 +263,15 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private void mostrarAtributos () {
 		//Se encarga de ubicar cada atributo en listaAtributosTabla
 		try {
+			tabla.setSelectSql("SHOW COLUMNS FROM " + listaTablas.getSelectedValue ());
 			
-			Statement stmt = this.conexionBD.createStatement ();
-			//DESCRIBE hace lo mismo, pero como son equivalentes lo dejo
-			String sql = "SHOW COLUMNS FROM " + listaTablas.getSelectedValue (); 
-			ResultSet rs = stmt.executeQuery(sql);
+			tabla.createColumnModelFromQuery();
 			
-			int I = 0;
      		String nombreAtributo;
-     		while (rs.next ()) {
-     			nombreAtributo = rs.getString(I); 
-     			modeloListaAtributos.addElement (nombreAtributo);
-     			I++;
-     		}
-			
-			rs.close();
-     		stmt.close();
-     		
+     		for (int I = 0; I < tabla.getRowCount(); I++) {
+				nombreAtributo = (String) tabla.getRowObject(I);
+				modeloTablas.addElement (nombreAtributo);
+			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
