@@ -93,7 +93,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	               {
 	                  lblNombre = new JLabel();
 	                  pnlCampos.add(lblNombre);
-	                  lblNombre.setText("Nombre");
+	                  lblNombre.setText("Fecha Inicio");
 	                  lblNombre.setHorizontalAlignment(SwingConstants.TRAILING);
 	               }
 	               {
@@ -104,7 +104,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	               {
 	                  lblFecha = new JLabel();
 	                  pnlCampos.add(lblFecha);
-	                  lblFecha.setText("Fecha");
+	                  lblFecha.setText("Fecha Fin");
 	                  lblFecha.setHorizontalAlignment(SwingConstants.TRAILING);
 	               }
 	               {
@@ -170,6 +170,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   private void thisComponentShown(ComponentEvent evt) {
+		   Card = new JPasswordField();
+		   PIN_Field = new JPasswordField();
 		   int okCxl = JOptionPane.showConfirmDialog(null, Card, "Ingresar nro de Tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (okCxl == JOptionPane.OK_OPTION) {
 				Tarj = Card.getPassword().toString(); 
@@ -269,7 +271,10 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   private void thisComponentHidden(ComponentEvent evt) 
 	   {
+		  //No solo me desconecto, tambien limpio los datos del que ingresó, así otro usuario puede ingresar
 	      this.desconectarBD();
+	      Tarj = "";
+	      Pin = "";
 	   }
 	   
 	   private void conectarBD() {

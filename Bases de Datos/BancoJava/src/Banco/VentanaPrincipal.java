@@ -32,7 +32,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	
 	private VentanaAdmin ventanaAdmin;
 	private VentanaEmpleado ventanaEmpleado;
-	private VentanaATM ventanaATM;
+	private ConsultasATM ConsultasATM;
 	private JButton btnCerrar, loginATM, loginAdmin, loginEmpleado;
 	private JPasswordField passwordField;
 	private JTextField textField;
@@ -58,7 +58,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		initGUI ();
 		this.ventanaAdmin = new VentanaAdmin ();
 		this.ventanaEmpleado = new VentanaEmpleado ();
-		this.ventanaATM = new VentanaATM ();
+		this.ConsultasATM = new ConsultasATM ();
 		getContentPane().setLayout(null);
 		
 		Button button = new Button("Ingresar como Admin");
@@ -77,11 +77,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		getContentPane().add(button_2);
 		this.ventanaAdmin.setVisible(false);
 		this.ventanaEmpleado.setVisible(false);
-		this.ventanaATM.setVisible(false);
+		this.ConsultasATM.setVisible(false);
 		
 		this.jDesktopPane1.add(this.ventanaAdmin);
 		this.jDesktopPane1.add(this.ventanaEmpleado);
-		this.jDesktopPane1.add(this.ventanaATM);
+		this.jDesktopPane1.add(this.ConsultasATM);
 	}
 	
 	private void initGUI () {
@@ -186,9 +186,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	   
     private void mniATMActionPerformed (ActionEvent evt) {
 	    try {
-	        this.ventanaATM.setMaximum (true);
+	        this.ConsultasATM.setMaximum (true);
 	    }
 	    catch (PropertyVetoException e) {}
-	    this.ventanaATM.setVisible (true);      
+	    this.ConsultasATM.setVisible (true);      
     }
 }

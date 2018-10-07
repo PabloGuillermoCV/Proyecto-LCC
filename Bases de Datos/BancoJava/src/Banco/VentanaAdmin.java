@@ -173,6 +173,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	   
 	private void thisComponentHidden (ComponentEvent evt) {
 	    this.desconectarBD();
+	    clave = "";
 	}
 
 	private void btnEjecutarActionPerformed (ActionEvent evt) {

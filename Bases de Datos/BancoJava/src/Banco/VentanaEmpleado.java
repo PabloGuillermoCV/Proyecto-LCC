@@ -385,7 +385,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	   
 	private void thisComponentHidden (ComponentEvent evt) {
-	    this.desconectarBD();
+	    //Desconecto y  limpio todos los atributos
+		this.desconectarBD();
+	    nro = "";
+	    legajo = "";
+	    clave = "";
+	    tipo = "";
+	    seleccionado = -1;
 	}
 
 	private void btnEjecutarActionPerformed (ActionEvent evt) {
