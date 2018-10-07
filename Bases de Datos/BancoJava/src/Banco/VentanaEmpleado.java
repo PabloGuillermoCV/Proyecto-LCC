@@ -37,7 +37,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private JTextField Num_doc;
 	private JTextField Tipo_Doc;
 	private DBTable tabla = new DBTable();
-	private String nro;
+	private int nro;
 	private String tipo;
 	protected Connection conexionBD = null;
 	int seleccionado = -1;
@@ -206,7 +206,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del botón, no se usa pa mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void verCuotas(ActionEvent e) {
-		nro = Num_doc.getText();
+		nro = Integer.parseInt(Num_doc.getText());
 		tipo = Tipo_Doc.getText();
 		Num_doc.setText("");
 		Tipo_Doc.setText("");
@@ -215,8 +215,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			ResultSet R;
 			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento "
 					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C "
-					+ "WHERE C.tipo_doc = " + tipo + " AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
-			tabla.refresh();
+					+ "WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+			tabla.refresh(R);
 		}
 		catch(SQLException f) {
 			f.printStackTrace();
@@ -228,7 +228,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del Botón, ne se usa para mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void CrearPrest(ActionEvent e) {
-		nro = Num_doc.getText();
+		nro = Integer.parseInt(Num_doc.getText());
 		tipo = Tipo_Doc.getText();
 		noPrestActual(nro, tipo);
 	}
@@ -238,7 +238,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		this.conectarBD();
 	}
 	
-	private void noPrestActual(String doc, String typeDoc) {
+	private void noPrestActual(int doc, String typeDoc) {
 		int mon = 0;
 		int mes = 0;
 		try {
@@ -364,7 +364,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void thisComponentHidden (ComponentEvent evt) {
 	    //Desconecto y  limpio todos los atributos
 		this.desconectarBD();
-	    nro = "";
 	    legajo = "";
 	    clave = "";
 	    tipo = "";
