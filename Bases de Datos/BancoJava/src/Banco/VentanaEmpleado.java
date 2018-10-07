@@ -108,7 +108,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton CuotasBtn = new JButton("Ver Cuotas");
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				tabla.setEnabled(true);
+				tabla.setEnabled(false);
 				verCuotas(arg0);
 			}
 		});
