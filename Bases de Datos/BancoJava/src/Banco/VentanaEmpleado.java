@@ -88,7 +88,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		tabla = new DBTable();
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
-		tabla.setEnabled(false);
+		tabla.setEnabled(true);
+		tabla.setEditable(false);
 		tabla.addMouseListener(new MouseAdapter() {
 			public void MouseListener(MouseEvent evt) {
 				TablaClick(evt);
@@ -108,7 +109,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton CuotasBtn = new JButton("Ver Cuotas");
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				tabla.setEnabled(false);
+				tabla.setEnabled(true);
+				tabla.setEdita
 				verCuotas(arg0);
 			}
 		});
