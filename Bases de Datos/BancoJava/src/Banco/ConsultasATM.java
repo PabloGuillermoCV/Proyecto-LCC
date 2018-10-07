@@ -259,7 +259,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 				   Statement stmt = this.conexionBD.createStatement();
 			         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino"
 			                      + " FROM trans_cajas_ahorro TCA"
-			                      + " WHERE TCA.fecha >= " + txtFechaInicio.getText().trim() + "AND TCA.fecha <=" + txtFechaFin.getText().trim();
+			                      + " WHERE TCA.fecha >= " + txtFechaInicio.getText().trim() + " AND TCA.fecha <= " + txtFechaFin.getText().trim();
 			         stmt.execute(sql);
 			         ResultSet R = stmt.getResultSet();
 			         tabla.refresh(R); //Obtenidas las tuplas, refresco la tabla con el ResultSet
