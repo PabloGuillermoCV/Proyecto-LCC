@@ -234,7 +234,10 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		                      + " WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5( " + Pin + ")";
 		         stmt.execute(sql);
 		         ResultSet R = stmt.getResultSet();
-		         int sal = R.getInt(1);
+		         int sal = 0;
+		         if (R.next()) {
+		        	 sal = R.getInt(1);
+		         }
 		         //No necesito mostrar una tabla, solo piden el saldo de la tarjeta, lo muestro en un pop up
 		         JOptionPane.showMessageDialog(this, "El saldo de la Tarjeta es: " + sal);
 		         stmt.close();
