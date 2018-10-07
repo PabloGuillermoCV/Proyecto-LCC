@@ -29,7 +29,6 @@ import quick.dbtable.DBTable;
 public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   private JPanel pnlInferior;
-	   
 	   private JFormattedTextField txtFechaInicio; 
 	   private JFormattedTextField txtFechaFin;
 	   private JLabel lblFecha;
@@ -39,12 +38,11 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private JButton btnMovimientosPeriodo;
 	   private JPanel pnlBotones;
 	   private JPanel pnlCampos;
-	   private DBTable tabla; 
+	   private DBTable tabla = new DBTable(); 
 	   private JPasswordField PIN_Field;
-		private JPasswordField Card;
-		private String Tarj,Pin;
-	   
-	   protected Connection conexionBD = null;
+	   private JPasswordField Card;
+	   private String Tarj,Pin;
+	   private Connection conexionBD = null;
 	   
 	   public ConsultasATM() {
 	      super();
@@ -170,19 +168,27 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   private void thisComponentShown(ComponentEvent evt) {
-		   Card = new JPasswordField();
-		   PIN_Field = new JPasswordField();
-		   int okCxl = JOptionPane.showConfirmDialog(null, Card, "Ingresar nro de Tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-			if (okCxl == JOptionPane.OK_OPTION) {
-				Tarj = Card.getPassword().toString(); 
-			}
-			int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Ingresar Pin", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-			if (okCx2 == JOptionPane.OK_OPTION) {
-				Pin = PIN_Field.getPassword().toString(); 
-			}
-	      this.conectarBD();
-	      this.refrescar();
+		  login ();
+	      this.conectarBD ();
+	      this.refrescarTabla ();
 	   }
+	   
+	   /**
+		 * Hace login del Empleado por medio de Pop Ups
+		 */
+	   private void login () {
+		   Card = new JPasswordField();
+	       PIN_Field = new JPasswordField();
+	       int okCxl = JOptionPane.showConfirmDialog(null, Card, "Ingresar nro de Tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	       if (okCxl == JOptionPane.OK_OPTION) {
+	           Tarj = Card.getPassword().toString(); 
+	       }
+		   int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Ingresar Pin", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		   if (okCx2 == JOptionPane.OK_OPTION) {
+			   Pin = PIN_Field.getPassword().toString(); 
+		   }
+	   }
+	   
 	   private void btnUltimosMoviminetosActionPerformed(ActionEvent evt) {
 			//Mostrar las ultimas 15 transacciones
 		   try {
@@ -245,7 +251,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		}
 	   
 	   private void btnMovimientosPeriodoActionPerformed(ActionEvent evt) {
-		   
 		   if(validarCampos()) {
 			   try {
 				   //Revisar Query, se me confunde un toque con tanta informacion en el View
@@ -271,38 +276,30 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   private void thisComponentHidden(ComponentEvent evt) 
 	   {
-		  //No solo me desconecto, tambien limpio los datos del que ingresó, así otro usuario puede ingresar
+		  //No solo me desconecto, tambien limpio los datos del que ingreso, asi otro usuario puede ingresar
 	      this.desconectarBD();
 	      Tarj = "";
 	      Pin = "";
 	   }
 	   
 	   private void conectarBD() {
-		      if (this.conexionBD == null)
-		      {
-		        
-		    	  try
-		         {
+		      if (this.conexionBD == null) {
+		         try {
 		            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 		         }
-		         catch (Exception ex)
-		         {
+		         catch (Exception ex) {
 		            System.out.println(ex.getMessage());
 		         }
 		        
-		         try
-		         {
-		        	//Ver Esto
-		            String servidor = "localhost:3306";
-		            String baseDatos = "banco";
-		            //String usuario = "admin_batallas";
-		            //String clave = "pwadmin";
-		            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
-		   
-		            this.conexionBD = DriverManager.getConnection(uriConexion, Tarj, Pin);
+		         try {
+		        	String driver ="com.mysql.cj.jdbc.Driver";
+		            String usuario = "atm";
+		            String password = "atm";
+		            String urlConexion = "jdbc:mysql://%25/banco?serverTimezone=UTC";
+		            tabla.connectDatabase (driver, urlConexion, usuario, password);
+		            conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
 		         }
-		         catch (SQLException ex)
-		         {
+		         catch (SQLException ex) {
 		            JOptionPane.showMessageDialog(this,
 		                                          "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
 		                                          "Error",
@@ -311,33 +308,31 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		            System.out.println("SQLState: " + ex.getSQLState());
 		            System.out.println("VendorError: " + ex.getErrorCode());
 		         }
+		         catch (ClassNotFoundException e) {
+		 	        e.printStackTrace();
+		 	    }
 		      }
 		   }
 
-		   private void desconectarBD()
-		   {
-		      if (this.conexionBD != null)
-		      {
-		         try
-		         {
-		            this.conexionBD.close();
-		            this.conexionBD = null;
-		         }
-		         catch (SQLException ex)
-		         {
-		            System.out.println("SQLException: " + ex.getMessage());
-		            System.out.println("SQLState: " + ex.getSQLState());
-		            System.out.println("VendorError: " + ex.getErrorCode());
-		         }
-		      }
+		   private void desconectarBD() {
+		       if (this.conexionBD != null) {
+		           try {
+		               tabla.close();
+		               conexionBD.close();
+		               conexionBD = null;
+		           }
+		           catch (SQLException ex) {
+		               System.out.println("SQLException: " + ex.getMessage());
+		               System.out.println("SQLState: " + ex.getSQLState());
+		               System.out.println("VendorError: " + ex.getErrorCode());
+		           }
+		       }
 		   }
 		   
 		 //Revisar, no me parece necesario todo el codigo que este metodo contiene 
 		 //Se usa la primera vez para mostrar todos los campos, medio raro de tener 
-		 private void refrescar()
-		   {
-		      try
-		      {
+		 private void refrescarTabla() {
+		      try {
 		         Statement stmt = this.conexionBD.createStatement();
 
 		         String sql = "SELECT *" + 
@@ -358,8 +353,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		         rs.close();
 		         stmt.close();
 		      }
-		      catch (SQLException ex)
-		      {
+		      catch (SQLException ex) {
 		         System.out.println("SQLException: " + ex.getMessage());
 		         System.out.println("SQLState: " + ex.getSQLState());
 		         System.out.println("VendorError: " + ex.getErrorCode());
@@ -368,15 +362,13 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      this.inicializarCampos();
 		   }
 		 
-		 private void inicializarCampos()
-		   {
+		 private void inicializarCampos() {
 		      this.txtFechaFin.setText("");
 		      this.txtFechaInicio.setText("");
 		   }
 		 
 		 //Esta funcion es necesaria para validar el input ANTES de realizar los query
-		 private boolean validarCampos()
-		   {
+		 private boolean validarCampos() {
 		      String mensajeError = null;
 		      if (this.txtFechaInicio.getText().isEmpty())
 		      {

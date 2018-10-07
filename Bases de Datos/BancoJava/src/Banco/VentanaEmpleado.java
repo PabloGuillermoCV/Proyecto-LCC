@@ -14,10 +14,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.GregorianCalendar;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,7 +34,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
 import quick.dbtable.*;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -56,7 +55,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private JTextField nf;
 	private JTextField Num_doc;
 	private JTextField Tipo_Doc;
-	private DBTable TablaEmpleado;
+	private DBTable tabla = new DBTable();
 	private String nro;
 	private String tipo;
 	protected Connection conexionBD = null;
@@ -70,7 +69,14 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		setMaximizable(true);
 		setTitle("Consultas Empleado");
 		getContentPane().setLayout(null);
-		
+		this.addComponentListener(new ComponentAdapter() {
+            public void componentHidden(ComponentEvent evt) {
+                thisComponentHidden(evt);
+            }
+            public void componentShown(ComponentEvent evt) {
+                thisComponentShown(evt);
+            }
+        });
 		
 		JPanel PaneTabla = new JPanel();
 		PaneTabla.setBounds(0, 161, 493, 326);
@@ -98,11 +104,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		getContentPane().add(Tipo_Doc);
 		Tipo_Doc.setColumns(10);
 		
-		TablaEmpleado = new DBTable();
-		PaneTabla.add(TablaEmpleado);
+		tabla = new DBTable();
+		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
-		TablaEmpleado.setEnabled(false);
-		TablaEmpleado.addMouseListener(new MouseAdapter() {
+		tabla.setEnabled(false);
+		tabla.addMouseListener(new MouseAdapter() {
 			public void MouseListener(MouseEvent evt) {
 				TablaClick(evt);
 			}
@@ -111,7 +117,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton CrearPrest = new JButton("Crear Prestamo");
 		CrearPrest.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg1) {
-				TablaEmpleado.setEnabled(false);
+				tabla.setEnabled(false);
 				CrearPrest(arg1);
 			}
 		});
@@ -121,7 +127,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton CuotasBtn = new JButton("Ver Cuotas");
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				TablaEmpleado.setEnabled(true);
+				tabla.setEnabled(true);
 				verCuotas(arg0);
 			}
 		});
@@ -131,7 +137,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton btnVerMorosos = new JButton("Ver Morosos");
 		btnVerMorosos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TablaEmpleado.setEnabled(false);
+				tabla.setEnabled(false);
 				verMor(e);
 			}
 		});
@@ -142,17 +148,17 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		}
 
 	private void TablaClick(MouseEvent evt) {
-		if ((this.TablaEmpleado.getSelectedRow() != -1) && (evt.getClickCount() == 2))
+		if ((this.tabla.getSelectedRow() != -1) && (evt.getClickCount() == 2))
 	      {
 	         seleccionarFila();
 	      }
 	}
 	
 	private void seleccionarFila() {
-		this.seleccionado = this.TablaEmpleado.getSelectedRow();
-		//Obtengo los valores en la Tabla por la fila que se seleccionó
-		String nroCuota = TablaEmpleado.getValueAt(seleccionado, 1).toString().trim();
-		String valor = TablaEmpleado.getValueAt(seleccionado, 2).toString().trim();
+		this.seleccionado = this.tabla.getSelectedRow();
+		//Obtengo los valores en la Tabla por la fila que se selecciono
+		String nroCuota = tabla.getValueAt(seleccionado, 1).toString().trim();
+		String valor = tabla.getValueAt(seleccionado, 2).toString().trim();
 		//hago un pop up para que se confirme, si se confirma, se registra el pago
 		int ok = JOptionPane.showConfirmDialog(null, null,"Desea registrar el pago de la cuota numero " + nroCuota + " con valor " + valor + "?", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
 		if(ok == JOptionPane.OK_OPTION) {
@@ -175,12 +181,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				JOptionPane.showInternalMessageDialog(null, "Se ha registrado el Pago de la Cuota con exito");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	//Métodos donde irian las consultas SQL
+	//Metodos donde irian las consultas SQL
 	/**
 	 * llena la Tabla con Clientes Morosos
 	 * @param e Action Event del botón, no se usa pa mucho
@@ -195,15 +200,15 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 					+ "FROM (cliente NATURAL JOIN prestamo) AS x, pago "
 					+ "WHERE x.nro_prestamo = pago.nro_prestamo and COUNT(nro_pago) >= 2"; // , verificar, falta la condicion de moroso
 			ResultSet rs = stmt.executeQuery(SQL1);
-			TablaEmpleado.refresh(rs);
+			tabla.refresh(rs);
 
-			//para que está esto de abajo? lo de arriba ^ deberia hacer todo automáticamente
+			//para que esta esto de abajo? lo de arriba ^ deberia hacer todo automáticamente
 			//Aunque DBTable no tiene SetAutoCreateRowSorter, ver esto
 	        int I = 0;
 	        while (rs.next()) {
-	            TablaEmpleado.setValueAt(rs.getInt("nro_cliente"), I, 0);
-	            TablaEmpleado.setValueAt(rs.getString("tipo_doc"), I, 1);
-	            TablaEmpleado.setValueAt(rs.getInt("nro_doc"), I, 2);
+	            tabla.setValueAt(rs.getInt("nro_cliente"), I, 0);
+	            tabla.setValueAt(rs.getString("tipo_doc"), I, 1);
+	            tabla.setValueAt(rs.getInt("nro_doc"), I, 2);
 	            I++;
 	        }
 			
@@ -235,9 +240,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		catch(SQLException f) {
 			
 		}
-		
-		
-		
 	}
 	
 	/**
@@ -247,14 +249,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void CrearPrest(ActionEvent e) {
 		nro = Num_doc.getText();
 		tipo = Tipo_Doc.getText();
-		try {
-			Statement stmt = this.conexionBD.createStatement();
-			ResultSet R;
-			noPrestActual(nro, tipo);
-		}
-		catch(SQLException f) {
-			
-		}
+		noPrestActual(nro, tipo);
 	}
 	
 	private void thisComponentShown (ComponentEvent evt) {
@@ -337,7 +332,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 	}
 	
-	//Método auxiliar para cargar las cuotas
+	//Metodo auxiliar para cargar las cuotas
 	private void cargarCuotas(int c, String d, int nro_pre, int periodo) {
 		Statement stmt;
 		try {
@@ -358,7 +353,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			}
 		}
 		catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -370,11 +364,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void login() {
 		JTextField Leg = new JTextField();
         int okCx2 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese numero de Legajo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if(okCx2 == JOptionPane.OK_OPTION)
-        	legajo = Leg.getText().trim(); 
+        if(okCx2 == JOptionPane.OK_OPTION) {
+        	legajo = Leg.getText().trim();
+        }
+        pf = new JPasswordField();
 		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (okCxl == JOptionPane.OK_OPTION) {
-			clave = pf.getPassword().toString(); 
+			clave = new String (pf.getPassword()); 
 		}
 	}
 	   
@@ -393,68 +389,72 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
     }
 	
 	private void conectarBD () {
-		try {
-	        String driver ="com.mysql.cj.jdbc.Driver";
-	        String servidor = "%";
-	        String baseDatos = "banco";
-	        //String legajo = "empleado";
-	        //String clave = "empleado";
-	        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
-	        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-	        TablaEmpleado.connectDatabase (driver, uriConexion, legajo, clave);   
-	    }
-	    catch (SQLException ex) {
-	        JOptionPane.showMessageDialog (this,
-	        			"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-	                    "Error",
-	                    JOptionPane.ERROR_MESSAGE);
-	        System.out.println("SQLException: " + ex.getMessage());
-	        System.out.println("SQLState: " + ex.getSQLState());
-	        System.out.println("VendorError: " + ex.getErrorCode());
-	    }
-	    catch (ClassNotFoundException e) {
-	        e.printStackTrace();
-	    }
+		if (conexionBD == null) {
+			try {
+		        String driver ="com.mysql.cj.jdbc.Driver";
+		        String usuario = "empleado";
+		        String password = "empleado";
+		        String urlConexion = "jdbc:mysql://%25/banco?serverTimezone=UTC";
+		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
+		        tabla.connectDatabase (driver, urlConexion, usuario, password);
+		        conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
+		    }
+		    catch (SQLException ex) {
+		        JOptionPane.showMessageDialog (this,
+		        			"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+		                    "Error",
+		                    JOptionPane.ERROR_MESSAGE);
+		        System.out.println("SQLException: " + ex.getMessage());
+		        System.out.println("SQLState: " + ex.getSQLState());
+		        System.out.println("VendorError: " + ex.getErrorCode());
+		    }
+		    catch (ClassNotFoundException e) {
+		        e.printStackTrace();
+		    }
+		}
 	}
 	
 	private void desconectarBD () {
-		try {
-			TablaEmpleado.close();
-	    }
-	    catch (SQLException ex) {
-	        System.out.println("SQLException: " + ex.getMessage());
-	        System.out.println("SQLState: " + ex.getSQLState());
-	        System.out.println("VendorError: " + ex.getErrorCode());
-	    }
+		if (conexionBD != null) {
+			try {
+				tabla.close();
+				conexionBD.close();
+				conexionBD = null;
+		    }
+		    catch (SQLException ex) {
+		        System.out.println("SQLException: " + ex.getMessage());
+		        System.out.println("SQLState: " + ex.getSQLState());
+		        System.out.println("VendorError: " + ex.getErrorCode());
+		    }
+		}
 	}
 	
 	private void refrescarTabla () {
 	    try {    
 	          
 	    	// seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-	    	TablaEmpleado.setSelectSql(this.txtConsulta.getText().trim());
+	    	tabla.setSelectSql(this.txtConsulta.getText().trim());
 	    	// obtenemos el modelo de la tabla a partir de la consulta para 
 	    	// modificar la forma en que se muestran de algunas columnas  
-	    	TablaEmpleado.createColumnModelFromQuery();    	    
-	    	for (int i = 0; i < TablaEmpleado.getColumnCount(); i++) { 
+	    	tabla.createColumnModelFromQuery();    	    
+	    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
 	    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-	    		if (TablaEmpleado.getColumn(i).getType()==Types.TIME) {    		 
-	    			TablaEmpleado.getColumn(i).setType(Types.CHAR);  
+	    		if (tabla.getColumn(i).getType()==Types.TIME) {    		 
+	    			tabla.getColumn(i).setType(Types.CHAR);  
 	  	       	}
 	    		// cambiar el formato en que se muestran los valores de tipo DATE
-	    		if (TablaEmpleado.getColumn(i).getType()==Types.DATE) {
-	    			TablaEmpleado.getColumn(i).setDateFormat("dd/MM/YYYY");
+	    		if (tabla.getColumn(i).getType()==Types.DATE) {
+	    			tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
 	    		}
 	        }  
 	    	// actualizamos el contenido de la tabla.   	     	  
-	    	TablaEmpleado.refresh();
+	    	tabla.refresh();
 	    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
 	    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
 	    	// patir de la conexion y la consulta seteadas con connectDatabase() y 
 	        // setSelectSql() respectivamente.
 	    }
-	    catch (SQLException ex)
-	    {
+	    catch (SQLException ex) {
 	        // en caso de error, se muestra la causa en la consola
 	        System.out.println("SQLException: " + ex.getMessage());
 	        System.out.println("SQLState: " + ex.getSQLState());
@@ -463,7 +463,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	                            ex.getMessage() + "\n", 
 	                            "Error al ejecutar la consulta.",
 	                            JOptionPane.ERROR_MESSAGE);
-	         
 	    }
     }
 }

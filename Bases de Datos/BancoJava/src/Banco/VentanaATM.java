@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Types;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -136,11 +137,11 @@ public class VentanaATM extends javax.swing.JInternalFrame {
 	        String driver ="com.mysql.cj.jdbc.Driver";
 	        String servidor = "%";
 	        String baseDatos = "banco";
-	        //String usuario = "atm";
-	        //String clave = "atm";
-	        String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos+"?serverTimezone=UTC";
+	        String usuario = "atm";
+	        String clave = "atm";
+	        String urlConexion = "jdbc:mysql://%25/banco?serverTimezone=UTC";
 	        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-	        tabla.connectDatabase (driver, uriConexion, Tarj, Pin);
+	        tabla.connectDatabase (driver, urlConexion, usuario, clave);
 	           
 	    }
 	    catch (SQLException ex) {

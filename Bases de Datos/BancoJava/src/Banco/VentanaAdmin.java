@@ -8,6 +8,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Types;
 import java.util.Arrays;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -22,10 +25,11 @@ import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import quick.dbtable.*;
 import javax.swing.JList;
-import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import java.sql.Statement;
 
 @SuppressWarnings("serial")
 public class VentanaAdmin extends javax.swing.JInternalFrame {
@@ -34,7 +38,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JTextArea txtConsulta;
 	private JButton botonBorrar;
 	private JButton btnEjecutar;
-	private DBTable tabla = new DBTable();    
+	private DBTable tabla = new DBTable();
 	private JScrollPane scrConsulta;
 	protected int Seleccionado = -1;
 	private String clave;
@@ -44,7 +48,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JList <String> listaAtributosTabla;
 	private DefaultListModel <String> modeloListaAtributos;
 	private JButton btnMostrarTablas;
-	
+	private Connection conexionBD = null;
 	
 	public VentanaAdmin () {
 		super ();
@@ -145,7 +149,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	         
 	         listaTablas.addListSelectionListener(new ListSelectionListener() {
 	               public void valueChanged(ListSelectionEvent evt) {
-	                 mostrarAtributos();
+	                   mostrarAtributos();
 	               }
 	         });
 	    } 
@@ -181,37 +185,43 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
     }
 	
 	private void conectarBD () {
-		try {
-			//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
-		    String driver = "com.mysql.cj.jdbc.Driver";
-		    String usuario = "admin";
-		    String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
-		    //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable
-		    tabla.connectDatabase (driver, urlConexion, usuario, clave);
-		    mostrarTablas();
-		}
-		catch (SQLException ex) {
-		    JOptionPane.showMessageDialog (this,
-		        		"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-		                "Error",
-		                JOptionPane.ERROR_MESSAGE);
-		    System.out.println("SQLException: " + ex.getMessage());
-		    System.out.println("SQLState: " + ex.getSQLState());
-		    System.out.println("VendorError: " + ex.getErrorCode());
-		}
-		catch (ClassNotFoundException e) {
-		    e.printStackTrace();
+		if (conexionBD == null) {
+			try {
+				//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
+			    String driver = "com.mysql.cj.jdbc.Driver";
+			    String usuario = "admin";
+			    String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
+			    //Establece una conexion con la  B.D. "banco" una tabla DBTabla y una Conection
+			    tabla.connectDatabase (driver, urlConexion, usuario, clave);
+			    conexionBD = DriverManager.getConnection (urlConexion, usuario, clave);
+			}
+			catch (SQLException ex) {
+			    JOptionPane.showMessageDialog (this,
+			        		"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE);
+			    System.out.println("SQLException: " + ex.getMessage());
+			    System.out.println("SQLState: " + ex.getSQLState());
+			    System.out.println("VendorError: " + ex.getErrorCode());
+			}
+			catch (ClassNotFoundException e) {
+			    e.printStackTrace();
+			}
 		}
 	}
 	
 	private void desconectarBD () {
-		try {
-			tabla.close();
-		}
-		catch (SQLException ex) {
-		    System.out.println("SQLException: " + ex.getMessage());
-		    System.out.println("SQLState: " + ex.getSQLState());
-		    System.out.println("VendorError: " + ex.getErrorCode());
+		if (conexionBD != null) {
+			try {
+				tabla.close();
+				conexionBD.close();
+	            conexionBD = null;
+			}
+			catch (SQLException ex) {
+			    System.out.println("SQLException: " + ex.getMessage());
+			    System.out.println("SQLState: " + ex.getSQLState());
+			    System.out.println("VendorError: " + ex.getErrorCode());
+			}
 		}
 	}
 	
@@ -239,8 +249,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	// patir de la conexion y la consulta seteadas con connectDatabase() y 
 	        // setSelectSql() respectivamente.
 	    }
-	    catch (SQLException ex)
-	    {
+	    catch (SQLException ex) {
 	        // en caso de error, se muestra la causa en la consola
 	        System.out.println("SQLException: " + ex.getMessage());
 	        System.out.println("SQLState: " + ex.getSQLState());
@@ -255,15 +264,14 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private void mostrarTablas () {
 		//Se encarga de poner el nombre de cada tabla en listaTablas
 		try {
-			tabla.setSelectSql("SHOW TABLES FROM BANCO");
-			
-			tabla.createColumnModelFromQuery();
+			Statement stmt = conexionBD.createStatement ();
+			ResultSet R = stmt.executeQuery ("SHOW TABLES FROM BANCO");
 			
 			String nombreTabla;
-			for (int I = 0; I < tabla.getRowCount(); I++) {
-				nombreTabla = (String) tabla.getRowObject(I);
-				modeloTablas.addElement (nombreTabla);
-			}
+	        while (R.next()) {
+	        	nombreTabla = R.getString ("Tables_in_banco");
+	        	modeloTablas.addElement (nombreTabla);
+	        }
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -273,15 +281,16 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private void mostrarAtributos () {
 		//Se encarga de ubicar cada atributo en listaAtributosTabla
 		try {
-			tabla.setSelectSql("SHOW COLUMNS FROM " + listaTablas.getSelectedValue ());
+			modeloListaAtributos.removeAllElements ();
 			
-			tabla.createColumnModelFromQuery();
+			Statement stmt = conexionBD.createStatement ();
+			ResultSet R = stmt.executeQuery ("SHOW COLUMNS FROM " + listaTablas.getSelectedValue ());
 			
-     		String nombreAtributo;
-     		for (int I = 0; I < tabla.getRowCount(); I++) {
-				nombreAtributo = (String) tabla.getRowObject(I);
-				modeloTablas.addElement (nombreAtributo);
-			}
+			String nombreAtributo;
+	        while (R.next()) {
+	        	nombreAtributo = R.getString ("Field");
+	        	modeloListaAtributos.addElement (nombreAtributo);
+	        }
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
