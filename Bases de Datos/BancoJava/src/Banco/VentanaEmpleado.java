@@ -85,6 +85,17 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		getContentPane().add(Tipo_Doc);
 		Tipo_Doc.setColumns(10);
 		
+		JButton btnRegistrarPago = new JButton("Registrar Pago");
+		btnRegistrarPago.setEnabled(false);
+		btnRegistrarPago.setBounds(213, 54, 112, 23);
+		getContentPane().add(btnRegistrarPago);
+		btnRegistrarPago.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				seleccionarFila();
+			}
+		});
+		
+		
 		tabla = new DBTable();
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
@@ -99,6 +110,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton CrearPrest = new JButton("Crear Prestamo");
 		CrearPrest.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg1) {
+				btnRegistrarPago.setEnabled(false);
 				tabla.setEnabled(false);
 				CrearPrest(arg1);
 			}
@@ -110,6 +122,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				tabla.setEnabled(true);
+				btnRegistrarPago.setEnabled(true);
 				verCuotas(arg0);
 			}
 		});
@@ -119,13 +132,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		JButton btnVerMorosos = new JButton("Ver Morosos");
 		btnVerMorosos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnRegistrarPago.setEnabled(false);
 				tabla.setEnabled(false);
 				verMor(e);
 			}
 		});
 		btnVerMorosos.setBounds(672, 114, 107, 23);
 		getContentPane().add(btnVerMorosos);
-		
 		
 		}
 
