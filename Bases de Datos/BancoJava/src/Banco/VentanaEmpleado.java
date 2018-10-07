@@ -29,7 +29,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	private JPanel pnlConsulta;
 	private JButton botonBorrar;
-	private JButton btnEjecutar;   
 	private JScrollPane scrConsulta;
 	private String legajo;
 	private String clave;
@@ -130,10 +129,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		}
 
 	private void TablaClick(MouseEvent evt) {
-		if ((this.tabla.getSelectedRow() != -1) && (evt.getClickCount() == 2))
-	      {
-	         seleccionarFila();
-	      }
+		if ((this.tabla.getSelectedRow() != -1) && (evt.getClickCount() == 2)){
+			seleccionarFila();
+	    }
 	}
 	
 	private void seleccionarFila() {
@@ -178,9 +176,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		//para cada Prestamo, necesito saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
 		try {
 			Statement stmt = this.conexionBD.createStatement();
-			String SQL1 = "SELECT nro_cliente, tipo_doc , nro_doc, apellido, nombre, nro_prestamo, monto, cant_meses,valor_cuota, COUNT(nro_pago)"
-					+ "FROM (cliente NATURAL JOIN prestamo) AS x, pago "
-					+ "WHERE x.nro_prestamo = pago.nro_prestamo and COUNT(nro_pago) >= 2"; // , verificar, falta la condicion de moroso
+			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago)"
+					+ "FROM Cliente C NATURAL JOIN Prestamo PR, Pago PA "
+					+ "WHERE PR.nro_prestamo = PA.nro_prestamo HAVING COUNT(PA.nro_pago) >= 2"; // , verificar, falta la condicion de moroso
 			ResultSet rs = stmt.executeQuery(SQL1);
 			tabla.refresh(rs);
 
@@ -214,10 +212,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			R = stmt.executeQuery("SELECT nro_pago AS Cuota_Nro,valor_cuota AS Valor,fecha_venc AS Vencimiento"
-					+ "FROM prestamo NATURAL JOIN pago NATURAL JOIN Cliente"
-					+ "WHERE Cliente.tipo_doc = " + tipo + "and Cliente.nro_doc =" + nro + 
-					"and pago.fecha_pago = NULL");
+			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento"
+					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C"
+					+ "WHERE C.tipo_doc = " + tipo + " AND C.nro_doc = " + nro + " AND PA.fecha_pago = NULL");
 		}
 		catch(SQLException f) {
 			
@@ -245,11 +242,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			//SQL para determinar los prestamos actuales de un cliente
-			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente = " + doc) ;
-			if(!R.first()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
-				R = stmt.executeQuery("SELECT MAX(periodo) FROM tasa_prestamo");
+			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc) ;
+			if(R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
+				R = stmt.executeQuery("SELECT MAX(TP.periodo) FROM Tasa_Prestamo TP");
 				mes = R.getInt(1);
-				R = stmt.executeQuery("SELECT MAX(monto_sup) from tasa_prestamo");
+				R = stmt.executeQuery("SELECT MAX(TP.monto_sup) FROM Tasa_Prestamo TP");
 				mon = R.getInt(1); //Ojo, es un decimal, no se si anda
 				IngresoPrest ven = new IngresoPrest();
 				int m = ven.getmon();
@@ -352,7 +349,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
         pf = new JPasswordField();
 		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (okCxl == JOptionPane.OK_OPTION) {
-			clave = new String (pf.getPassword()); 
+			clave = new String (pf.getPassword());
 		}
 	}
 	   
@@ -365,10 +362,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	    tipo = "";
 	    seleccionado = -1;
 	}
-
-	private void btnEjecutarActionPerformed (ActionEvent evt) {
-	    this.refrescarTabla();      
-    }
 	
 	private void conectarBD () {
 		if (conexionBD == null) {
@@ -410,33 +403,4 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		    }
 		}
 	}
-	
-	private void refrescarTabla () {
-		 try {
-	         Statement stmt = this.conexionBD.createStatement();
-
-	         String sql = "SELECT *" + 
-	                      "FROM trans_cajas_ahorro " +
-	                      "ORDER BY nro_ca DESC";
-
-
-	         ResultSet rs = stmt.executeQuery(sql);
-	       
-	                 
-	        //actualiza el contenido de la tabla con los datos del result set rs
-	         tabla.refresh(rs);
-
-	        //setea el formato de visualizacion de la columna "fecha" a dia/mes/ano
-	         tabla.getColumnByDatabaseName("fecha").setDateFormat("dd/MM/YYYY");
-	         
-	         tabla.getColumnByDatabaseName("fecha").setMinWidth(80);       
-	         rs.close();
-	         stmt.close();
-	      }
-	      catch (SQLException ex) {
-	         System.out.println("SQLException: " + ex.getMessage());
-	         System.out.println("SQLState: " + ex.getSQLState());
-	         System.out.println("VendorError: " + ex.getErrorCode());
-	      }
-    }
 }

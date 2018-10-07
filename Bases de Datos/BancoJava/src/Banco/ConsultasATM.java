@@ -181,11 +181,11 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	       PIN_Field = new JPasswordField();
 	       int okCxl = JOptionPane.showConfirmDialog(null, Card, "Ingresar nro de Tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	       if (okCxl == JOptionPane.OK_OPTION) {
-	           Tarj = Card.getPassword().toString(); 
+	           Tarj = new String (Card.getPassword());
 	       }
 		   int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Ingresar Pin", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		   if (okCx2 == JOptionPane.OK_OPTION) {
-			   Pin = PIN_Field.getPassword().toString(); 
+			   Pin = new String (PIN_Field.getPassword());
 		   }
 	   }
 	   
@@ -195,13 +195,12 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   //corroborar Query
 			   //PIN esta con md5, hay que ver como ejecutarlo aca -> ya deberia de estar
 			   //El NATURAL JOIN deberia ser correcto, estoy corroborando al ejecutar las queries en SQL
-			   //lo unico que dudo es el "AS CodigoCaja"... no me estaria funcionando
 			   Statement stm = this.conexionBD.createStatement();
-			   String sql = "SELECT  fecha, hora, monto, tipo, (cod_caja AS CodigoCaja), destino"
-			   		+ "FROM  (trans_cajas_ahorro NATURAL JOIN tarjeta) AS x"
-			   		+ "WHERE " + Tarj + " = x.nro_tarjeta AND x.PIN = md5(" + Pin + ")"
-			   		+ "ORDER BY fecha DESC , hora DESC"
-			   		+ "LIMIT 15";
+			   String sql = "SELECT TCA.fecha, TCA.hora, TCA.monto, TCA.tipo, TCA.cod_caja AS CodigoCaja, TCA.destino"
+			   		+ " FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T"
+			   		+ " WHERE " + Tarj + " = T.nro_tarjeta AND T.PIN = md5(" + Pin + ")"
+			   		+ " ORDER BY TCA.fecha DESC, TCA.hora DESC"
+			   		+ " LIMIT 15";
 			   stm.execute(sql);
 			   ResultSet R = stm.getResultSet();
 			   tabla.refresh(R);
@@ -230,9 +229,9 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		   //El query deberia funcionar
 		   try {
 			   Statement stmt = this.conexionBD.createStatement();
-		         String sql = "SELECT DISTINCT saldo" +
-		                      "FROM trans_cajas_ahorro natural join tarjeta"
-		                      + "WHERE tarjeta.nro_tarjeta = " + Tarj + "and tarjeta.PIN = md5( " + Pin + ")" ;
+		         String sql = "SELECT DISTINCT saldo"
+		                      + " FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T"
+		                      + " WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5( " + Pin + ")";
 		         stmt.execute(sql);
 		         ResultSet R = stmt.getResultSet();
 		         int sal = R.getInt(1);
@@ -255,9 +254,9 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   try {
 				   //Revisar Query, se me confunde un toque con tanta informacion en el View
 				   Statement stmt = this.conexionBD.createStatement();
-			         String sql = "SELECT Fecha,hora,tipo,monto,cod_caja AS codCaja,destino" +
-			                      "FROM trans_cajas_ahorro"
-			                      + "WHERE Fecha >= " + txtFechaInicio.getText().trim() + "and Fecha <=" + txtFechaFin.getText().trim() ;
+			         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino"
+			                      + " FROM trans_cajas_ahorro TCA"
+			                      + " WHERE TCA.fecha >= " + txtFechaInicio.getText().trim() + "AND TCA.fecha <=" + txtFechaFin.getText().trim();
 			         stmt.execute(sql);
 			         ResultSet R = stmt.getResultSet();
 			         tabla.refresh(R); //Obtenidas las tuplas, refresco la tabla con el ResultSet
