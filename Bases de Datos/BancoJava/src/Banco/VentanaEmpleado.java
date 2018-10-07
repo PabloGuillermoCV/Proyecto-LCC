@@ -88,7 +88,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		tabla = new DBTable();
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
-		tabla.setEnabled(false);
+		tabla.setEnabled(true);
 		tabla.addMouseListener(new MouseAdapter() {
 			public void MouseListener(MouseEvent evt) {
 				TablaClick(evt);
@@ -179,7 +179,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago)"
 					+ "FROM Cliente C NATURAL JOIN Prestamo PR NATURAL JOIN Pago PA "
 					+ "WHERE PR.nro_prestamo = PA.nro_prestamo "
-					+ "GROUP BY C.nombre HAVING COUNT(PA.nro_pago) >= 2";
+					+ "HAVING COUNT(PA.nro_pago) >= 2";
 			ResultSet rs = stmt.executeQuery(SQL1);
 			tabla.refresh(rs);
 
@@ -238,7 +238,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	private void noPrestActual(String doc, String typeDoc) {
-		int mon, mes;
+		int mon = 0;
+		int mes = 0;
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
@@ -246,9 +247,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc) ;
 			if(R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
 				R = stmt.executeQuery("SELECT MAX(TP.periodo) FROM Tasa_Prestamo TP");
-				mes = R.getInt(1);
+				if (R.next()) 
+					mes = R.getInt(1);
 				R = stmt.executeQuery("SELECT MAX(TP.monto_sup) FROM Tasa_Prestamo TP");
-				mon = R.getInt(1); //Ojo, es un decimal, no se si anda
+				if (R.next()) 
+					mon = R.getInt(1); //Ojo, es un decimal, no se si anda
 				IngresoPrest ven = new IngresoPrest();
 				int m = ven.getmon();
 				int p = ven.getper();
@@ -282,18 +285,21 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			//cargo el Prestamo
-			int tasa_Int;
+			int tasa_Int = 0;
 			int Interes;
 			int ValCuota;
+			int c = 0;
 			R = stmt.executeQuery("SELECT tasa FROM tasa_prestamo WHERE tasa_prestamo.periodo = " + periodo); //revisar si esta bien
-			tasa_Int= R.getInt(1);
+			if (R.next()) 
+				tasa_Int = R.getInt(1);
 			Interes = (plata + tasa_Int + periodo)/1200;
 			ValCuota = (plata + tasa_Int)/periodo;
 			R = stmt.executeQuery("SELECT nro_cliente FROM Cliente WHERE nro_doc = " + nro + "and tipo_doc = " + tipo);
-			int c = R.getInt(1);
-			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
-			 LocalDateTime now = LocalDateTime.now(); 
-			 String d = now.toString();
+			if (R.next()) 
+				c = R.getInt(1);
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
+			LocalDateTime now = LocalDateTime.now(); 
+			String d = now.toString();
 			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,"
 					+ "valor_cuota,legajo,nro_cliente) VALUES"
 					+ "STR_TO_DATE(" + d + ",\"%d-%m-%Y\")," + periodo + "," + plata + "," +
