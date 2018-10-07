@@ -162,9 +162,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	private void registrarPago(String nroC, String money) {
 		try {
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
-			LocalDateTime now = LocalDateTime.now(); 
-			String d = now.toString();
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+			String d = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();
 			//Hago un UPDATE Query, revisar si esta bien
 			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d/%m/%Y %r')" + 
