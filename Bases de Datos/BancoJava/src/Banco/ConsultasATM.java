@@ -12,6 +12,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
@@ -351,7 +353,10 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		        //setea el formato de visualizacion de la columna "fecha" a dia/mes/ano
 		         tabla.getColumnByDatabaseName("fecha").setDateFormat("dd/MM/YYYY");
 		         
-		         tabla.getColumnByDatabaseName("fecha").setMinWidth(80);       
+		         tabla.getColumnByDatabaseName("fecha").setMinWidth(80);
+		         
+		         tabla.getColumnByDatabaseName("hora").setType(Types.CHAR);
+		         
 		         rs.close();
 		         stmt.close();
 		      }
