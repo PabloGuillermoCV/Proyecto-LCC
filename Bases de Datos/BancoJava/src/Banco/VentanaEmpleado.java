@@ -110,7 +110,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				tabla.setEnabled(true);
-				tabla.setEdita
 				verCuotas(arg0);
 			}
 		});
