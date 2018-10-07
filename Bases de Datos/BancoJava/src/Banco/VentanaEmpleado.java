@@ -213,12 +213,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento"
-					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C"
-					+ "WHERE C.tipo_doc = " + tipo + " AND C.nro_doc = " + nro + " AND PA.fecha_pago = NULL");
+			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento "
+					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C "
+					+ "WHERE C.tipo_doc = " + tipo + " AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+			tabla.refresh();
 		}
 		catch(SQLException f) {
-			
+			f.printStackTrace();
 		}
 	}
 	
