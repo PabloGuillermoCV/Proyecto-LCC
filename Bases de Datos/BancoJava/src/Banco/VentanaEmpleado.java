@@ -177,8 +177,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago)"
-					+ "FROM Cliente C NATURAL JOIN Prestamo PR, Pago PA "
-					+ "WHERE PR.nro_prestamo = PA.nro_prestamo GROUP BY NULL HAVING COUNT(PA.nro_pago) >= 2"; // , verificar, falta la condicion de moroso
+					+ "FROM Cliente C NATURAL JOIN Prestamo PR NATURAL JOIN Pago PA "
+					+ "WHERE PR.nro_prestamo = PA.nro_prestamo "
+					+ "GROUP BY C.nombre HAVING COUNT(PA.nro_pago) >= 2";
 			ResultSet rs = stmt.executeQuery(SQL1);
 			tabla.refresh(rs);
 
