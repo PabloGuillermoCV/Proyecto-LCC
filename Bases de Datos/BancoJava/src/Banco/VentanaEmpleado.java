@@ -167,7 +167,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			String d = now.toString();
 			Statement stmt = this.conexionBD.createStatement();
 			//Hago un UPDATE Query, revisar si esta bien
-			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ",'%m/%d/%Y')" + 
+			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d/%m/%Y %r')" + 
 						" WHERE Pago.nro_pago = " + nroC);
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
