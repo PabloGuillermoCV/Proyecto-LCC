@@ -25,6 +25,7 @@ import javax.swing.event.ListSelectionListener;
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class VentanaAdmin extends javax.swing.JInternalFrame {
@@ -35,7 +36,6 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private JButton btnEjecutar;
 	private DBTable tabla = new DBTable();    
 	private JScrollPane scrConsulta;
-	private JSplitPane Listas;
 	protected int Seleccionado = -1;
 	private String clave;
 	private JPasswordField pf;
@@ -43,21 +43,19 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private DefaultListModel <String> modeloTablas;
 	private JList <String> listaAtributosTabla;
 	private DefaultListModel <String> modeloListaAtributos;
+	private JButton btnMostrarTablas;
 	
 	
 	public VentanaAdmin () {
 		super ();
+		setResizable(true);
 		initGUI ();
 	}
 	
 	private void initGUI () {
         try {
-        	{
- 	         	Listas = new JSplitPane();
- 	         	getContentPane().add(Listas, BorderLayout.CENTER);
- 	        }
 	        setPreferredSize(new Dimension(800, 600));
-	        this.setBounds(0, 0, 800, 600);
+	        this.setBounds(0, 0, 919, 700);
 	        setVisible(true);
 	        BorderLayout thisLayout = new BorderLayout();
 	        this.setTitle("Consultas Admin (Utilizando DBTable)");
@@ -102,6 +100,15 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	                botonBorrar = new JButton();
 	            	pnlConsulta.add(botonBorrar);
 	            	botonBorrar.setText("Borrar");            
+	            	{
+	            		btnMostrarTablas = new JButton("Mostrar Tablas");
+	            		pnlConsulta.add(btnMostrarTablas);
+	            		btnMostrarTablas.addActionListener(new ActionListener() {
+	            			public void actionPerformed(ActionEvent evt) {
+	            				mostrarTablas();
+	            			}
+	            		});
+	            	}
 	            	botonBorrar.addActionListener(new ActionListener() {
 	            	    public void actionPerformed(ActionEvent arg0) {
 	            		    txtConsulta.setText("");            			
@@ -111,24 +118,10 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	            {
 	            	//Muestra todas las tablas en la base de datos
 	            	modeloTablas = new DefaultListModel <String> ();
-	            	listaTablas = new JList <> (modeloTablas);
-	            	JScrollPane panelLista = new JScrollPane (listaTablas,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-	            	//panelLista.setBounds(0, 20, 600, 600);
-	            	//panelLista.contains(1, 1);
-	            	pnlConsulta.add (panelLista);
-	         		
-	         		listaTablas.addListSelectionListener(new ListSelectionListener() {
-	         		      public void valueChanged(ListSelectionEvent evt) {
-	         		        mostrarAtributos();
-	         		      }
-	         		});
 	            }
 	            {
 	            	//Muestra todos los atributos de una tabla al seleccionarla
 	            	modeloListaAtributos = new DefaultListModel <String> ();
-	            	listaAtributosTabla = new JList <> (modeloListaAtributos);
-	            	JScrollPane panelLista = new JScrollPane (listaAtributosTabla);
-	            	pnlConsulta.add (panelLista);
 	            }
 	         }
 	         {
@@ -139,6 +132,22 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	             // setea la tabla para solo lectura (no se puede editar su contenido)  
 	             tabla.setEditable(false);
 	         }
+	         JScrollPane panelLista = new JScrollPane (JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+	         getContentPane().add(panelLista, BorderLayout.EAST);
+	         JScrollPane panelLista_1 = new JScrollPane ();
+	         getContentPane().add(panelLista_1, BorderLayout.CENTER);
+	         listaTablas = new JList <> (modeloTablas);
+	         listaTablas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	         panelLista_1.setRowHeaderView(listaTablas);
+	         listaAtributosTabla = new JList <> (modeloListaAtributos);
+	         listaAtributosTabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	         panelLista_1.setViewportView(listaAtributosTabla);
+	         
+	         listaTablas.addListSelectionListener(new ListSelectionListener() {
+	               public void valueChanged(ListSelectionEvent evt) {
+	                 mostrarAtributos();
+	               }
+	         });
 	    } 
 		catch (Exception e) {
 	        e.printStackTrace();
