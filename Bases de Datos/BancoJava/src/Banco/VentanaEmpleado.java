@@ -148,10 +148,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	private void registrarPago(String nroC, String money) {
 		try {
-			//Le tengo miedo al tema de las fechas, revisar
-			 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
-			 LocalDateTime now = LocalDateTime.now(); 
-			 String d = now.toString();
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
+			LocalDateTime now = LocalDateTime.now(); 
+			String d = now.toString();
 			Statement stmt = this.conexionBD.createStatement();
 			//Hago un UPDATE Query, revisar si esta bien
 			stmt.executeUpdate("UPDATE Pago SET fecha_pago = " +"STR_TO_DATE(" + d + ",\"%d-%m-%Y\")" + 
@@ -295,7 +294,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				tasa_Int = R.getInt(1);
 			Interes = (plata + tasa_Int + periodo)/1200;
 			ValCuota = (plata + tasa_Int)/periodo;
-			R = stmt.executeQuery("SELECT nro_cliente FROM Cliente WHERE nro_doc = " + nro + "and tipo_doc = " + tipo);
+			R = stmt.executeQuery("SELECT nro_cliente FROM Cliente WHERE nro_doc = " + nro + "and tipo_doc = '" + tipo + "'");
 			if (R.next()) 
 				c = R.getInt(1);
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
