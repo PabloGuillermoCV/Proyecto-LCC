@@ -88,7 +88,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		tabla = new DBTable();
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
-		tabla.setEnabled(true);
+		tabla.setEnabled(false);
 		tabla.addMouseListener(new MouseAdapter() {
 			public void MouseListener(MouseEvent evt) {
 				TablaClick(evt);
