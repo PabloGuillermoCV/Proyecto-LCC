@@ -65,6 +65,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 	public VentanaEmpleado () {
 		super ();
+		setClosable(true);
+		setResizable(true);
+		setMaximizable(true);
 		setTitle("Consultas Empleado");
 		getContentPane().setLayout(null);
 		
@@ -365,19 +368,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * Hace login del Empleado por medio de Pop Ups
 	 */
 	private void login() {
-		final JFrame parent = new JFrame();
-        JButton button = new JButton();
-        parent.getContentPane().add(button);
-        parent.pack();
-        parent.setVisible(true);
-
-        button.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                legajo = JOptionPane.showInputDialog(parent,
-                        "Ingrese numero de Legajo", null);
-            }
-        });
+		JTextField Leg = new JTextField();
+        int okCx2 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese numero de Legajo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if(okCx2 == JOptionPane.OK_OPTION)
+        	legajo = Leg.getText().trim(); 
 		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (okCxl == JOptionPane.OK_OPTION) {
 			clave = pf.getPassword().toString(); 
