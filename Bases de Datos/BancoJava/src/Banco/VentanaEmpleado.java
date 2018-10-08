@@ -174,6 +174,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				JOptionPane.showConfirmDialog(null, "Se ha registrado el Pago de la Cuota con exito");
 			}
 		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+	        System.out.println("SQLState: " + e.getSQLState());
+	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
 	}
@@ -210,6 +213,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	        stmt.close();
 		}
 		catch (SQLException e1) {
+			System.out.println("SQLException: " + e1.getMessage());
+	        System.out.println("SQLState: " + e1.getSQLState());
+	        System.out.println("VendorError: " + e1.getErrorCode());
 			e1.printStackTrace();
 		}
 	}
@@ -232,6 +238,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			tabla.refresh(R);
 		}
 		catch(SQLException f) {
+			System.out.println("SQLException: " + f.getMessage());
+	        System.out.println("SQLState: " + f.getSQLState());
+	        System.out.println("VendorError: " + f.getErrorCode());
 			f.printStackTrace();
 		}
 	}
@@ -289,6 +298,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			R.close();
 			
 		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+	        System.out.println("SQLState: " + e.getSQLState());
+	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
 	}
@@ -339,6 +351,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			stmt.close();
 			R.close();
 		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+	        System.out.println("SQLState: " + e.getSQLState());
+	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
 		
@@ -353,7 +368,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			int i = 2;
 			//Cargo la primera cuota
 			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES ("
-					+ nro_pre + "," + 1000 + ",STR_TO_DATE(" + "'" + fechaD + "'" + ",'%d-%m-%Y')" + ", NULL)");
+					+ nro_pre + "," + 1 + ",STR_TO_DATE(" + "'" + fechaD + "'" + ",'%d-%m-%Y')" + ", NULL)");
 			//Cargo el resto de las cuotas
 			while(i <= periodo) {
 				R = stmt.executeQuery("SELECT DATE_ADD(STR_TO_DATE('"+fechaD+"','%d-%m-%Y'), INTERVAL 1 MONTH);");
@@ -367,6 +382,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			}
 		}
 		catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+	        System.out.println("SQLState: " + e.getSQLState());
+	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
 
