@@ -266,9 +266,21 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				R = stmt.executeQuery("SELECT MAX(TP.monto_sup) FROM Tasa_Prestamo TP");
 				if (R.next()) 
 					mon = R.getInt(1); //Ojo, es un decimal, no se si anda
-				IngresoPrest ven = new IngresoPrest();
-				int m = ven.getmon();
-				int p = ven.getper();
+
+				int m = 0;
+				int p = 0;
+				
+				JTextField Leg = new JTextField();
+		        int okCx2 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese monto a prestar", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		        if(okCx2 == JOptionPane.OK_OPTION) {
+		        	m = Integer.parseInt(Leg.getText().trim());
+		        }
+		        
+		        int okCx1 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese periodo en meses", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		        if(okCx1 == JOptionPane.OK_OPTION) {
+		        	p = Integer.parseInt(Leg.getText().trim());
+		        }
+
 				if(corroborar(m,p,mes,mon)) { //Los montos ingresados no superan los máximos establecidos por las tasas
 					EjecutarCreacion(m,p);
 				}
