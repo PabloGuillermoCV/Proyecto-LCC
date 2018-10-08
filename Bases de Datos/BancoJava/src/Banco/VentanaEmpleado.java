@@ -326,7 +326,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			LocalDateTime now = LocalDateTime.now(); 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			String fechaAInsertar = now.format(formatter);
-			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (STR_TO_DATE(" + fechaAInsertar + ", '%d-%m-%Y')," + periodo + "," + plata + "," + tasa_Int + "," + Interes + "," + ValCuota + "," + legajo + "," + intC +");");
+			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (STR_TO_DATE(" + "'" + fechaAInsertar + "'" + ", '%d-%m-%Y')," + periodo + "," + plata + "," + tasa_Int + "," + Interes + "," + ValCuota + "," + legajo + "," + intC +");");
 			
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
 			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + intC);
