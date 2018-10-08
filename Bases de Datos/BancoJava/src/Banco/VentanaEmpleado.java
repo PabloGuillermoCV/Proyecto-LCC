@@ -330,7 +330,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
 			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + intC);
-			int nro_pre = R.getInt(1);
+			int nro_pre = 0;
+			if (R.next()) {
+				nro_pre = R.getInt(1);
+			}
 			cargarCuotas(intC,fechaAInsertar,nro_pre,periodo);
 			
 			stmt.close();
