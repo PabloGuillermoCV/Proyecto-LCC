@@ -356,7 +356,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 					+ nro_pre + "," + 1 + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL");
 			//Cargo el resto de las cuotas
 			while(i <= periodo) {
-				R = stmt.executeQuery("SELECT DATE_ADD(" + fechaD + "INTERVAL 1 month)");
+				R = stmt.executeQuery("SELECT DATE_ADD('" + fechaD + "'" + "INTERVAL 1 month)");
 				//Aca cargo las cuotas una por una
 				stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES "
 						+ nro_pre + "," + i + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL)"); 
