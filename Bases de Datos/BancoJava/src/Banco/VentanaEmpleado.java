@@ -259,7 +259,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			ResultSet R;
 			//SQL para determinar los prestamos actuales de un cliente
 			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc) ;
-			if(R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
+			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
 				R = stmt.executeQuery("SELECT MAX(TP.periodo) FROM Tasa_Prestamo TP");
 				if (R.next()) 
 					mes = R.getInt(1);
