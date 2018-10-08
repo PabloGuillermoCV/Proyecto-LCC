@@ -320,7 +320,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				tasa_Int = R.getInt(1);
 			Interes = (plata + tasa_Int + periodo)/1200;
 			ValCuota = (plata + tasa_Int)/periodo;
-			R = stmt.executeQuery("SELECT nro_cliente FROM Cliente WHERE nro_doc = " + nro + "and tipo_doc = '" + tipo + "'");
+			R = stmt.executeQuery("SELECT C.nro_cliente FROM Cliente C WHERE C.nro_doc = " + nro + " AND C.tipo_doc = '" + tipo + "'");
 			if (R.next()) 
 				c = R.getInt(1);
 			LocalDateTime now = LocalDateTime.now(); 
