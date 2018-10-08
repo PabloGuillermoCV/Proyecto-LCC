@@ -345,23 +345,23 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	//Metodo auxiliar para cargar las cuotas
-	private void cargarCuotas(int c, String d, int nro_pre, int periodo) {
+	private void cargarCuotas(int c, String fechaD, int nro_pre, int periodo) {
 		Statement stmt;
 		try {
 			stmt = this.conexionBD.createStatement();
 		 		ResultSet R;
 			int i = 2;
 			//Cargo la primera cuota
-			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES"
-					+ nro_pre + "," + 1 + ",STR_TO_DATE(" + d +",%d-%m-%Y)" + ", NULL");
+			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES "
+					+ nro_pre + "," + 1 + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL");
 			//Cargo el resto de las cuotas
 			while(i <= periodo) {
-				R = stmt.executeQuery("SELECT DATE_ADD(" + d + "INTERVAL 1 month)");
+				R = stmt.executeQuery("SELECT DATE_ADD(" + fechaD + "INTERVAL 1 month)");
 				//Aca cargo las cuotas una por una
-				stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES"
-						+ nro_pre + "," + i + ",STR_TO_DATE(" + d + ",%d-%m-%Y)" + ", NULL)"); 
+				stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES "
+						+ nro_pre + "," + i + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL)"); 
 				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
-				d = R.getString(1);
+				fechaD = R.getString(1);
 			}
 		}
 		catch (SQLException e) {
