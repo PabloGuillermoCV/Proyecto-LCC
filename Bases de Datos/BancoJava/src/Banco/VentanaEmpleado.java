@@ -171,7 +171,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 						" WHERE Pago.nro_pago = " + nroC);
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
-				JOptionPane.showInternalMessageDialog(null, "Se ha registrado el Pago de la Cuota con exito");
+				JOptionPane.showInputDialog(null, "Se ha registrado el Pago de la Cuota con exito");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
