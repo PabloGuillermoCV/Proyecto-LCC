@@ -314,7 +314,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			int tasa_Int = 0;
 			int Interes;
 			int ValCuota;
-			int c = 0;
+			int intC = 0;
 			R = stmt.executeQuery("SELECT tasa FROM tasa_prestamo WHERE tasa_prestamo.periodo = " + periodo); //revisar si esta bien
 			if (R.next()) 
 				tasa_Int = R.getInt(1);
@@ -322,19 +322,16 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			ValCuota = (plata + tasa_Int)/periodo;
 			R = stmt.executeQuery("SELECT C.nro_cliente FROM Cliente C WHERE C.nro_doc = " + nro + " AND C.tipo_doc = '" + tipo + "'");
 			if (R.next()) 
-				c = R.getInt(1);
+				intC = R.getInt(1);
 			LocalDateTime now = LocalDateTime.now(); 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-			String d = now.format(formatter);
-			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,"
-					+ "valor_cuota,legajo,nro_cliente) VALUES ("
-					+ "STR_TO_DATE(" + d + ",'%d-%m-%Y')," + periodo + "," + plata + "," +
-					tasa_Int + "," + Interes + "," + ValCuota + "," + legajo + "," + c +")"); //corroborar que los datos son correctos
+			String fechaAInsertar = now.format(formatter);
+			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (STR_TO_DATE(" + fechaAInsertar + ", '%d-%m-%Y')," + periodo + "," + plata + "," + tasa_Int + "," + Interes + "," + ValCuota + "," + legajo + "," + intC +");");
 			
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
-			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + c);
+			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + intC);
 			int nro_pre = R.getInt(1);
-			cargarCuotas(c,d,nro_pre,periodo);
+			cargarCuotas(intC,fechaAInsertar,nro_pre,periodo);
 			
 			stmt.close();
 			R.close();
