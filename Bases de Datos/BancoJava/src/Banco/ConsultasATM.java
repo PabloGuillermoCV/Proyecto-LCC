@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
@@ -24,7 +23,6 @@ import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
-import EjemploClase.Fechas;
 import quick.dbtable.DBTable;
 
 @SuppressWarnings("serial")
@@ -385,7 +383,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      {
 		         mensajeError = "Debe ingresar un valor para el campo 'Fecha Fin'.";
 		      }
-		      else if (! Fechas.validar(this.txtFechaInicio.getText().trim()))
+		      else if (!Fechas.validar(this.txtFechaInicio.getText().trim()))
 		      {
 		         mensajeError = "En el campo 'Fecha Inicio' debe ingresar un valor con el formato dd/mm/aaaa.";
 		      }
