@@ -478,3 +478,21 @@ CREATE TABLE Transferencia(
 	GRANT UPDATE ON banco.tarjeta TO 'atm'@'%';
 
 #-------------------------------------------------------------------------
+
+#Cosas a Chequear
+#Las Cajas de ahorro Existen
+#El Monto no supera al saldo de la Caja Origen
+
+
+delimiter ! # defino ! como delimitador
+CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, OUT nro_trans INT)
+	begin
+
+	end; !
+
+CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT, OUT nro_trans INT)
+	begin
+
+	end; !
+
+delimiter ; # devuelvo todo a la normalidad
