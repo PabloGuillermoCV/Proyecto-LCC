@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
@@ -43,6 +44,10 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private JPasswordField Card;
 	   private String Tarj,Pin;
 	   private Connection conexionBD = null;
+	   private int Cod_Caja = 100;
+	   private JButton BtnRealizarTransferencia;
+	   private JButton BtnRealizarExtraccion;
+	   private JTextField montos;
 	   
 	   public ConsultasATM() {
 	      super();
@@ -51,8 +56,9 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   private void initGUI() {
 	      try {
+	    	 montos = new JTextField();
 	         setPreferredSize(new Dimension(640, 480));
-	         this.setBounds(0, 0, 640, 480);
+	         this.setBounds(0, 0, 881, 585);
 	         this.setTitle("Consultas ATM");
 	         this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 	         this.setResizable(true);
@@ -153,18 +159,73 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	                  btnMovimientosPeriodo = new JButton();
 	                  pnlBotones.add(btnMovimientosPeriodo);
 	                  btnMovimientosPeriodo.setText("Consultar Movimientos por Periodo");
+	                  {
+	                  	BtnRealizarTransferencia = new JButton("Realizar Transferencia");
+	                  	pnlBotones.add(BtnRealizarTransferencia);
+	                  	BtnRealizarTransferencia.addActionListener(new ActionListener() {
+	                  		public void actionPerformed(ActionEvent evt) {
+	                  			RealizarTrans();
+	                  		}
+	                  });
+	               }
+	                  {
+	                  	BtnRealizarExtraccion = new JButton("Realizar Extraccion");
+	                  	pnlBotones.add(BtnRealizarExtraccion);
+	                  	BtnRealizarExtraccion.addActionListener(new ActionListener() {
+	                  		public void actionPerformed(ActionEvent evt) {
+	                  			RealizarExtra();
+	                  		}
+
+	                  	});
+	                  }
 	                  btnMovimientosPeriodo.addActionListener(new ActionListener() {
 	                     public void actionPerformed(ActionEvent evt) {
 	                        btnMovimientosPeriodoActionPerformed(evt);
 	                     }
-
-						
 	                  });
-	               }
+	      
 	      }
-	      catch(Exception e) {
+	      
+	   }
+	   catch(Exception e) {
 	    	  e.printStackTrace();
-	      }
+	   }
+	   }
+	   /**
+	    * Primer método para la Extreacción, obtengo el monto a extraer y delego la extracción en si en otro método
+	    */
+	   private void RealizarExtra() {
+		   int okcx1 = JOptionPane.showConfirmDialog(null,montos,"Ingrese el Monto a Extraer", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+		   if(okcx1 == JOptionPane.OK_OPTION) {
+			   int m = Integer.parseInt(montos.getText().trim());
+			   String x = Extraer(m);
+			   JOptionPane.showConfirmDialog(null,null,x,JOptionPane.OK_OPTION,JOptionPane.PLAIN_MESSAGE); //Devuelvo el resultado de la Extracción en un PopUp
+		   }
+	   }
+	   
+	   /**
+	    * 
+	    * @param m Monto a extraer de la tarjeta ingresada en el login
+	    * @return un String que determina la natuiraleza de la Extracción, si fue exitosa o no
+	    */
+	   private String Extraer(int m) {
+		   try {
+			   int Out = 0;
+			   Statement stm = this.conexionBD.createStatement();
+			   //Aca asumo que el S.P existe y funciona, hay que primero hacer los S.P y corroborar que funcionan con MySQL primero
+			   String sql = "call RealizarExtraccion(" + m + "," + Cod_Caja + "," + Out + ")";
+			   stm.executeQuery(sql);
+			   
+		   }
+		   catch(SQLException e) {
+			   	//Devuelvo que la Transacción fallo a mi metodo padre para que lo maneje
+                      return  "Se produjo un error al realizar la Extracción.\n" + e.getMessage();
+		   }
+		   return "Extracción Realizada con Exito";
+	   }
+	      
+	   private void RealizarTrans() {
+		   
 	   }
 	   
 	   private void thisComponentShown(ComponentEvent evt) {
@@ -174,7 +235,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   /**
-		 * Hace login del Empleado por medio de Pop Ups
+		 * Hace login de la Tarjeta por medio de Pop Ups
 		 */
 	   private void login () {
 		   Card = new JPasswordField();
@@ -192,9 +253,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private void btnUltimosMoviminetosActionPerformed(ActionEvent evt) {
 			//Mostrar las ultimas 15 transacciones
 		   try {
-			   //corroborar Query
-			   //PIN esta con md5, hay que ver como ejecutarlo aca -> ya deberia de estar
-			   //El NATURAL JOIN deberia ser correcto, estoy corroborando al ejecutar las queries en SQL
 			   Statement stm = this.conexionBD.createStatement();
 			   String sql = "SELECT TCA.fecha, TCA.hora, TCA.monto, TCA.tipo, TCA.cod_caja AS CodigoCaja, TCA.destino"
 			   		+ " FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T"
@@ -206,14 +264,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   tabla.refresh(R);
 			   stm.close();
 			   R.close();
-			
-			   /* int i = 1; Ver esto, aunque no se si se puede iterar manualmente con una DBTable 
-			   while(i <= 15 && R.next() != false) {
-				   R.
-			   }
-			   */
-			   
-			   
 		   }
 		   catch(SQLException ex) {
 			   JOptionPane.showMessageDialog(this,
@@ -226,7 +276,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   
 	   private void btnSaldoActionPerformed(ActionEvent evt) {
 		   //Mostrar el Saldo del Usuario
-		   //El query deberia funcionar
 		   try {
 			   Statement stmt = this.conexionBD.createStatement();
 		         String sql = "SELECT DISTINCT saldo"
@@ -255,7 +304,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private void btnMovimientosPeriodoActionPerformed(ActionEvent evt) {
 		   if(validarCampos()) {
 			   try {
-				   //Revisar Query, se me confunde un toque con tanta informacion en el View
 				   Statement stmt = this.conexionBD.createStatement();
 			         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino"
 			                      + " FROM trans_cajas_ahorro TCA"

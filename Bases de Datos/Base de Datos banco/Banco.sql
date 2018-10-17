@@ -482,6 +482,7 @@ CREATE TABLE Transferencia(
 #Cosas a Chequear
 #Las Cajas de ahorro Existen
 #El Monto no supera al saldo de la Caja Origen
+#Se me ocurre usar un OUT nro_trans, pero podria ser medio al pedo, hay que verlo
 
 
 delimiter ! # defino ! como delimitador
@@ -494,5 +495,12 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT, OUT nro_
 	begin
 
 	end; !
+
+CREATE TRIGGER CargoCuotas
+AFTER UPDATE ON Prestamo
+FOR EACH ROW
+	BEGIN
+
+	END; !
 
 delimiter ; # devuelvo todo a la normalidad

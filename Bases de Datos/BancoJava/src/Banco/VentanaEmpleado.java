@@ -346,6 +346,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			if (R.next()) {
 				nro_pre = R.getInt(1);
 			}
+			//ESTE METODO DEBE BORRARSE UNA VEZ QUE SE CORROBORE QUE EL TRIGGER DE CUOTAS FUNCIONA!!!!!!!
 			cargarCuotas(intC,fechaAInsertar,nro_pre,periodo);
 			
 			stmt.close();
