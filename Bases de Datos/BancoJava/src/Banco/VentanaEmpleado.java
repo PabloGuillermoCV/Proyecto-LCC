@@ -169,6 +169,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			//Hago un UPDATE Query, revisar si esta bien
 			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d-%m-%Y')" + 
 						" WHERE Pago.nro_pago = " + nroC);
+			//Esto no esta del todo bien? Si devuelve un ResultSet la cosa me devuelve -1
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
 				JOptionPane.showConfirmDialog(null, "Se ha registrado el Pago de la Cuota con exito");
@@ -269,6 +270,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			//SQL para determinar los prestamos actuales de un cliente
 			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc) ;
 			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
+				//Ver estos dos, el máximo monto de Prestamo peritido es 20000
 				R = stmt.executeQuery("SELECT MAX(TP.periodo) FROM Tasa_Prestamo TP");
 				if (R.next()) 
 					mes = R.getInt(1);
@@ -293,6 +295,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				if(corroborar(m,p,mes,mon)) { //Los montos ingresados no superan los máximos establecidos por las tasas
 					EjecutarCreacion(m,p);
 				}
+			}
+			else {
+				//Muestro un cuadro de error que especifica que el Cliente ya tiene un prestamo
+				JOptionPane.showConfirmDialog(null,null, "No es posible crear un prestamo ya que el cliente ya posee un prestamo a su nombre", 
+							JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
 			}
 			stmt.close();
 			R.close();
@@ -361,6 +368,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	//Metodo auxiliar para cargar las cuotas
+	//DEBE BORRARSE UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!
 	private void cargarCuotas(int c, String fechaD, int nro_pre, int periodo) {
 		Statement stmt;
 		try {
@@ -420,12 +428,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		if (conexionBD == null) {
 			try {
 		        String driver ="com.mysql.cj.jdbc.Driver";
-		        String usuario = "empleado";
-		        String password = "empleado";
 		        String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-		        tabla.connectDatabase (driver, urlConexion, usuario, password);
-		        conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
+		        tabla.connectDatabase (driver, urlConexion, legajo, clave);
+		        conexionBD = DriverManager.getConnection (urlConexion, legajo, clave);
 		    }
 		    catch (SQLException ex) {
 		        JOptionPane.showMessageDialog (this,

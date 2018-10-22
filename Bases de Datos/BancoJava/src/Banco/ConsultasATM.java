@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.Connection;
+import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -384,9 +385,11 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		 private void refrescarTabla() {
 		      try {
 		         Statement stmt = this.conexionBD.createStatement();
-
-		         String sql = "SELECT *" + 
-		                      "FROM trans_cajas_ahorro " +
+		         //Muestro datos de las transacciones del cliente, no toda la info del banco 
+		         //Corroborar Query
+		         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino" + 
+		                      "FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T" +
+		                      " WHERE " + Tarj + " = T.nro_tarjeta AND T.PIN = md5(" + Pin + ")" +
 		                      "ORDER BY nro_ca DESC";
 
 
@@ -422,21 +425,29 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		 
 		 //Esta funcion es necesaria para validar el input ANTES de realizar los query
 		 private boolean validarCampos() {
+			  String Fin = this.txtFechaFin.getText().trim();
+			  String Ini = this.txtFechaInicio.getText().trim();
+			  Date F = Fechas.convertirStringADate(Fin);
+			  Date I = Fechas.convertirStringADate(Ini);
 		      String mensajeError = null;
-		      if (this.txtFechaInicio.getText().isEmpty())
+		      if (Ini == "")
 		      {
 		         mensajeError = "Debe ingresar un valor para el campo 'Fecha Inicio'.";
 		      }
-		      else if (this.txtFechaFin.getText().isEmpty())
+		      else if (Fin == "")
 		      {
 		         mensajeError = "Debe ingresar un valor para el campo 'Fecha Fin'.";
 		      }
-		      else if (!Fechas.validar(this.txtFechaInicio.getText().trim()))
+		      else if (!Fechas.validar(Ini))
 		      {
 		         mensajeError = "En el campo 'Fecha Inicio' debe ingresar un valor con el formato dd/mm/aaaa.";
 		      }
-		      else if (!Fechas.validar(this.txtFechaFin.getText().trim())){
+		      else if (!Fechas.validar(Fin)){
 		    	  mensajeError = "En el campo 'Fecha Fin' debe ingresar un valor con el formato dd/mm/aaaa.";
+		      }
+		      else if(I.after(F))
+		      {
+		    	  mensajeError = "La fecha de Inicio NO debe ser una fecha posterior a la fecha de Fin";
 		      }
 
 		      if (mensajeError != null)

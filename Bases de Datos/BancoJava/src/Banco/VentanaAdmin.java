@@ -227,7 +227,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 			    String driver = "com.mysql.cj.jdbc.Driver";
 			    String usuario = "admin";
 			    String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
-			    //Establece una conexion con la  B.D. "banco" una tabla DBTabla y una Conection
+			    //Establece una conexion con la  B.D. "banco" una tabla DBTabla y una Connection
 			    tabla.connectDatabase (driver, urlConexion, usuario, clave);
 			    conexionBD = DriverManager.getConnection (urlConexion, usuario, clave);
 			}
@@ -264,7 +264,10 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private void refrescarTabla () {
 	    try {    
 	        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-	    	tabla.setSelectSql(this.txtConsulta.getText().trim());
+	    	Statement St = conexionBD.createStatement();
+	    	String S = this.txtConsulta.getText().trim();
+	    	St.execute(S);
+	    	
 	    	// obtenemos el modelo de la tabla a partir de la consulta para 
 	    	// modificar la forma en que se muestran de algunas columnas  
 	    	tabla.createColumnModelFromQuery();
@@ -282,8 +285,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	tabla.refresh();
 	    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
 	    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
-	    	// patir de la conexion y la consulta seteadas con connectDatabase() y 
-	        // setSelectSql() respectivamente.
+	    	// patir de la conexion y la consulta seteadas con connectDatabase()
 	    }
 	    catch (SQLException ex) {
 	        // en caso de error, se muestra la causa en la consola
@@ -296,4 +298,5 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	                            JOptionPane.ERROR_MESSAGE);
 	    }
     }
+	
 }
