@@ -19,17 +19,17 @@
 
 - Usuario ATM: 
 	1) Cuando se loguean en un ATM con una tarjeta, deberían mostrar solamente la información 
-	sobre la caja de ahorro y cliente vinculados a esa tarjeta (no toda la información del banco). -listo(?)
+	sobre la caja de ahorro y cliente vinculados a esa tarjeta (no toda la información del banco). -VER SQL
 	
 	Si se loguean con una tarjeta/password inválido, la aplicación me deja acceder igual
-	Esto no debería ser así. how and why?
+	Esto no debería ser así. PROBAR
 	
 	Les adjunto datos de prueba: datos.sql para que puedan probar las correcciones.
 	Fíjense que si se loguean con el numero de tarjeta=1 y pin= 1111
 	La tarjeta 1 esta asociada a la caja de ahorro 1 y al cliente 1.
 	
 	2) Luego, al mostrar los movimientos de los últimos 15 días no me devuelve sólo 7 movimientos
-	mientras que debería devolver las siguientes 15 transacciones:
+	mientras que debería devolver las siguientes 15 transacciones:-PROBAR
 	
 	+------------+----------+---------------+---------+----------+---------+
 	| fecha      | hora     | tipo          | monto   | cod_caja | destino |
@@ -56,7 +56,7 @@
 	En el campo "hora" figura 01-ene.-1970 y la fecha se visualiza desplazada un 
 	día hacia atrás, mientras que en la BD se almacena bien ya que por consola 
 	los devuelve correctamente. Les adjunto los datos de prueba datos.sql para que
-	puedan probar con los mismos datos de las correcciones. 
+	puedan probar con los mismos datos de las correcciones. -VER FORMATEO TABLA VentanaConsultas.java
 	
 	
 	3) Al consultar movimientos por periodo donde la fecha de inicio sea mayor a la fecha fin. 
@@ -68,7 +68,7 @@
 		
 - Usuario EMPLEADO: 
 	- Al intentar loguearme con un empleado con password incorrecto,
-	debería mostrar un mensaje adecuado y solicitar el password nuevamente.
+	debería mostrar un mensaje adecuado y solicitar el password nuevamente. -PROBAR
 	 
 	- Al intentar crear un préstamo para el cliente que ya tenga un prestamo vigente 
 	respectivamente la aplicación debería mostrar un mensaje diciendo que el
@@ -88,7 +88,7 @@
 	Puedo apretar varias veces el botón "registrar Pago" y se ve un cartel de pago de la cuota
 	pero no se almacena en la BD.
 
-	- Al listar los clientes morosos que deban 2 o más cuotas se deberia mostrar:
+	- Al listar los clientes morosos que deban 2 o más cuotas se deberia mostrar: -PROBAR
 
 	+-------------+----------+---------+-------------+---------------+--------------+----------+------------+-------------+-----------------------+
 	| nro_cliente | tipo_doc | nro_doc | nombre      | apellido      | nro_prestamo | monto    | cant_meses | valor_cuota | cant_cuotas_atrasadas |

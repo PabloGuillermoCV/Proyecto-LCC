@@ -230,10 +230,40 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   private void thisComponentShown(ComponentEvent evt) {
-		  login ();
-	      this.conectarBD ();
+	      boolean Verif = false;
+		  this.conectarBD ();
+	      while(!Verif) {
+				login(); //Obtengo los datos del empleado
+				Verif = VerificarLogin();
+			}
 	      this.refrescarTabla ();
 	   }
+	   
+	   
+	   private boolean VerificarLogin() {
+			boolean ret = true;
+			
+			try {
+				Statement st = this.conexionBD.createStatement();
+				ResultSet R = st.executeQuery("SELECT nro_tarjeta, PIN "
+						+ "			FROM Tarjeta WHERE " + Tarj + 
+							"= nro_tarjeta AND PIN = md5(" +  Pin + ")");
+				
+				ret = R.next(); //Pregunto si el ResultSet tiene un dato
+				if(!ret) {
+					//Hago pop-ups para decir que falló
+					JOptionPane.showConfirmDialog(null, null,"Ocurrió un error al buscar su tarjeta,"
+								+ "por favor, ingrese los datos nuevamente",
+								JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);	
+				}
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return ret;
+		}
 	   
 	   /**
 		 * Hace login de la Tarjeta por medio de Pop Ups
@@ -257,7 +287,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   Statement stm = this.conexionBD.createStatement();
 			   String sql = "SELECT TCA.fecha, TCA.hora, TCA.monto, TCA.tipo, TCA.cod_caja AS CodigoCaja, TCA.destino"
 			   		+ " FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T"
-			   		+ " WHERE " + Tarj + " = T.nro_tarjeta AND T.PIN = md5(" + Pin + ")"
+			   		+ " WHERE  TCA.nro_ca = T.nro_ca AND T.nro_tarjeta = " + Tarj
 			   		+ " ORDER BY TCA.fecha DESC, TCA.hora DESC"
 			   		+ " LIMIT 15";
 			   stm.execute(sql);

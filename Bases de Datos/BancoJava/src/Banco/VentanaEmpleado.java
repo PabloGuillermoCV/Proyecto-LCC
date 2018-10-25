@@ -195,7 +195,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago)"
 					+ "FROM Cliente C NATURAL JOIN Prestamo PR NATURAL JOIN Pago PA "
-					+ "WHERE PR.nro_prestamo = PA.nro_prestamo "
+					+ "WHERE PR.nro_prestamo = PA.nro_prestamo AND C.nro_cliente = PR.nro_cliente"
 					+ "GROUP BY C.nro_cliente , PR.nro_prestamo HAVING COUNT(PA.nro_pago) >= 2";
 			ResultSet rs = stmt.executeQuery(SQL1);
 			tabla.refresh(rs);
@@ -257,8 +257,37 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	private void thisComponentShown (ComponentEvent evt) {
-		login();
-		this.conectarBD();
+		boolean Verif = false;
+		this.conectarBD(); //Conecto a la Vista
+		while(!Verif) {
+			login(); //Obtengo los datos del empleado
+			Verif = VerificarLogin();
+		}
+	}
+	
+	private boolean VerificarLogin() {
+		boolean ret = true;
+		
+		try {
+			Statement st = this.conexionBD.createStatement();
+			ResultSet R = st.executeQuery("SELECT legajo, password "
+					+ "			FROM Empleado WHERE " + legajo + 
+						"= legajo AND password = md5(" +  clave + ")");
+			
+			ret = R.next(); //Pregunto si el ResultSet tiene un dato
+			if(!ret) {
+				//Hago pop-ups para decir que falló
+				JOptionPane.showConfirmDialog(null, null,"Ocurrió un error al buscar su usuario,"
+							+ "por favor, ingrese los datos nuevamente",
+							JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);	
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return ret;
 	}
 	
 	private void noPrestActual(int doc, String typeDoc) {
@@ -430,8 +459,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        String driver ="com.mysql.cj.jdbc.Driver";
 		        String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-		        tabla.connectDatabase (driver, urlConexion, legajo, clave);
-		        conexionBD = DriverManager.getConnection (urlConexion, legajo, clave);
+		        tabla.connectDatabase (driver, urlConexion, "empleado", "empleado");
+		        conexionBD = DriverManager.getConnection (urlConexion, "empleado", "empleado");
 		    }
 		    catch (SQLException ex) {
 		        JOptionPane.showMessageDialog (this,
