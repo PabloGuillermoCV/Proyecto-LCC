@@ -39,6 +39,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private DBTable tabla = new DBTable();
 	private int nro;
 	private String tipo;
+	private boolean Salir = false;
 	protected Connection conexionBD = null;
 	int seleccionado = -1;
 	
@@ -95,8 +96,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			}
 		});
 		
-		
-		tabla = new DBTable();
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
 		tabla.setEnabled(true);
@@ -173,11 +172,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
 				JOptionPane.showConfirmDialog(null, "Se ha registrado el Pago de la Cuota con exito");
-				//Refresco la tabla para que se note que se pagó la cuota
-				ResultSet r = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, "
-						+ "PA.fecha_venc AS Vencimiento "
-					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C "
-					+ "WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+				//Refresco la tabla para que se note que se pago la cuota
+				ResultSet r = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
 				tabla.refresh(r);
 			}
 		} catch (SQLException e) {
@@ -199,10 +195,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		//para cada Prestamo, necesito saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
 		try {
 			Statement stmt = this.conexionBD.createStatement();
-			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago)"
-					+ "FROM Cliente C NATURAL JOIN Prestamo PR NATURAL JOIN Pago PA "
-					+ "WHERE PR.nro_prestamo = PA.nro_prestamo AND C.nro_cliente = PR.nro_cliente"
-					+ "GROUP BY C.nro_cliente , PR.nro_prestamo HAVING COUNT(PA.nro_pago) >= 2";
+			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) FROM Cliente C NATURAL JOIN Prestamo PR NATURAL JOIN Pago PA WHERE PR.nro_prestamo = PA.nro_prestamo AND C.nro_cliente = PR.nro_cliente GROUP BY C.nro_cliente, PR.nro_prestamo HAVING COUNT(PA.nro_pago) >= 2";
 			ResultSet rs = stmt.executeQuery(SQL1);
 			tabla.refresh(rs);
 
@@ -239,9 +232,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento "
-					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C "
-					+ "WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
 			tabla.refresh(R);
 		}
 		catch(SQLException f) {
@@ -265,7 +256,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 
 	
 	/**
-	 * Método que verifica si el cliente ingresado tiene un Prestamo en vigencia
+	 * Metodo que verifica si el cliente ingresado tiene un Prestamo en vigencia
 	 * Caso contrario, se avanza en la creación de un nuevo prestamo para dicho cliente
 	 * @param doc numero de documento del cliente
 	 * @param typeDoc tipo del documento del cliente
@@ -295,20 +286,19 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        }
 		        
 		        //Pregunto si el periodo de meses que me ingresaron ES ALGUNO DE LOS DISPONIBLES
-		        //También verifico que dado ese periodo, el monto ingresado este ENTRE
+		        //Tambien verifico que dado ese periodo, el monto ingresado este ENTRE
 		        	//un Monto Inferior Y superior PARA DICHO PERIODO
-		        //Corroboré este Query en SQL y anda 
+		        //Corrobore este Query en SQL y anda 
 		        //NO solo corroboro que el periodo y el monto sean legales, sino que de una obtengo la tasa asociada
 		        //Al nuevo prestamo con los datos dados,que trucazo, no? ;)
-		        //BETWEEN hace comparación <= / >=, asi que no hay riesgo de que me ingresen un monto límite y la cosa no ande
-		        R = stmt.executeQuery("SELECT tasa FROM Tasa_Prestamo TP WHERE periodo = " + p 
-		        			+ " AND " + m + "BETWEEN monto_inf AND monto_sup");
+		        //BETWEEN hace comparacion <= / >=, asi que no hay riesgo de que me ingresen un monto lite y la cosa no ande
+		        R = stmt.executeQuery("SELECT tasa FROM Tasa_Prestamo TP WHERE periodo = " + p + " AND " + m + "BETWEEN monto_inf AND monto_sup");
 		        
 		        int t = R.getInt(1);
 		        if(t != 0)
 		        	EjecutarCreacion(m,p,t);
 		        else {//Si el ResutSet es vacio, es poque le erraron al monto o al periodo, comunico dicho error
-		        	JOptionPane.showConfirmDialog(null, null, "Ocurrió un error al obtener la Tasa, "
+		        	JOptionPane.showConfirmDialog(null, null, "Ocurrio un error al obtener la Tasa, "
 		        			+ "el Monto o supera los $20000 o el Periodo NO es un Periodo de meses valido",
 		        			JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
 		        }
@@ -411,7 +401,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 
 	   /**
-	    * Método que se ejecuta cuando este componente aparece en pantalla
+	    * Metodo que se ejecuta cuando este componente aparece en pantalla
 	    * @param evt el evento que crea esto
 	    */
 		private void thisComponentShown (ComponentEvent evt) {
@@ -420,35 +410,36 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			while(!Verif) {
 				login(); //Obtengo los datos del empleado
 				Verif = VerificarLogin();
+				if (Salir == true) {
+					thisComponentHidden(evt);
+					System.exit(0);
+				}
 			}
 		}
 
 	   /**
-	    * Método privado que Verifica que los datos de Login ingresados sean correctos
+	    * Metodo privado que Verifica que los datos de Login ingresados sean correctos
 	    * @return un valor booleano que discrimina si el loguo fue hecho con exito o no
 	    */
-		private boolean VerificarLogin() {
+       private boolean VerificarLogin() {
 			boolean ret = true;
-			
 			try {
 				Statement st = this.conexionBD.createStatement();
-				ResultSet R = st.executeQuery("SELECT legajo, password "
-						+ "			FROM Empleado WHERE " + legajo + 
-							"= legajo AND password = md5(" +  clave + ")");
+				String sql = "SELECT legajo, password FROM Empleado E WHERE E.legajo = " + legajo + " AND E.password = md5('" +  clave + "')";
+				ResultSet R = st.executeQuery(sql);
 				
 				ret = R.next(); //Pregunto si el ResultSet tiene un dato
 				if(!ret) {
-					//Hago pop-ups para decir que falló
-					JOptionPane.showConfirmDialog(null, null,"Ocurrió un error al buscar su usuario,"
-								+ "por favor, ingrese los datos nuevamente",
-								JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);	
+					//Hago pop-ups para decir que fallo
+					int reply = JOptionPane.showConfirmDialog(null, "Ocurrio un error al buscar su usuario, por favor, ingrese los datos nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
+					if (reply == JOptionPane.NO_OPTION) {
+						Salir = true;
+					}
 				}
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+			}
+			catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
 			return ret;
 		}
 	
@@ -470,7 +461,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	
 
    /**
-    * Método que se ejecuta cuando el componente se hace invisible
+    * Metodo que se ejecuta cuando el componente se hace invisible
     * @param evt evento que cause la ida del componente
     */
 	private void thisComponentHidden (ComponentEvent evt) {
@@ -486,10 +477,12 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		if (conexionBD == null) {
 			try {
 		        String driver ="com.mysql.cj.jdbc.Driver";
+		        String usuario = "empleado";
+	            String password = "empleado";
 		        String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 		        //Establece una conexion con la  B.D. "banco"  usando directamante una tabla DBTable    
-		        tabla.connectDatabase (driver, urlConexion, "empleado", "empleado");
-		        conexionBD = DriverManager.getConnection (urlConexion, "empleado", "empleado");
+		        tabla.connectDatabase (driver, urlConexion, usuario, password);
+		        conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
 		    }
 		    catch (SQLException ex) {
 		        JOptionPane.showMessageDialog (this,

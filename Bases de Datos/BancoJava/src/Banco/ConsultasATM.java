@@ -50,6 +50,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private JButton BtnRealizarTransferencia;
 	   private JButton BtnRealizarExtraccion;
 	   private JTextField montos;
+	   private boolean Salir = false;
 	   
 	   public ConsultasATM() {
 	      super();
@@ -121,9 +122,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	         
 	       //Utilizando DBTable            
 	            {
-	            	// crea la tabla  
-	            	tabla = new DBTable();    
-	            	
 	            	// Agregar la tabla al frame (no necesita JScrollPane como Jtable)
 	                getContentPane().add(tabla, BorderLayout.CENTER);           
 	                          
@@ -194,7 +192,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   }
 	   /**
-	    * Primer método para la Extreacción, obtengo el monto a extraer y delego la extracción en si en otro método
+	    * Primer metodo para la Extreaccion, obtengo el monto a extraer y delego la extraccion en si en otro metodo
 	    */
 	   private void RealizarExtra() {
 		   int okcx1 = JOptionPane.showConfirmDialog(null,montos,"Ingrese el Monto a Extraer", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
@@ -206,7 +204,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   /**
-	    * Método para el Proyecto 3 que realiza una extracción de la cuenta del banco
+	    * Metodo para el Proyecto 3 que realiza una extracción de la cuenta del banco
 	    * @param m Monto a extraer de la tarjeta ingresada en el login
 	    * @return un String que determina la naturaleza de la Extracción, si fue exitosa o no
 	    */
@@ -220,15 +218,15 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   
 		   }
 		   catch(SQLException e) {
-			   	//Devuelvo que la Transacción fallo a mi metodo padre para que lo maneje
-                      return  "Se produjo un error al realizar la Extracción.\n" + e.getMessage();
+			   	//Devuelvo que la Transaccion fallo a mi metodo padre para que lo maneje
+                      return  "Se produjo un error al realizar la Extraccion.\n" + e.getMessage();
 		   }
-		   return "Extracción Realizada con Exito";
+		   return "Extraccion Realizada con Exito";
 	   }
 	   
 	   /**
-	    * Método del Proyecto 3 que Realiza una Transferencia entre dos cuentas
-	    * Este método obtiene los datos necesarios y delega la Transferencia en si a otro método
+	    * Metodo del Proyecto 3 que Realiza una Transferencia entre dos cuentas
+	    * Este metodo obtiene los datos necesarios y delega la Transferencia en si a otro metodo
 	    */
 	   private void RealizarTrans() {
 		   int CajaD = 0;
@@ -272,21 +270,17 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   /**
-	    * Método que genera los ultimos 15 movimientos de un cliente ingresado
-	    * @param evt evento del botón asociado, no se usa, honestamente
+	    * Metodo que genera los ultimos 15 movimientos de un cliente ingresado
+	    * @param evt evento del boton asociado, no se usa, honestamente
 	    */
 	   private void btnUltimosMoviminetosActionPerformed(ActionEvent evt) {
 		   try {
 			   Statement stm = this.conexionBD.createStatement();
 			   //Query para obtener los movimientos, limitamos a los primeros 15 resultados
-			   String sql = "SELECT TCA.fecha, TCA.hora, TCA.monto, TCA.tipo, TCA.cod_caja AS CodigoCaja, TCA.destino"
-			   		+ " FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T"
-			   		+ " WHERE  TCA.nro_ca = T.nro_ca AND T.nro_tarjeta = " + Tarj
-			   		+ " ORDER BY TCA.fecha DESC, TCA.hora DESC"
-			   		+ " LIMIT 15";
+			   String sql = "SELECT TCA.fecha, TCA.hora, TCA.monto, TCA.tipo, TCA.cod_caja AS CodigoCaja, TCA.destino FROM trans_cajas_ahorro TCA JOIN Tarjeta T ON TCA.nro_ca = T.nro_ca WHERE T.nro_tarjeta = " + Tarj + " ORDER BY TCA.fecha DESC, TCA.hora DESC LIMIT 15";
 			   stm.execute(sql);
 			   ResultSet R = stm.getResultSet();
-			   refrescarTabla(R); //Delego el refresco de la DBTable en el método especifico
+			   refrescarTabla(R); //Delego el refresco de la DBTable en el metodo especifico
 			   stm.close();
 			   R.close(); //Cierro el ResultSet y el Statement
 		   }
@@ -299,16 +293,14 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		}
 	   
 	   /**
-	    * Método que obtiene el Saldo del cliente ingresado
-	    * @param evt evento del botón asociado, No se usa, honestamente
+	    * Metodo que obtiene el Saldo del cliente ingresado
+	    * @param evt evento del boton asociado, No se usa, honestamente
 	    */
 	   private void btnSaldoActionPerformed(ActionEvent evt) {
 		   //Mostrar el Saldo del Usuario
 		   try {
 			   Statement stmt = this.conexionBD.createStatement();
-		         String sql = "SELECT DISTINCT saldo"
-		                      + " FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T"
-		                      + " WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5( " + Pin + ")";
+		         String sql = "SELECT DISTINCT saldo FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "')";
 		         stmt.execute(sql);
 		         ResultSet R = stmt.getResultSet();
 		         int sal = 0;
@@ -334,8 +326,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		}
 	   
 	   /**
-	    * Método que realiza la consulta de Movimientos por Periodo
-	    * @param evt evento del botón asociado, no se usa, honestamente
+	    * Metodo que realiza la consulta de Movimientos por Periodo
+	    * @param evt evento del boton asociado, no se usa, honestamente
 	    */
 	   private void btnMovimientosPeriodoActionPerformed(ActionEvent evt) {
 		   if(validarCampos()) {
@@ -346,7 +338,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			                      + " WHERE TCA.fecha >= " + txtFechaInicio.getText().trim() + " AND TCA.fecha <= " + txtFechaFin.getText().trim();
 			         stmt.execute(sql);
 			         ResultSet R = stmt.getResultSet();
-			         refrescarTabla(R); //Delego el Refresco en el método que lo hace como la gente
+			         refrescarTabla(R); //Delego el Refresco en el metodo que lo hace como la gente
 			         stmt.close();
 			         R.close();
 			   }
@@ -359,7 +351,66 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		  }
 			
 		}
-	      
+	   
+	   /**
+	    * Metodo que se ejecuta cuando este componente aparece en pantalla
+	    * @param evt el evento que crea esto
+	    */
+	   private void thisComponentShown(ComponentEvent evt) {
+		      boolean Verif = false;
+			  this.conectarBD ();
+		      while(!Verif) {
+					login(); //Obtengo los datos del empleado
+					Verif = VerificarLogin();
+					if (Salir == true) {
+						thisComponentHidden(evt);
+						System.exit(0);
+					}
+			  }
+		      try {
+		    	 Statement stmt = this.conexionBD.createStatement();
+		         //Muestro datos de las transacciones del cliente, no toda la info del banco
+		         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE " + Tarj + " = T.nro_tarjeta AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
+		         ResultSet rs = stmt.executeQuery(sql);
+		         this.refrescarTabla (rs);
+		      }
+		      catch(SQLException e) {
+		    	  JOptionPane.showMessageDialog(this,
+	                      "Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
+	                      "Error",
+	                      JOptionPane.ERROR_MESSAGE);
+					System.out.println("SQLException: " + e.getMessage());
+					System.out.println("SQLState: " + e.getSQLState());
+					System.out.println("VendorError: " + e.getErrorCode());
+		      }
+	   }
+	   
+	   /**
+	    * Metodo privado que Verifica que los datos de Login ingresados sean correctos
+	    * @return un valor booleano que discrimina si el loguo fue hecho con exito o no
+	    */
+	   private boolean VerificarLogin() {
+			boolean ret = true;
+			try {
+				Statement st = this.conexionBD.createStatement();
+				String sql = "SELECT nro_tarjeta, PIN FROM Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" +  Pin + "')";
+				ResultSet R = st.executeQuery(sql);
+				
+				ret = R.next(); //Pregunto si el ResultSet tiene un dato
+				if(!ret) {
+					//Hago pop-ups para decir que fallo
+					int reply = JOptionPane.showConfirmDialog(null, "Ocurrio un error al buscar su usuario, por favor, ingrese los datos nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
+					if (reply == JOptionPane.NO_OPTION) {
+						Salir = true;
+					}
+				}
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return ret;
+		}
+	   
 	   /**
 		 * Hace login de la Tarjeta por medio de Pop Ups
 		 */
@@ -377,72 +428,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   
 	   /**
-	    * Método privado que Verifica que los datos de Login ingresados sean correctos
-	    * @return un valor booleano que discrimina si el loguo fue hecho con exito o no
-	    */
-	   private boolean VerificarLogin() {
-			boolean ret = true;
-			
-			try {
-				Statement st = this.conexionBD.createStatement();
-				ResultSet R = st.executeQuery("SELECT nro_tarjeta, PIN "
-						+ "			FROM Tarjeta WHERE " + Tarj + 
-							"= nro_tarjeta AND PIN = md5(" +  Pin + ")");
-				
-				ret = R.next(); //Pregunto si el ResultSet tiene un dato
-				if(!ret) {
-					//Hago pop-ups para decir que falló
-					JOptionPane.showConfirmDialog(null, null,"Ocurrió un error al buscar su tarjeta,"
-								+ "por favor, ingrese los datos nuevamente",
-								JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);	
-				}
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			return ret;
-		}
-	   
-	   /**
-	    * Método que se ejecuta cuando este componente aparece en pantalla
-	    * @param evt el evento que crea esto
-	    */
-	   private void thisComponentShown(ComponentEvent evt) {
-		      boolean Verif = false;
-		      ResultSet rs = null;
-			  this.conectarBD ();
-		      while(!Verif) {
-					login(); //Obtengo los datos del empleado
-					Verif = VerificarLogin();
-				}
-		      try {
-		    	  Statement stmt = this.conexionBD.createStatement();
-		         //Muestro datos de las transacciones del cliente, no toda la info del banco 
-		         //Corroborar Query
-		         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino" + 
-		                      "FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T" +
-		                      " WHERE " + Tarj + " = T.nro_tarjeta AND T.PIN = md5(" + Pin + ")" +
-		                      "ORDER BY nro_ca DESC";
-
-
-		         rs = stmt.executeQuery(sql);
-		      }
-		      catch(SQLException e) {
-		    	  JOptionPane.showMessageDialog(this,
-	                      "Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
-	                      "Error",
-	                      JOptionPane.ERROR_MESSAGE);
-					System.out.println("SQLException: " + e.getMessage());
-					System.out.println("SQLState: " + e.getSQLState());
-					System.out.println("VendorError: " + e.getErrorCode());
-		      }
-		      this.refrescarTabla (rs);
-		   }
-	   
-	   /**
-	    * Método que se ejecuta cuando el componente se hace invisible
+	    * Metodo que se ejecuta cuando el componente se hace invisible
 	    * @param evt evento que cause la ida del componente
 	    */
 	   private void thisComponentHidden(ComponentEvent evt) 
@@ -545,11 +531,11 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		   }
 		 
 		private void refrescarTabla(ResultSet R) {
-		    try {    
+		    try {
 		        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
 		    	
 		    	// obtenemos el modelo de la tabla a partir de la consulta para 
-		    	// modificar la forma en que se muestran de algunas columnas  
+		    	// modificar la forma en que se muestran de algunas columnas
 		    	tabla.createColumnModelFromQuery();
 		    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
 		    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
@@ -561,7 +547,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		    		    tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
 		    		}
 		        }  
-		    	// actualizamos el contenido de la tabla.   	     	  
+		    	// actualizamos el contenido de la tabla.
 		    	tabla.refresh(R);
 		    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
 		    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
