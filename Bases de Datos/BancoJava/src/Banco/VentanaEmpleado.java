@@ -169,10 +169,16 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			//Hago un UPDATE Query, revisar si esta bien
 			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d-%m-%Y')" + 
 						" WHERE Pago.nro_pago = " + nroC);
-			//Esto no esta del todo bien? Si devuelve un ResultSet la cosa me devuelve -1
+			//Si devuelve un ResultSet la cosa me devuelve -1
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
 				JOptionPane.showConfirmDialog(null, "Se ha registrado el Pago de la Cuota con exito");
+				//Refresco la tabla para que se note que se pagó la cuota
+				ResultSet r = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, "
+						+ "PA.fecha_venc AS Vencimiento "
+					+ "FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C "
+					+ "WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+				tabla.refresh(r);
 			}
 		} catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
@@ -255,41 +261,15 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		tipo = Tipo_Doc.getText();
 		noPrestActual(nro, tipo);
 	}
+
+
 	
-	private void thisComponentShown (ComponentEvent evt) {
-		boolean Verif = false;
-		this.conectarBD(); //Conecto a la Vista
-		while(!Verif) {
-			login(); //Obtengo los datos del empleado
-			Verif = VerificarLogin();
-		}
-	}
-	
-	private boolean VerificarLogin() {
-		boolean ret = true;
-		
-		try {
-			Statement st = this.conexionBD.createStatement();
-			ResultSet R = st.executeQuery("SELECT legajo, password "
-					+ "			FROM Empleado WHERE " + legajo + 
-						"= legajo AND password = md5(" +  clave + ")");
-			
-			ret = R.next(); //Pregunto si el ResultSet tiene un dato
-			if(!ret) {
-				//Hago pop-ups para decir que falló
-				JOptionPane.showConfirmDialog(null, null,"Ocurrió un error al buscar su usuario,"
-							+ "por favor, ingrese los datos nuevamente",
-							JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);	
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return ret;
-	}
-	
+	/**
+	 * Método que verifica si el cliente ingresado tiene un Prestamo en vigencia
+	 * Caso contrario, se avanza en la creación de un nuevo prestamo para dicho cliente
+	 * @param doc numero de documento del cliente
+	 * @param typeDoc tipo del documento del cliente
+	 */
 	private void noPrestActual(int doc, String typeDoc) {
 		int mon = 0;
 		int mes = 0;
@@ -299,14 +279,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			//SQL para determinar los prestamos actuales de un cliente
 			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc) ;
 			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
-				//Ver estos dos, el máximo monto de Prestamo peritido es 20000
-				R = stmt.executeQuery("SELECT MAX(TP.periodo) FROM Tasa_Prestamo TP");
-				if (R.next()) 
-					mes = R.getInt(1);
-				R = stmt.executeQuery("SELECT MAX(TP.monto_sup) FROM Tasa_Prestamo TP");
-				if (R.next()) 
-					mon = R.getInt(1); //Ojo, es un decimal, no se si anda
-
+				
 				int m = 0;
 				int p = 0;
 				
@@ -316,14 +289,30 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        	m = Integer.parseInt(Leg.getText().trim());
 		        }
 		        
-		        int okCx1 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese periodo en meses", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		        int okCx1 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese periodo en numero de meses", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		        if(okCx1 == JOptionPane.OK_OPTION) {
 		        	p = Integer.parseInt(Leg.getText().trim());
 		        }
-
-				if(corroborar(m,p,mes,mon)) { //Los montos ingresados no superan los máximos establecidos por las tasas
-					EjecutarCreacion(m,p);
-				}
+		        
+		        //Pregunto si el periodo de meses que me ingresaron ES ALGUNO DE LOS DISPONIBLES
+		        //También verifico que dado ese periodo, el monto ingresado este ENTRE
+		        	//un Monto Inferior Y superior PARA DICHO PERIODO
+		        //Corroboré este Query en SQL y anda 
+		        //NO solo corroboro que el periodo y el monto sean legales, sino que de una obtengo la tasa asociada
+		        //Al nuevo prestamo con los datos dados,que trucazo, no? ;)
+		        //BETWEEN hace comparación <= / >=, asi que no hay riesgo de que me ingresen un monto límite y la cosa no ande
+		        R = stmt.executeQuery("SELECT tasa FROM Tasa_Prestamo TP WHERE periodo = " + p 
+		        			+ " AND " + m + "BETWEEN monto_inf AND monto_sup");
+		        
+		        int t = R.getInt(1);
+		        if(t != 0)
+		        	EjecutarCreacion(m,p,t);
+		        else {//Si el ResutSet es vacio, es poque le erraron al monto o al periodo, comunico dicho error
+		        	JOptionPane.showConfirmDialog(null, null, "Ocurrió un error al obtener la Tasa, "
+		        			+ "el Monto o supera los $20000 o el Periodo NO es un Periodo de meses valido",
+		        			JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+		        }
+				
 			}
 			else {
 				//Muestro un cuadro de error que especifica que el Cliente ya tiene un prestamo
@@ -341,40 +330,33 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		}
 	}
 	
-	//Corroboro que lo ingresado no supere los máximos de las Tasas
-	private boolean corroborar(int mon, int mes,int monSup,int perSup) {
-		if(mon < monSup && mes < perSup)
-			return true;
-		else
-			return false;
-	}
-	
 	//Con todo corroborado, creo el Prestamo
 	//Esto implica crear el prestamo y todas las cuotas asociadas al mismo
 	//cantidad de cuotas (Pagos en con fecha_pago = NULL) depende de la cantidad de Meses
 	//usar date_add(<Fecha_actual_mientras_se_Itera>, interval 1 month)
-	private void EjecutarCreacion(int plata, int periodo) {
+	private void EjecutarCreacion(int plata, int periodo, int tasa) {
 		int i = 2;
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			//cargo el Prestamo
-			int tasa_Int = 0;
 			int Interes;
 			int ValCuota;
 			int intC = 0;
-			R = stmt.executeQuery("SELECT tasa FROM tasa_prestamo WHERE tasa_prestamo.periodo = " + periodo); //revisar si esta bien
-			if (R.next()) 
-				tasa_Int = R.getInt(1);
-			Interes = (plata + tasa_Int + periodo)/1200;
-			ValCuota = (plata + tasa_Int)/periodo;
-			R = stmt.executeQuery("SELECT C.nro_cliente FROM Cliente C WHERE C.nro_doc = " + nro + " AND C.tipo_doc = '" + tipo + "'");
+			Interes = (plata + tasa + periodo)/1200;
+			ValCuota = (plata + tasa)/periodo;
+			R = stmt.executeQuery("SELECT C.nro_cliente FROM Cliente C "
+					+ "WHERE C.nro_doc = " + nro 
+					+ " AND C.tipo_doc = '" + tipo + "'");
 			if (R.next()) 
 				intC = R.getInt(1);
 			LocalDateTime now = LocalDateTime.now(); 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			String fechaAInsertar = now.format(formatter);
-			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (STR_TO_DATE(" + "'" + fechaAInsertar + "'" + ", '%d-%m-%Y')," + periodo + "," + plata + "," + tasa_Int + "," + Interes + "," + ValCuota + "," + legajo + "," + intC +");");
+			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) "
+					+ "VALUES (STR_TO_DATE(" + "'" + fechaAInsertar + "'" + ", '%d-%m-%Y'),"
+						+ periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," 
+					+ legajo + "," + intC +")");
 			
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
 			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + intC);
@@ -428,6 +410,48 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 
 	}
 
+	   /**
+	    * Método que se ejecuta cuando este componente aparece en pantalla
+	    * @param evt el evento que crea esto
+	    */
+		private void thisComponentShown (ComponentEvent evt) {
+			boolean Verif = false;
+			this.conectarBD(); //Conecto a la Vista
+			while(!Verif) {
+				login(); //Obtengo los datos del empleado
+				Verif = VerificarLogin();
+			}
+		}
+
+	   /**
+	    * Método privado que Verifica que los datos de Login ingresados sean correctos
+	    * @return un valor booleano que discrimina si el loguo fue hecho con exito o no
+	    */
+		private boolean VerificarLogin() {
+			boolean ret = true;
+			
+			try {
+				Statement st = this.conexionBD.createStatement();
+				ResultSet R = st.executeQuery("SELECT legajo, password "
+						+ "			FROM Empleado WHERE " + legajo + 
+							"= legajo AND password = md5(" +  clave + ")");
+				
+				ret = R.next(); //Pregunto si el ResultSet tiene un dato
+				if(!ret) {
+					//Hago pop-ups para decir que falló
+					JOptionPane.showConfirmDialog(null, null,"Ocurrió un error al buscar su usuario,"
+								+ "por favor, ingrese los datos nuevamente",
+								JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);	
+				}
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return ret;
+		}
+	
 	/**
 	 * Hace login del Empleado por medio de Pop Ups
 	 */
@@ -443,7 +467,12 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			clave = new String (pf.getPassword());
 		}
 	}
-	   
+	
+
+   /**
+    * Método que se ejecuta cuando el componente se hace invisible
+    * @param evt evento que cause la ida del componente
+    */
 	private void thisComponentHidden (ComponentEvent evt) {
 	    //Desconecto y  limpio todos los atributos
 		this.desconectarBD();

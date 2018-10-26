@@ -1,118 +1,421 @@
-INSERT INTO Ciudad (cod_postal,nombre) VALUES (8001,"Ciudad1");
-INSERT INTO Ciudad (cod_postal,nombre) VALUES (8002,"Ciudad2");
+USE banco;
 
-INSERT INTO Sucursal (nombre,direccion,telefono,horario,cod_postal) VALUES ("Sucursal1","CalleSuc1","111111","24",8001);
-INSERT INTO Sucursal (nombre,direccion,telefono,horario,cod_postal) VALUES ("Sucursal2","CalleSuc2","222222","24",8001);
+DELETE FROM debito;
+DELETE FROM deposito;
+DELETE FROM transferencia;
+DELETE FROM extraccion;
+DELETE FROM transaccion_por_caja;
+DELETE FROM transaccion;
+DELETE FROM atm;
+DELETE FROM ventanilla;
+DELETE FROM caja;
+DELETE FROM tarjeta;
+DELETE FROM cliente_CA;
+DELETE FROM caja_ahorro;
+DELETE FROM tasa_prestamo;
+DELETE FROM pago;
+DELETE FROM prestamo;
+DELETE FROM plazo_cliente;
+DELETE FROM tasa_plazo_fijo;
+DELETE FROM plazo_fijo;
+DELETE FROM cliente;
+DELETE FROM empleado;
+DELETE FROM sucursal;
+DELETE FROM ciudad;
 
-INSERT INTO Empleado (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,cargo,password,nro_suc) 
-			VALUES ("AE1","NE1","dni",84532017,"CalleEmp1","147252","Cargo1",md5("password1"),1);
-INSERT INTO Empleado (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,cargo,password,nro_suc) 
-			VALUES ("AE2","NE2","dni",13245678,"CalleEmp2","786521","Cargo2",md5("password2"),1);
-INSERT INTO Empleado (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,cargo,password,nro_suc) 
-			VALUES ("AE3","NE3","dni",20314565,"CalleEmp3","456217","Cargo3",md5("password3"),1);
 
-INSERT INTO Cliente (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,fecha_nac) 
-			VALUES ("AC1","NC1","dni",01356489,"CalleCli1","453210",STR_TO_DATE("05-04-2000","%d-%m-%Y"));
-INSERT INTO Cliente (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,fecha_nac) 
-			VALUES ("AC2","NC2","dni",13645820,"CalleCli2","302124",STR_TO_DATE("15-03-1998","%d-%m-%Y"));
-INSERT INTO Cliente (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,fecha_nac) 
-			VALUES ("AC3","NC3","dni",30124872,"CalleCli3","134251",STR_TO_DATE("07-04-2001","%d-%m-%Y"));
-INSERT INTO Cliente (apellido,nombre,tipo_doc,nro_doc,direccion,telefono,fecha_nac) 
-			VALUES ("AC4","NC4","dni",65487952,"CalleCli4","134247",STR_TO_DATE("20-10-2000","%d-%m-%Y"));
+#................................................................................................
+# 3 ciudades
 
-INSERT INTO Plazo_Fijo (capital,fecha_inicio,fecha_fin,tasa_interes,interes,nro_suc) 
-			VALUES (200.02,STR_TO_DATE("10-09-2018","%d-%m-%Y"),STR_TO_DATE("05-11-2018","%d-%m-%Y"),10.02,32.45,1);
-INSERT INTO Plazo_Fijo (capital,fecha_inicio,fecha_fin,tasa_interes,interes,nro_suc) 
-			VALUES (250.85,STR_TO_DATE("06-08-2018","%d-%m-%Y"),STR_TO_DATE("22-12-2018","%d-%m-%Y"),20.78,25.12,1);
+INSERT INTO ciudad(cod_postal,Nombre) VALUES (8000, 'Bahia Blanca'); 
+INSERT INTO ciudad(cod_postal,Nombre) VALUES (1000, 'Buenos Aires'); 
+INSERT INTO ciudad(cod_postal,Nombre) VALUES (2000, 'Mar del Plata'); 
 
-INSERT INTO Tasa_Plazo_Fijo (periodo,monto_inf,monto_sup,tasa) VALUES (245,423.44,782.12,45.11);
-INSERT INTO Tasa_Plazo_Fijo (periodo,monto_inf,monto_sup,tasa) VALUES (245,256.66,532.57,87.45);
+#................................................................................................
+# 3 Sucursales de Bahia Blanca
 
-INSERT INTO Plazo_Cliente (nro_plazo,nro_cliente) VALUES (1,1);
-INSERT INTO Plazo_Cliente (nro_plazo,nro_cliente) VALUES (2,2);
+ INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal)
+ VALUES (1,'Suc1-BB', 'Dir Suc1-BB', '0291-4540001', 'lu. a vi. de 10 a 15 hs.', 8000); 
+INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal) 
+VALUES (2,'Suc2-BB', 'Dir Suc2-BB', '0291-4540002', 'lu. a vi. de 10 a 15 hs.', 8000); 
+INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal) 
+VALUES (3,'Suc3-BB', 'Dir Suc3-BB', '0291-4540003', 'lu. a vi. de 10 a 15 hs.', 8000); 
 
-INSERT INTO Prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) 
-			VALUES (STR_TO_DATE("15-09-2018","%d-%m-%Y"),4,120.55,12.48,98.66,2.35,1,1);
-INSERT INTO Prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) 
-			VALUES (STR_TO_DATE("14-11-2018","%d-%m-%Y"),5,782.01,98.02,46.52,3.12,2,2);
-INSERT INTO Prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) 
-			VALUES (STR_TO_DATE("23-12-2018","%d-%m-%Y"),3,352.01,45.58,45.22,2.98,1,3);
+# 2 Sucursales de Buenos Aires
+INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal) 
+VALUES (4,'Suc4-BA', 'Dir Suc4-BA', '011-4540004', 'lu. a vi. de 10 a 15 hs.', 1000); 
+INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal) 
+VALUES (5,'Suc5-BA', 'Dir Suc5-BA', '011-4540005', 'lu. a vi. de 10 a 15 hs.', 1000); 
 
-INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) 
-			VALUES (1,01,STR_TO_DATE("15-01-2019","%d-%m-%Y"),STR_TO_DATE("02-01-2019","%d-%m-%Y"));
-INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) 
-			VALUES (2,03,STR_TO_DATE("14-03-2019","%d-%m-%Y"),NULL);
-INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) 
-			VALUES (3,03,STR_TO_DATE("23-04-2019","%d-%m-%Y"),STR_TO_DATE("20-04-2019","%d-%m-%Y"));
+# 2 Sucursales de Mardel Plata
+INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal) 
+VALUES (6,'Suc6-MDP', 'Dir Suc6-MDP', '0223-4540006', 'lu. a vi. de 10 a 15 hs.', 2000); 
+INSERT INTO sucursal(nro_suc, nombre, direccion, telefono, horario, cod_postal) 
+VALUES (7,'Suc7-MDP', 'Dir Suc7-MDP', '0223-4540007', 'lu. a vi. de 10 a 15 hs.', 2000); 
 
-INSERT INTO Tasa_Prestamo (periodo,monto_inf,monto_sup,tasa) VALUES (123,45.02,78.56,12.35);
-INSERT INTO Tasa_Prestamo (periodo,monto_inf,monto_sup,tasa) VALUES (123,12.47,65.25,12.35);
-INSERT INTO Tasa_Prestamo (periodo,monto_inf,monto_sup,tasa) VALUES (123,77.54,99.56,45.08);
+#................................................................................................
+# Empleados: del 1 al 7, uno por sucursal
 
-INSERT INTO Caja_Ahorro (nro_ca,CBU,saldo) VALUES (12345678,1432147678961345,100.45);
-INSERT INTO Caja_Ahorro (nro_ca,CBU,saldo) VALUES (23456789,6054870514705220,188.32);
-INSERT INTO Caja_Ahorro (nro_ca,CBU,saldo) VALUES (34567891,2013450650457865,142.98);
-INSERT INTO Caja_Ahorro (nro_ca,CBU,saldo) VALUES (45678912,4243567894123102,132.75);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (1, 'Nombre_Emp1', 'Apellido_Emp1', 'DNI', 11, 'Dir_Emp1', '0291-4540011', 'Gerente', md5('emp1'), 1);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (2, 'Nombre_Emp2', 'Apellido_Emp2', 'DNI', 22, 'Dir_Emp2', '0291-4540012', 'Cajero', md5('emp2'), 2);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (3, 'Nombre_Emp3', 'Apellido_Emp3', 'DNI', 33, 'Dir_Emp3', '0291-4540013', 'Oficial de prestamos', md5('emp3'), 3);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (4, 'Nombre_Emp4', 'Apellido_Emp4', 'DNI', 44, 'Dir_Emp4', '011-4540014', 'Gerente', md5('emp4'), 4);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (5, 'Nombre_Emp5', 'Apellido_Emp5', 'DNI', 55, 'Dir_Emp5', '011-4540015', 'Cajero', md5('emp5'), 5);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (6, 'Nombre_Emp6', 'Apellido_Emp6', 'DNI', 66, 'Dir_Emp6', '0223-4540016', 'Oficial de prestamos',md5('emp6'), 6);
+INSERT INTO empleado(legajo, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, cargo, password, nro_suc) 
+VALUES (7, 'Nombre_Emp7', 'Apellido_Emp7', 'DNI', 77, 'Dir_Emp7', '0223-4540017', 'Oficial de prestamos',md5('emp7'), 7);
 
-INSERT INTO Cliente_ca (nro_cliente,nro_ca) VALUES (1,12345678);
-INSERT INTO Cliente_ca (nro_cliente,nro_ca) VALUES (2,23456789);
-INSERT INTO Cliente_ca (nro_cliente,nro_ca) VALUES (3,34567891);
-INSERT INTO Cliente_ca (nro_cliente,nro_ca) VALUES (4,45678912);
+#................................................................................................
+# Clientes: del 1 al 7 (nro_doc = nro_cliente)
+ 
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (1, 'Nombre_Cli1', 'Apellido_Cli1', 'DNI', 1, 'Dir_Cli1', '0291-4540021', '1980-05-01');
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (2, 'Nombre_Cli2', 'Apellido_Cli2', 'DNI', 2, 'Dir_Cli2', '0291-4540022', '1980-05-02');
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (3, 'Nombre_Cli3', 'Apellido_Cli3', 'DNI', 3, 'Dir_Cli3', '0291-4540023', '1980-05-03');
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (4, 'Nombre_Cli4', 'Apellido_Cli4', 'DNI', 4, 'Dir_Cli4', '0291-4540024', '1980-05-04');
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (5, 'Nombre_Cli5', 'Apellido_Cli5', 'DNI', 5, 'Dir_Cli5', '0291-4540025', '1980-05-05');
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (6, 'Nombre_Cli6', 'Apellido_Cli6', 'DNI', 6, 'Dir_Cli6', '0291-4540026', '1980-05-06');
+INSERT INTO cliente(nro_cliente, nombre, apellido, tipo_doc, nro_doc, direccion, telefono, fecha_nac) 
+VALUES (7, 'Nombre_Cli7', 'Apellido_Cli7', 'DNI', 7,'Dir_Cli7', '0291-4540027', '1980-05-07');
 
-INSERT INTO Tarjeta (PIN,CVT,fecha_venc,nro_cliente,nro_ca) 
-			VALUES (md5("ajfkdlsiwuehcndmxk78945610234786"),md5("pdowlaksmcxbzjkjgvhjkds4561231562"),STR_TO_DATE("10-08-2022","%d-%m-%Y"),1,12345678);
-INSERT INTO Tarjeta (PIN,CVT,fecha_venc,nro_cliente,nro_ca) 
-			VALUES (md5("dhgfd67h14gfd56453d1bgfdbhgfd654"),md5("opuqiopehjklsdaf45602312348975310"),STR_TO_DATE("14-08-2022","%d-%m-%Y"),2,23456789);
-INSERT INTO Tarjeta (PIN,CVT,fecha_venc,nro_cliente,nro_ca) 
-			VALUES (md5("gfds67g8fdsgfdsgfds1231gr65ew7t1"),md5("efwqfdsa5403201234fdsaf4g65456405"),STR_TO_DATE("30-09-2022","%d-%m-%Y"),3,34567891);
-INSERT INTO Tarjeta (PIN,CVT,fecha_venc,nro_cliente,nro_ca) 
-			VALUES (md5("gerw60w103fd4s56741894530123sdg4"),md5("wytre97poiu41255360gkjhgkjhg7iuy9"),STR_TO_DATE("15-02-2023","%d-%m-%Y"),4,45678912);
 
-INSERT INTO Caja () VALUES ();
-INSERT INTO Caja () VALUES ();
-INSERT INTO Caja () VALUES ();
-INSERT INTO Caja () VALUES ();
+#................................................................................................
+# Prestamos 
+ 
+# prestamos del cliente 1 (y empleado 1)
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes, interes, valor_cuota, legajo, nro_cliente) 
+VALUES (1, '2017-6-6', 6, 2000, 17, 0, 0, 1, 1);  # esta pago
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes, interes, valor_cuota,legajo, nro_cliente) 
+VALUES (2, '2018-4-4', 6, 9000, 20, 0, 0, 1, 1);  # moroso
 
-INSERT INTO Ventanilla (cod_caja,nro_suc) VALUES (1,1);
-INSERT INTO Ventanilla (cod_caja,nro_suc) VALUES (2,1);
-INSERT INTO Ventanilla (cod_caja,nro_suc) VALUES (3,1);
-INSERT INTO Ventanilla (cod_caja,nro_suc) VALUES (4,1);
+# prestamos del cliente 2 (y empleado 2)
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes, interes, valor_cuota,legajo, nro_cliente)
+VALUES (3, '2017-4-4', 6, 5000, 20, 0, 0, 2, 2);   # esta pago
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes, interes, valor_cuota,legajo, nro_cliente)
+VALUES (4, '2018-4-5', 6, 20000, 24, 0, 0, 2, 2); # moroso
 
-INSERT INTO ATM (cod_caja,cod_postal,direccion) VALUES (1,8001,"DirATM1");
-INSERT INTO ATM (cod_caja,cod_postal,direccion) VALUES (2,8001,"DirATM2");
-INSERT INTO ATM (cod_caja,cod_postal,direccion) VALUES (3,8001,"DirATM3");
-INSERT INTO ATM (cod_caja,cod_postal,direccion) VALUES (4,8001,"DirATM4");
+# prestamos del cliente 3 (y empleado 3)
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes,interes, valor_cuota, legajo, nro_cliente)
+VALUES (5, '2018-1-7', 6, 18000, 24, 0, 0, 3, 3); # moroso
 
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("06-12-2018","%d-%m-%Y"),HOUR("04"),45.20);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("02-12-2018","%d-%m-%Y"),HOUR("11"),78.50);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("12-12-2018","%d-%m-%Y"),HOUR("05"),65.32);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("15-12-2018","%d-%m-%Y"),HOUR("07"),75.21);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("17-12-2018","%d-%m-%Y"),HOUR("03"),45.12);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("22-12-2018","%d-%m-%Y"),HOUR("04"),95.37);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("28-12-2018","%d-%m-%Y"),HOUR("10"),82.14);
-INSERT INTO Transaccion (fecha,hora,monto) VALUES (STR_TO_DATE("30-12-2018","%d-%m-%Y"),HOUR("01"),65.27);
+# prestamos del cliente 4 (y empleado 4)
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes, interes, valor_cuota, legajo, nro_cliente)
+VALUES (6, '2013-9-9', 6, 20000, 24, 0, 0, 4, 4); # esta pagado
+INSERT INTO prestamo(nro_prestamo, fecha, cant_meses, monto, tasa_interes, interes, valor_cuota, legajo, nro_cliente)
+VALUES (7, '2018-9-20', 6, 1000, 17, 0, 0, 4, 4); # cuotas impagas, pero al dia
 
-INSERT INTO Debito (nro_trans,descripcion,nro_cliente,nro_ca) VALUES (1,"desc1",1,12345678);
-INSERT INTO Debito (nro_trans,descripcion,nro_cliente,nro_ca) VALUES (2,"desc2",2,23456789);
-INSERT INTO Debito (nro_trans,descripcion,nro_cliente,nro_ca) VALUES (3,"desc3",3,34567891);
-INSERT INTO Debito (nro_trans,descripcion,nro_cliente,nro_ca) VALUES (4,"desc4",4,45678912);
 
-INSERT INTO Transaccion_por_caja (nro_trans,cod_caja) VALUES (5,1);
-INSERT INTO Transaccion_por_caja (nro_trans,cod_caja) VALUES (6,2);
-INSERT INTO Transaccion_por_caja (nro_trans,cod_caja) VALUES (7,3);
-INSERT INTO Transaccion_por_caja (nro_trans,cod_caja) VALUES (8,4);
+UPDATE prestamo set interes=(monto * tasa_interes * cant_meses)/1200; 
 
-INSERT INTO Deposito (nro_trans,nro_ca) VALUES (5,12345678);
-INSERT INTO Deposito (nro_trans,nro_ca) VALUES (6,23456789);
-INSERT INTO Deposito (nro_trans,nro_ca) VALUES (7,34567891);
-INSERT INTO Deposito (nro_trans,nro_ca) VALUES (8,45678912);
+UPDATE prestamo set valor_cuota=(monto+interes)/cant_meses;
 
-INSERT INTO Extraccion (nro_trans,nro_cliente,nro_ca) VALUES (5,1,12345678);
-INSERT INTO Extraccion (nro_trans,nro_cliente,nro_ca) VALUES (6,2,23456789);
-INSERT INTO Extraccion (nro_trans,nro_cliente,nro_ca) VALUES (7,3,34567891);
-INSERT INTO Extraccion (nro_trans,nro_cliente,nro_ca) VALUES (8,4,45678912);
+#................................................................................................
+# Pagos
 
-INSERT INTO Transferencia (nro_trans,nro_cliente,origen,destino) VALUES (5,1,12345678,23456789);
-INSERT INTO Transferencia (nro_trans,nro_cliente,origen,destino) VALUES (6,2,23456789,12345678);
-INSERT INTO Transferencia (nro_trans,nro_cliente,origen,destino) VALUES (7,3,34567891,23456789);
-INSERT INTO Transferencia (nro_trans,nro_cliente,origen,destino) VALUES (8,4,45678912,45678912);
+# del prestamo 1 (esta pago)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (1, 1, '2017-7-6', '2017-7-4'); 
+#makedate(year(curdate())-1, dayofyear('0001-7-6'));
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (1, 2, '2017-8-6', '2017-8-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (1, 3, '2017-9-6', '2017-9-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (1, 4, '2017-10-6', '2017-10-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (1, 5, '2017-11-6', '2017-11-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (1, 6, '2017-12-6', '2017-12-4'); 
+
+# del prestamo 2 (moroso: tiene la cuota 4, 5 y 6 cuotas vencidas e impagas)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (2, 1, '2018-5-4', '2018-5-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (2, 2, '2018-6-4', '2018-6-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (2, 3, '2018-7-4', '2018-7-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (2, 4, '2018-8-4', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (2, 5, '2018-9-4', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (2, 6, '2018-10-4', NULL); 
+
+# del prestamo 3 (esta pago)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (3, 1, '2017-5-4', '2017-5-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (3, 2, '2017-6-4', '2017-6-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (3, 3, '2017-7-4', '2017-7-4'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (3, 4, '2017-8-4', '2017-8-6'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (3, 5, '2017-9-4', '2017-9-6'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (3, 6, '2017-10-4', '2017-10-6'); 
+
+# del prestamo 4 (moroso: tiene la cuota 5 y 6 vencidas e impagas)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (4, 1, '2018-5-5', '2018-5-5'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (4, 2, '2018-6-5', '2018-6-5'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (4, 3, '2018-7-5', '2018-7-5'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (4, 4, '2018-8-5', '2018-8-5'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (4, 5, '2018-9-5', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (4, 6, '2018-10-5', NULL); 
+
+# del prestamo 5 (moroso: tiene las cuotas 2 a 6 vencidas e impagas)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (5, 1, '2018-2-7', '2018-2-7'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (5, 2, '2018-3-7', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (5, 3, '2018-4-7', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (5, 4, '2018-5-7', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (5, 5, '2018-6-7', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (5, 6, '2018-7-7', NULL); 
+
+# del prestamo 6 (esta pago)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (6, 1, '2013-10-9', '2013-10-9'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (6, 2, '2013-11-9', '2013-11-9'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (6, 3, '2013-12-9', '2013-12-9'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (6, 4, '2017-1-9', '2017-1-9'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (6, 5, '2017-2-9', '2017-2-9'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (6, 6, '2017-3-9', '2017-3-9'); 
+
+# del prestamo 7 (tiene cuotas impagas, pero esta al dia)
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (7, 1, '2018-10-20', '2018-10-20'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (7, 2, '2018-11-20', '2018-11-20'); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (7, 3, '2018-12-20', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (7, 4, '2019-1-20', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (7, 5, '2019-2-20', NULL); 
+INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES (7, 6, '2019-3-20', NULL); 
+
+
+
+#...............................................................................
+# Tasas prestamos
+ 
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (6,0,2999,17);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (6,3000,9999,20);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (6,10000,20000,24);  
+
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (12,0,2999,18.5);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (12,3000,9999,21.5);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (12,10000,20000,25.5);  
+
+# periodo nuevo de 18 meses, no estaba en el enunciado del proyecto 1
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (18,0,2999,19);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (18,3000,9999,22);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (18,10000,20000,26);  
+
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (24,0,2999,20);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (24,3000,9999,23);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (24,10000,20000,27);  
+
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (60,0,2999,25);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (60,3000,9999,28);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (60,10000,20000,32);  
+
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (120,0,2999,30);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (120,3000,9999,33);  
+INSERT INTO tasa_prestamo(periodo, monto_inf, monto_sup, tasa) VALUES (120,10000,20000,37);  
+
+#...............................................................................
+# Cajas de ahorro
+ 
+INSERT INTO caja_ahorro(nro_ca,CBU, saldo) VALUES (1,11,1000);  
+INSERT INTO caja_ahorro(nro_ca,CBU, saldo) VALUES (2,12,2000);  
+INSERT INTO caja_ahorro(nro_ca,CBU, saldo) VALUES (3,13,3000);  
+INSERT INTO caja_ahorro(nro_ca,CBU, saldo) VALUES (4,14,4000); 
+
+
+#...............................................................................
+# Cliente_CA
+# Caja 1 con cliente 1 y 7
+# Caja 2 con cliente 2 
+# Caja 3 con cliente 3 
+# Caja 4 con cliente 4,5,6 y 7
+ 
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (1,1);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (2,2);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (3,3);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (4,4);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (5,4);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (6,4);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (7,4);  
+INSERT INTO Cliente_CA(nro_cliente, nro_ca) VALUES (7,1);  
+ 
+#...............................................................................
+# Tarjetas 
+# El pin de la tarjeta i es: iiii 
+# La tarjeta 1 esta asociada al par caja-cliente (1,1)
+# La tarjeta 2 esta asociada al par caja-cliente (2,2)
+# La tarjeta 3 esta asociada al par caja-cliente (3,3)
+# La tarjeta 4 esta asociada al par caja-cliente (4,4)
+# La tarjeta 5 esta asociada al par caja-cliente (5,4)
+# La tarjeta 6 esta asociada al par caja-cliente (6,4)
+# La tarjeta 7 esta asociada al par caja-cliente (7,4)
+# La tarjeta 8 esta asociada al par caja-cliente (7,1)
+ 
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+VALUES(1,md5('1111'),md5('111'),'2017-4-16',1,1);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+VALUES(2,md5('2222'),md5('222'),'2017-4-16',2,2);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+VALUES(3,md5('3333'),md5('333'),'2017-4-16',3,3);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+VALUES(4,md5('4444'),md5('444'),'2017-4-16',4,4);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+VALUES(5,md5('5555'),md5('555'),'2017-4-16',5,4);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+ VALUES(6,md5('6666'),md5('666'),'2017-4-16',6,4);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+ VALUES(7,md5('7777'),md5('777'),'2017-4-16',7,4);
+INSERT INTO tarjeta(nro_tarjeta, PIN, CVT, fecha_venc, nro_cliente, nro_ca)
+ VALUES(8,md5('8888'),md5('888'),'2017-4-16',7,1);
+
+
+#...............................................................................
+# cajas
+
+# 7 Ventanillas, una por sucursal
+INSERT INTO caja VALUES(1);
+INSERT INTO caja VALUES(2);
+INSERT INTO caja VALUES(3);
+INSERT INTO caja VALUES(4);
+INSERT INTO caja VALUES(5);
+INSERT INTO caja VALUES(6);
+INSERT INTO caja VALUES(7);
+
+# 4 ATM
+INSERT INTO caja VALUES(10);
+INSERT INTO caja VALUES(11);
+INSERT INTO caja VALUES(12);
+INSERT INTO caja VALUES(13);
+
+#...............................................................................
+# 7 Ventanillas, una por sucursal
+ 
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(1,1);
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(2,2);
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(3,3);
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(4,4);
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(5,5);
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(6,6);
+INSERT INTO ventanilla(cod_caja, nro_suc) VALUES(7,7);
+
+#...............................................................................
+# 4 atm
+ 
+# 2 Cajeros en Bahia
+INSERT INTO ATM(cod_caja, cod_postal, direccion) VALUES(10,8000,'Dir ATM 10-BB');
+INSERT INTO ATM(cod_caja, cod_postal, direccion) VALUES(11,8000,'Dir ATM 11-BB');
+# 1 Cajero en Bs. As.
+INSERT INTO ATM(cod_caja, cod_postal, direccion) VALUES(12,1000,'Dir ATM 12-BA');
+# 1 Cajero en Mar Del Plata
+INSERT INTO ATM(cod_caja, cod_postal, direccion) VALUES(13,2000,'Dir ATM 13-MDP');
+
+
+#...............................................................................
+# transacciones
+
+# transacciones de la caja de ahorro 1: 
+# números del 1001 al 1016, el número coincide con la fecha: 1001 = 10-01 (mmdd)
+# los montos son de la forma:
+#  XX.50 para los débitos
+#  100X para los depósitos
+#  10X para las extracciones
+#  50X para las transferencias
+   
+  
+INSERT INTO transaccion(nro_trans, fecha, hora, monto)
+VALUES(1001,'2018-10-1','13:30:00',40.50); 
+INSERT INTO debito(nro_trans, descripcion, nro_cliente, nro_ca)
+VALUES(1001,'Pago Servicios',1,1); 
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto)
+VALUES(1002,'2018-10-2','13:30:00',1001); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1002,2); 
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(1002,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto)
+VALUES(1003,'2018-10-3','13:30:00',101); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1003,10); 
+INSERT INTO extraccion(nro_trans, nro_cliente, nro_ca) VALUES(1003,7,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1004,'2018-10-4','13:30:00',501); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1004,11); 
+INSERT INTO transferencia(nro_trans, nro_cliente, origen, destino) VALUES(1004,1,1,2);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1005,'2018-10-5','13:30:00',50.50); 
+INSERT INTO debito(nro_trans, descripcion, nro_cliente, nro_ca) 
+VALUES(1005,'Pago servicios',7,1); 
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1006,'2018-10-6','13:30:00',1002); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1006,3); 
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(1006,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1007,'2018-10-7','13:30:00',102); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1007,12); 
+INSERT INTO extraccion(nro_trans, nro_cliente, nro_ca) VALUES(1007,1,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1008,'2018-10-8','13:30:00',502); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1008,13); 
+INSERT INTO transferencia(nro_trans, nro_cliente, origen, destino) VALUES(1008,7,1,3);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1009,'2018-10-9','13:30:00',60.50); 
+INSERT INTO debito(nro_trans, descripcion, nro_cliente, nro_ca) 
+VALUES(1009,'Pago servicios',1,1); 
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1010,'2018-10-10','13:30:00',1003);
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1010,2);  
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(1010,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1011,'2018-10-11','13:30:00',103); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1011,10);  
+INSERT INTO extraccion(nro_trans, nro_cliente, nro_ca) VALUES(1011,1,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1012,'2018-10-12','13:30:00',503); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1012,11);  
+INSERT INTO transferencia(nro_trans, nro_cliente, origen, destino) VALUES(1012,7,1,4);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto)
+VALUES(1013,'2018-10-13','13:30:00',70.50); 
+INSERT INTO debito(nro_trans, descripcion, nro_cliente, nro_ca) 
+VALUES(1013,'Pago servicios',1,1); 
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1014,'2018-10-14','13:30:00',1004); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1014,2);  
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(1014,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1015,'2018-10-15','13:30:00',104); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1015,12);  
+INSERT INTO extraccion(nro_trans, nro_cliente, nro_ca) VALUES(1015,1,1);
+
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(1016,'2018-10-16','13:30:00',504); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(1016,13);  
+INSERT INTO transferencia(nro_trans, nro_cliente, origen, destino) VALUES(1016,7,1,4);
+
+    
+# de la caja de ahorro 2 (un deposito por 2000)
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(2,'2018-9-1','13:30:00',2000);
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(2,1);   
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(2,2);
+
+# de la caja de ahorro 3 (un deposito por 3000)
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(3,'2018-9-1','13:30:00',3000); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(3,1);  
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(3,3);
+
+# de la caja de ahorro 4 (un deposito por 4000)
+INSERT INTO transaccion(nro_trans, fecha, hora, monto) 
+VALUES(4,'2018-9-1','13:30:00',4000); 
+INSERT INTO transaccion_por_caja(nro_trans, cod_caja) VALUES(4,1);  
+INSERT INTO deposito(nro_trans, nro_ca) VALUES(4,4);
+
+
+

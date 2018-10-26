@@ -56,7 +56,7 @@
 	En el campo "hora" figura 01-ene.-1970 y la fecha se visualiza desplazada un 
 	día hacia atrás, mientras que en la BD se almacena bien ya que por consola 
 	los devuelve correctamente. Les adjunto los datos de prueba datos.sql para que
-	puedan probar con los mismos datos de las correcciones. -VER FORMATEO TABLA VentanaConsultas.java
+	puedan probar con los mismos datos de las correcciones. -Deberia estar
 	
 	
 	3) Al consultar movimientos por periodo donde la fecha de inicio sea mayor a la fecha fin. 

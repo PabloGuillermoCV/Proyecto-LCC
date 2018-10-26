@@ -486,7 +486,7 @@ CREATE TABLE Transferencia(
 
 
 delimiter ! # defino ! como delimitador
-CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, OUT nro_trans INT)
+CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT)
 	begin
 
 	end; !
