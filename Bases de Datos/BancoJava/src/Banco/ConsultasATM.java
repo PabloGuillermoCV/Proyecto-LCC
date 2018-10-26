@@ -257,9 +257,16 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		   try {
 			Statement stmt = conexionBD.createStatement();
 			ResultSet R = stmt.executeQuery("call RealizarTransferencia(" + Cod_Caja + ", " + CajaD + ", " + plataT + ")");
+			String res = R.getString(1);
+			JOptionPane.showConfirmDialog(null, null, res, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	    	  JOptionPane.showMessageDialog(this,
+                      "Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
+                      "Error",
+                      JOptionPane.ERROR_MESSAGE);
+				System.out.println("SQLException: " + e.getMessage());
+				System.out.println("SQLState: " + e.getSQLState());
+				System.out.println("VendorError: " + e.getErrorCode());
 		}
 		   
 	   }
