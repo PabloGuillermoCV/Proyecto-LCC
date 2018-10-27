@@ -368,20 +368,17 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 					}
 			  }
 		      try {
-		    	 Statement stmt = this.conexionBD.createStatement();
-		         //Muestro datos de las transacciones del cliente, no toda la info del banco
-		         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE " + Tarj + " = T.nro_tarjeta AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
-		         ResultSet rs = stmt.executeQuery(sql);
-		         this.refrescarTabla (rs);
+			      Statement stmt = this.conexionBD.createStatement();
+			      //Muestro datos de las transacciones del cliente, no toda la info del banco
+			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
+			      ResultSet rs = stmt.executeQuery(sql);
+			      this.refrescarTabla (rs);
 		      }
 		      catch(SQLException e) {
-		    	  JOptionPane.showMessageDialog(this,
-	                      "Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
-	                      "Error",
-	                      JOptionPane.ERROR_MESSAGE);
-					System.out.println("SQLException: " + e.getMessage());
-					System.out.println("SQLState: " + e.getSQLState());
-					System.out.println("VendorError: " + e.getErrorCode());
+		    	  JOptionPane.showMessageDialog(this,"Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+			      System.out.println("SQLException: " + e.getMessage());
+				  System.out.println("SQLState: " + e.getSQLState());
+				  System.out.println("VendorError: " + e.getErrorCode());
 		      }
 	   }
 	   
@@ -395,7 +392,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 				Statement st = this.conexionBD.createStatement();
 				String sql = "SELECT nro_tarjeta, PIN FROM Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" +  Pin + "')";
 				ResultSet R = st.executeQuery(sql);
-				
 				ret = R.next(); //Pregunto si el ResultSet tiene un dato
 				if(!ret) {
 					//Hago pop-ups para decir que fallo

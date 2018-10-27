@@ -79,7 +79,8 @@
 	Con un monto de $2000 y periodo de 18 meses, éste no se almacena en la BD
 	
 	- Al crear un préstamo la aplicación no debe permitir ingresar un monto superior a $20000,
-    que es el máximo monto estipulado en la tabla tasa_prestamo.
+    que es el máximo monto estipulado en la tabla tasa_prestamo. - LISTO
+	
 	- La aplicación no debe permitir ingresar un periodo que no existan en 
     en la tabla tasa_prestamo.
 	

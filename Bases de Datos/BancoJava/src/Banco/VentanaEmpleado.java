@@ -148,14 +148,19 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	private void seleccionarFila() {
-		this.seleccionado = this.tabla.getSelectedRow();
-		//Obtengo los valores en la Tabla por la fila que se selecciono
-		String nroCuota = tabla.getValueAt(seleccionado, 1).toString().trim();
-		String valor = tabla.getValueAt(seleccionado, 2).toString().trim();
-		//hago un pop up para que se confirme, si se confirma, se registra el pago
-		int ok = JOptionPane.showConfirmDialog(null, null,"Desea registrar el pago de la cuota numero " + nroCuota + " con valor " + valor + "?", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
-		if(ok == JOptionPane.OK_OPTION) {
-			registrarPago(nroCuota,valor);
+		try {
+			this.seleccionado = this.tabla.getSelectedRow();
+			//Obtengo los valores en la Tabla por la fila que se selecciono
+			String nroCuota = tabla.getValueAt(seleccionado, 1).toString().trim();
+			String valor = tabla.getValueAt(seleccionado, 2).toString().trim();
+			//hago un pop up para que se confirme, si se confirma, se registra el pago
+			int ok = JOptionPane.showConfirmDialog(null, null,"Desea registrar el pago de la cuota numero " + nroCuota + " con valor " + valor + "?", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+			if(ok == JOptionPane.OK_OPTION) {
+				registrarPago(nroCuota,valor);
+			}
+		}
+		catch(ArrayIndexOutOfBoundsException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -187,29 +192,32 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	//Metodos donde irian las consultas SQL
 	/**
 	 * llena la Tabla con Clientes Morosos
-	 * @param e Action Event del botón, no se usa pa mucho
+	 * @param e Action Event del boton, no se usa pa mucho
 	 */
 	private void verMor(ActionEvent e) {
 		//Necesito los datos del cliente (Nro Cliente, Tipo y Nro de Doc, Apellido y nombre)
 		//Para cada cliente, neceisto los Prestamos en discordia (Nro de Prest, monto, cant_meses y valor cuota
 		//para cada Prestamo, necesito saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
 		try {
+			LocalDateTime now = LocalDateTime.now(); 
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String fechaAInsertar = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();
-			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) FROM Cliente C NATURAL JOIN Prestamo PR NATURAL JOIN Pago PA WHERE PR.nro_prestamo = PA.nro_prestamo AND C.nro_cliente = PR.nro_cliente GROUP BY C.nro_cliente, PR.nro_prestamo HAVING COUNT(PA.nro_pago) >= 2";
-			ResultSet rs = stmt.executeQuery(SQL1);
-			tabla.refresh(rs);
-
-			//para que esta esto de abajo? lo de arriba ^ deberia hacer todo automáticamente
-			//Aunque DBTable no tiene SetAutoCreateRowSorter, ver esto
-	        int I = 0;
-	        while (rs.next()) {
-	            tabla.setValueAt(rs.getInt("nro_cliente"), I, 0);
-	            tabla.setValueAt(rs.getString("tipo_doc"), I, 1);
-	            tabla.setValueAt(rs.getInt("nro_doc"), I, 2);
-	            I++;
-	        }
+			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) AS cant_cuotas_atrasadas FROM (Cliente C JOIN Prestamo PR ON C.nro_cliente = PR.nro_cliente) JOIN Pago PA ON PR.nro_prestamo = PA.nro_prestamo WHERE PA.fecha_pago IS NULL AND PA.fecha_venc < " + fechaAInsertar + " GROUP BY C.nro_cliente, PR.nro_prestamo HAVING COUNT(PA.fecha_pago IS NULL) > 1";
+			ResultSet R = stmt.executeQuery(SQL1);
+			tabla.refresh(R);
 			
-			rs.close();
+			//para que esta esto de abajo? lo de arriba ^ deberia hacer todo automaticamente
+			//Aunque DBTable no tiene SetAutoCreateRowSorter, ver esto
+	        /*int I = 0;
+	        while (R.next()) {
+	            tabla.setValueAt(R.getInt("nro_cliente"), I, 0);
+	            tabla.setValueAt(R.getString("tipo_doc"), I, 1);
+	            tabla.setValueAt(R.getInt("nro_doc"), I, 2);
+	            I++;
+	        }*/
+			
+			R.close();
 	        stmt.close();
 		}
 		catch (SQLException e1) {
@@ -225,27 +233,30 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del botón, no se usa pa mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void verCuotas(ActionEvent e) {
-		nro = Integer.parseInt(Num_doc.getText());
-		tipo = Tipo_Doc.getText();
-		Num_doc.setText("");
-		Tipo_Doc.setText("");
 		try {
+			nro = Integer.parseInt(Num_doc.getText());
+			tipo = Tipo_Doc.getText();
+			Num_doc.setText("");
+			Tipo_Doc.setText("");
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = '" + nro + "' AND PA.fecha_pago is NULL");
 			tabla.refresh(R);
 		}
 		catch(SQLException f) {
 			System.out.println("SQLException: " + f.getMessage());
-	        System.out.println("SQLState: " + f.getSQLState());
-	        System.out.println("VendorError: " + f.getErrorCode());
+		    System.out.println("SQLState: " + f.getSQLState());
+		    System.out.println("VendorError: " + f.getErrorCode());
 			f.printStackTrace();
+		}
+		catch(NumberFormatException ex) {
+			System.out.println(ex.getMessage());
 		}
 	}
 	
 	/**
 	 * Intenta crear un prestamo para un cliente
-	 * @param e ActionEvent del Botón, ne se usa para mucho, hay que agarrar los textos de los JTextField
+	 * @param e ActionEvent del Boton, no se usa para mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void CrearPrest(ActionEvent e) {
 		nro = Integer.parseInt(Num_doc.getText());
@@ -253,11 +264,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		noPrestActual(nro, tipo);
 	}
 
-
 	
 	/**
 	 * Metodo que verifica si el cliente ingresado tiene un Prestamo en vigencia
-	 * Caso contrario, se avanza en la creación de un nuevo prestamo para dicho cliente
+	 * Caso contrario, se avanza en la creacion de un nuevo prestamo para dicho cliente
 	 * @param doc numero de documento del cliente
 	 * @param typeDoc tipo del documento del cliente
 	 */
@@ -274,15 +284,16 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				int m = 0;
 				int p = 0;
 				
-				JTextField Leg = new JTextField();
-		        int okCx2 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese monto a prestar", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				JTextField Leg1 = new JTextField();
+		        int okCx2 = JOptionPane.showConfirmDialog(null,Leg1,"Ingrese monto a prestar", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		        if(okCx2 == JOptionPane.OK_OPTION) {
-		        	m = Integer.parseInt(Leg.getText().trim());
+		        	m = Integer.parseInt(Leg1.getText().trim());
 		        }
 		        
-		        int okCx1 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese periodo en numero de meses", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		        JTextField Leg2 = new JTextField();
+		        int okCx1 = JOptionPane.showConfirmDialog(null,Leg2,"Ingrese periodo en meses", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		        if(okCx1 == JOptionPane.OK_OPTION) {
-		        	p = Integer.parseInt(Leg.getText().trim());
+		        	p = Integer.parseInt(Leg2.getText().trim());
 		        }
 		        
 		        //Pregunto si el periodo de meses que me ingresaron ES ALGUNO DE LOS DISPONIBLES
@@ -292,30 +303,33 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        //NO solo corroboro que el periodo y el monto sean legales, sino que de una obtengo la tasa asociada
 		        //Al nuevo prestamo con los datos dados,que trucazo, no? ;)
 		        //BETWEEN hace comparacion <= / >=, asi que no hay riesgo de que me ingresen un monto lite y la cosa no ande
-		        R = stmt.executeQuery("SELECT tasa FROM Tasa_Prestamo TP WHERE periodo = " + p + " AND " + m + "BETWEEN monto_inf AND monto_sup");
+		        R = stmt.executeQuery("SELECT TP.tasa FROM Tasa_Prestamo TP WHERE TP.periodo = " + p + " AND " + m + " BETWEEN TP.monto_inf AND TP.monto_sup");
 		        
-		        int t = R.getInt(1);
-		        if(t != 0)
+		        if (R.next()) {
+		        	int t = R.getInt(1);
 		        	EjecutarCreacion(m,p,t);
+		        }
 		        else {//Si el ResutSet es vacio, es poque le erraron al monto o al periodo, comunico dicho error
-		        	JOptionPane.showConfirmDialog(null, null, "Ocurrio un error al obtener la Tasa, "
-		        			+ "el Monto o supera los $20000 o el Periodo NO es un Periodo de meses valido",
-		        			JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+		        	JOptionPane.showConfirmDialog(null, "Ocurrio un error al obtener la Tasa, el Monto o supera los $20000 o el Periodo NO es un Periodo de meses valido","Error",JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
 		        }
 				
 			}
 			else {
 				//Muestro un cuadro de error que especifica que el Cliente ya tiene un prestamo
-				JOptionPane.showConfirmDialog(null,null, "No es posible crear un prestamo ya que el cliente ya posee un prestamo a su nombre", 
-							JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showConfirmDialog(null, "No es posible crear un prestamo ya que el cliente ya posee un prestamo a su nombre", "Error", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
 			}
 			stmt.close();
 			R.close();
 			
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
 	        System.out.println("SQLState: " + e.getSQLState());
 	        System.out.println("VendorError: " + e.getErrorCode());
+			e.printStackTrace();
+		}
+		catch (NumberFormatException e) {
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -335,21 +349,23 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			int intC = 0;
 			Interes = (plata + tasa + periodo)/1200;
 			ValCuota = (plata + tasa)/periodo;
-			R = stmt.executeQuery("SELECT C.nro_cliente FROM Cliente C "
-					+ "WHERE C.nro_doc = " + nro 
-					+ " AND C.tipo_doc = '" + tipo + "'");
-			if (R.next()) 
+			String sql = "SELECT C.nro_cliente FROM Cliente C WHERE C.nro_doc = " + nro + " AND C.tipo_doc = '" + tipo + "'";
+			R = stmt.executeQuery(sql);
+			if (R.next()) {
 				intC = R.getInt(1);
+			}
 			LocalDateTime now = LocalDateTime.now(); 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			String fechaAInsertar = now.format(formatter);
-			stmt.executeUpdate("INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) "
-					+ "VALUES (STR_TO_DATE(" + "'" + fechaAInsertar + "'" + ", '%d-%m-%Y'),"
-						+ periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," 
-					+ legajo + "," + intC +")");
+			sql = "INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (STR_TO_DATE('" + fechaAInsertar + "', '%d-%m-%Y')," + periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," + legajo + "," + intC + ")";
+			stmt.executeUpdate(sql);
+			stmt.close();
+			R.close();
 			
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
-			R = stmt.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_cliente =" + intC);
+			sql = "SELECT nro_prestamo FROM prestamo WHERE nro_cliente = " + intC;
+			stmt = this.conexionBD.createStatement();
+			R = stmt.executeQuery(sql);
 			int nro_pre = 0;
 			if (R.next()) {
 				nro_pre = R.getInt(1);
@@ -359,13 +375,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			
 			stmt.close();
 			R.close();
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
 	        System.out.println("SQLState: " + e.getSQLState());
 	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
-		
 	}
 	
 	//Metodo auxiliar para cargar las cuotas
@@ -374,17 +390,18 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		Statement stmt;
 		try {
 			stmt = this.conexionBD.createStatement();
-		 		ResultSet R;
+		 	ResultSet R;
+		 	String sql;
 			int i = 2;
 			//Cargo la primera cuota
-			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES ("
-					+ nro_pre + "," + 1 + ",STR_TO_DATE(" + "'" + fechaD + "'" + ",'%d-%m-%Y')" + ", NULL)");
+			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + 1 + ",STR_TO_DATE(" + "'" + fechaD + "'" + ",'%d-%m-%Y')" + ", NULL)");
 			//Cargo el resto de las cuotas
 			while(i <= periodo) {
-				R = stmt.executeQuery("SELECT DATE_ADD(STR_TO_DATE('"+fechaD+"','%d-%m-%Y'), INTERVAL 1 MONTH);");
+				sql = "SELECT DATE_ADD(STR_TO_DATE('"+fechaD+"','%d-%m-%Y'), INTERVAL 1 MONTH)";
+				R = stmt.executeQuery(sql);
 				//Aca cargo las cuotas una por una
-				stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES ("
-						+ nro_pre + "," + i + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL)"); 
+				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL)";
+				stmt.executeUpdate(sql); 
 				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
 				if (R.next()) {
 					fechaD = R.getString(1);
