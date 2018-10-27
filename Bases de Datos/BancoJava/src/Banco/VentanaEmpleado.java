@@ -199,7 +199,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		//Para cada cliente, neceisto los Prestamos en discordia (Nro de Prest, monto, cant_meses y valor cuota
 		//para cada Prestamo, necesito saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
 		try {
-			LocalDateTime now = LocalDateTime.now(); 
+			LocalDateTime now = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String fechaAInsertar = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();

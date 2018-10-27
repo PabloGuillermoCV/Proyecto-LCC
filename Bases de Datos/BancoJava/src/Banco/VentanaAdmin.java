@@ -222,7 +222,6 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	tabla.setSelectSql(SQL);
 			tabla.refresh();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
     }
@@ -268,6 +267,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void refrescarTabla () {
 	    try {    
 	        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla

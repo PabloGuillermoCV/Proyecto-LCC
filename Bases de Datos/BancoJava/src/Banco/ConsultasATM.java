@@ -100,7 +100,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	               {
 	                  lblNombre = new JLabel();
 	                  pnlCampos.add(lblNombre);
-	                  lblNombre.setText("Fecha Inicio");
+	                  lblNombre.setText("Fecha Inicio (D/M/A)");
 	                  lblNombre.setHorizontalAlignment(SwingConstants.TRAILING);
 	               }
 	               {
@@ -111,7 +111,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	               {
 	                  lblFecha = new JLabel();
 	                  pnlCampos.add(lblFecha);
-	                  lblFecha.setText("Fecha Fin");
+	                  lblFecha.setText("Fecha Fin (D/M/A)");
 	                  lblFecha.setHorizontalAlignment(SwingConstants.TRAILING);
 	               }
 	               {
@@ -327,23 +327,26 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    * @param evt evento del boton asociado, no se usa, honestamente
 	    */
 	   private void btnMovimientosPeriodoActionPerformed(ActionEvent evt) {
-		   if(validarCampos()) {
+		   if (validarCampos()) {
 			   try {
+				   //Pasa la fecha ingresada por pantalla a un formato para que pueda ser comparada con la BD
+				   String Ini = this.txtFechaInicio.getText().trim();
+				   String Fin = this.txtFechaFin.getText().trim();
+				   Date IDate = Fechas.convertirStringADate(Ini);
+				   Date FDate = Fechas.convertirStringADate(Fin);
+				   String I = Fechas.convertirDateAStringDB(IDate);
+				   String F = Fechas.convertirDateAStringDB(FDate);
+				   System.out.println(I);
+				   System.out.println(F);
 				   Statement stmt = this.conexionBD.createStatement();
-			         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino"
-			                      + " FROM trans_cajas_ahorro TCA"
-			                      + " WHERE TCA.fecha >= " + txtFechaInicio.getText().trim() + " AND TCA.fecha <= " + txtFechaFin.getText().trim();
-			         refrescarTabla(sql); //Delego el Refresco en el metodo que lo hace como la gente
-			         stmt.close();
+			       String sql = "SELECT TCA.fecha, TCA.hora, TCA.tipo, TCA.monto, TCA.cod_caja AS codCaja, TCA.destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE TCA.fecha >= '" + I + "' AND TCA.fecha <= '" + F + "' AND T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
+			       refrescarTabla(sql); //Delego el Refresco en el metodo que lo hace como la gente
+			       stmt.close();
 			   }
 			   catch(SQLException ex) {
-				   JOptionPane.showMessageDialog(this,
-	                       "Se produjo un error al mostrar los movimientos.\n" + ex.getMessage(),
-	                       "Error",
-	                       JOptionPane.ERROR_MESSAGE);
+				   JOptionPane.showMessageDialog(this, "Se produjo un error al mostrar los movimientos.\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			   }
-		  }
-			
+		   }
 		}
 	   
 	   /**
@@ -362,6 +365,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 					}
 			  }
 		      try {
+			      @SuppressWarnings("unused")
 			      Statement stmt = this.conexionBD.createStatement();
 			      //Muestro datos de las transacciones del cliente, no toda la info del banco
 			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
@@ -421,8 +425,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    * Metodo que se ejecuta cuando el componente se hace invisible
 	    * @param evt evento que cause la ida del componente
 	    */
-	   private void thisComponentHidden(ComponentEvent evt) 
-	   {
+	   private void thisComponentHidden(ComponentEvent evt) {
 		  //No solo me desconecto, tambien limpio los datos del que ingreso, asi otro usuario puede ingresar
 	      this.desconectarBD();
 	      Tarj = "";
@@ -512,10 +515,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 
 		      if (mensajeError != null)
 		      {
-		         JOptionPane.showMessageDialog(this,
-		                                       mensajeError,
-		                                       "Error",
-		                                       JOptionPane.ERROR_MESSAGE);
+		         JOptionPane.showMessageDialog(this, mensajeError, "Error", JOptionPane.ERROR_MESSAGE);
 		         return false;
 		      }
 		      return true;
@@ -550,12 +550,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		        System.out.println("SQLException: " + ex.getMessage());
 		        System.out.println("SQLState: " + ex.getSQLState());
 		        System.out.println("VendorError: " + ex.getErrorCode());
-		        JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-		                            ex.getMessage() + "\n", 
-		                            "Error al ejecutar la consulta.",
-		                            JOptionPane.ERROR_MESSAGE);
+		        JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),ex.getMessage() + "\n", "Error al ejecutar la consulta.",JOptionPane.ERROR_MESSAGE);
 		    }
-		    
 		    inicializarCampos();
 		}
 }
