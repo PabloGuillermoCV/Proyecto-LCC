@@ -278,11 +278,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   Statement stm = this.conexionBD.createStatement();
 			   //Query para obtener los movimientos, limitamos a los primeros 15 resultados
 			   String sql = "SELECT TCA.fecha, TCA.hora, TCA.monto, TCA.tipo, TCA.cod_caja AS CodigoCaja, TCA.destino FROM trans_cajas_ahorro TCA JOIN Tarjeta T ON TCA.nro_ca = T.nro_ca WHERE T.nro_tarjeta = " + Tarj + " ORDER BY TCA.fecha DESC, TCA.hora DESC LIMIT 15";
-			   stm.execute(sql);
-			   ResultSet R = stm.getResultSet();
-			   refrescarTabla(R); //Delego el refresco de la DBTable en el metodo especifico
-			   stm.close();
-			   R.close(); //Cierro el ResultSet y el Statement
+			   refrescarTabla(sql); //Delego el refresco de la DBTable en el metodo especifico
+			   stm.close(); //Cierro y el Statement
 		   }
 		   catch(SQLException ex) {
 			   JOptionPane.showMessageDialog(this,
@@ -336,11 +333,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			         String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino"
 			                      + " FROM trans_cajas_ahorro TCA"
 			                      + " WHERE TCA.fecha >= " + txtFechaInicio.getText().trim() + " AND TCA.fecha <= " + txtFechaFin.getText().trim();
-			         stmt.execute(sql);
-			         ResultSet R = stmt.getResultSet();
-			         refrescarTabla(R); //Delego el Refresco en el metodo que lo hace como la gente
+			         refrescarTabla(sql); //Delego el Refresco en el metodo que lo hace como la gente
 			         stmt.close();
-			         R.close();
 			   }
 			   catch(SQLException ex) {
 				   JOptionPane.showMessageDialog(this,
@@ -371,10 +365,10 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			      Statement stmt = this.conexionBD.createStatement();
 			      //Muestro datos de las transacciones del cliente, no toda la info del banco
 			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
-			      ResultSet rs = stmt.executeQuery(sql);
-			      this.refrescarTabla (rs);
+			      this.refrescarTabla (sql);
 		      }
 		      catch(SQLException e) {
+		    	  e.printStackTrace();
 		    	  JOptionPane.showMessageDialog(this,"Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 			      System.out.println("SQLException: " + e.getMessage());
 				  System.out.println("SQLState: " + e.getSQLState());
@@ -453,6 +447,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		            conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
 		         }
 		         catch (SQLException ex) {
+		        	 ex.printStackTrace();
 		            JOptionPane.showMessageDialog(this,
 		                                          "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
 		                                          "Error",
@@ -526,10 +521,10 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      return true;
 		   }
 		 
-		private void refrescarTabla(ResultSet R) {
+		private void refrescarTabla(String SQL) {
 		    try {
 		        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-		    	
+		    	tabla.setSelectSql(SQL);
 		    	// obtenemos el modelo de la tabla a partir de la consulta para 
 		    	// modificar la forma en que se muestran de algunas columnas
 		    	tabla.createColumnModelFromQuery();
@@ -544,13 +539,14 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		    		}
 		        }  
 		    	// actualizamos el contenido de la tabla.
-		    	tabla.refresh(R);
+		    	tabla.refresh();
 		    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
 		    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
 		    	// patir de la conexion y la consulta seteadas con connectDatabase()
 		    }
 		    catch (SQLException ex) {
 		        // en caso de error, se muestra la causa en la consola
+		    	ex.printStackTrace();
 		        System.out.println("SQLException: " + ex.getMessage());
 		        System.out.println("SQLState: " + ex.getSQLState());
 		        System.out.println("VendorError: " + ex.getErrorCode());

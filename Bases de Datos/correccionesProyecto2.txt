@@ -22,11 +22,11 @@
 	sobre la caja de ahorro y cliente vinculados a esa tarjeta (no toda la información del banco). -VER SQL
 	
 	Si se loguean con una tarjeta/password inválido, la aplicación me deja acceder igual
-	Esto no debería ser así. LISTO PERO TIRA ERROR EN LA CONSULTA EN ThisComponentShow
+	Esto no debería ser así. LISTO 
 	
 	Les adjunto datos de prueba: datos.sql para que puedan probar las correcciones.
 	Fíjense que si se loguean con el numero de tarjeta=1 y pin= 1111
-	La tarjeta 1 esta asociada a la caja de ahorro 1 y al cliente 1.
+	La tarjeta 1 esta asociada a la caja de ahorro 1 y al cliente 1. LISTO
 	
 	2) Luego, al mostrar los movimientos de los últimos 15 días no me devuelve sólo 7 movimientos
 	mientras que debería devolver las siguientes 15 transacciones:-LISTO
@@ -56,7 +56,7 @@
 	En el campo "hora" figura 01-ene.-1970 y la fecha se visualiza desplazada un 
 	día hacia atrás, mientras que en la BD se almacena bien ya que por consola 
 	los devuelve correctamente. Les adjunto los datos de prueba datos.sql para que
-	puedan probar con los mismos datos de las correcciones. -Deberia estar
+	puedan probar con los mismos datos de las correcciones. -Listo
 	
 	
 	3) Al consultar movimientos por periodo donde la fecha de inicio sea mayor a la fecha fin. 

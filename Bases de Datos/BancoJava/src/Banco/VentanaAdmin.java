@@ -217,7 +217,14 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	}
 
 	private void btnEjecutarActionPerformed (ActionEvent evt) {
-	    this.refrescarTabla();      
+	    try {
+	    	String SQL = txtConsulta.getText().trim();
+	    	tabla.setSelectSql(SQL);
+			tabla.refresh();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
     }
 	
 	private void conectarBD () {
@@ -288,6 +295,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	// patir de la conexion y la consulta seteadas con connectDatabase()
 	    }
 	    catch (SQLException ex) {
+	    	ex.printStackTrace();
 	        // en caso de error, se muestra la causa en la consola
 	        System.out.println("SQLException: " + ex.getMessage());
 	        System.out.println("SQLState: " + ex.getSQLState());
