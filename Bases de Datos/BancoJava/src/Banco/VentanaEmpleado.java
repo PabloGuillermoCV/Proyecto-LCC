@@ -203,7 +203,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String fechaAInsertar = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();
-			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) AS cant_cuotas_atrasadas FROM (Cliente C JOIN Prestamo PR ON C.nro_cliente = PR.nro_cliente) JOIN Pago PA ON PR.nro_prestamo = PA.nro_prestamo WHERE PA.fecha_pago IS NULL AND PA.fecha_venc < " + fechaAInsertar + " GROUP BY C.nro_cliente, PR.nro_prestamo HAVING COUNT(PA.fecha_pago IS NULL) > 1";
+			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) AS cant_cuotas_atrasadas"
+					+ " FROM (Cliente C JOIN Prestamo PR ON C.nro_cliente = PR.nro_cliente) "
+					+ "JOIN Pago PA ON PR.nro_prestamo = PA.nro_prestamo WHERE PA.fecha_pago IS NULL "
+					+ "AND PA.fecha_venc < " + fechaAInsertar + " GROUP BY C.nro_cliente, PR.nro_prestamo "
+							+ "HAVING COUNT(PA.fecha_pago IS NULL) > 1";
 			ResultSet R = stmt.executeQuery(SQL1);
 			tabla.refresh(R);
 			
