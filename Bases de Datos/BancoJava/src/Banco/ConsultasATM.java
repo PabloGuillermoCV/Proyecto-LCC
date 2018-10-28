@@ -372,8 +372,9 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 					}
 					if (Salir == true) {
 						ok = false; //Evito un ciclo infinito de pop-ups
-						thisComponentHidden(evt);
-						this.dispose();
+						//Si hago la componente invisible, deebria ser capaz de seguir trabajando
+						//ademas, al hacer eso deberia de ejecutarse ThisCOmponentHidden solo, lo cual desconecta todo
+						this.setVisible(false); 
 					}
 			  }
 		      try {

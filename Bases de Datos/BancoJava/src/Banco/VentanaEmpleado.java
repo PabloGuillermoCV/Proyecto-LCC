@@ -451,8 +451,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				}
 				if (Salir == true) {
 					Verif = true; //Esto es para evitar quedar trabado en un ciclo infinito de Logins
-					thisComponentHidden(evt);
-					this.dispose(); //En vez de cerrar toda la aplicación, solo cierro este frame
+					this.setVisible(false);
 				}
 			}
 		}

@@ -156,7 +156,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	               }
 	            }
 	         }
-	         this.setSize(154, 279);
+	         this.setSize(1000, 1000);
 	         pack();
 	      } catch (Exception e) {
 	         e.printStackTrace();
@@ -170,7 +170,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private void mniAdminActionPerformed (ActionEvent evt) {
 	    try {
 	        this.ventanaAdmin.setMaximum (true);
-	        //al abrir, pido el password de admin para poder hacer el script de conexion (?)
 	    }
 	    catch (PropertyVetoException e) {}
 	    this.ventanaAdmin.setVisible (true);      
