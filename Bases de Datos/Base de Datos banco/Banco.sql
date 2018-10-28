@@ -482,19 +482,103 @@ CREATE TABLE Transferencia(
 #Cosas a Chequear
 #Las Cajas de ahorro Existen
 #El Monto no supera al saldo de la Caja Origen
-#Se me ocurre usar un OUT nro_trans, pero podria ser medio al pedo, hay que verlo
 
 
 delimiter ! # defino ! como delimitador
 CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT)
-	begin
+	BEGIN
+		 # Declaro una variable local saldo_actual	
+	 DECLARE saldo_actual_cuentaA DECIMAL(7,2);
+     
+     # Declaro variables locales para recuperar los errores 
+	 DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
+	 DECLARE codigo_MYSQL INT DEFAULT 0;
+	 DECLARE mensaje_error TEXT;
+	 DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
+	  BEGIN #En caso de una excepción SQLEXCEPTION retrocede la transacción y
+         	# devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
+			# el código de error SQL  (SQLSTATE) y el mensaje de error  	  
+	    # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6, 
+		GET DIAGNOSTICS CONDITION 1  codigo_MYSQL= MYSQL_ERRNO,  
+		                             codigo_SQL= RETURNED_SQLSTATE, 
+									 mensaje_error= MESSAGE_TEXT;
+	    SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, 
+		        codigo_MySQL, codigo_SQL,  mensaje_error;		
+        ROLLBACK;
+	  END;		      
+         
+         #Verificar los SELECT, hay que ver que datos se estan consiguiendo
+	 START TRANSACTION;	# Comienza la transacción  
+	   IF EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_Caja0) AND
+          EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_CajaD)
+	   THEN  # verifico que existan ambas cuentas
+	      SELECT saldo INTO saldo_actual_cuentaA 
+	      FROM cuentas  WHERE numero=cuentaA FOR UPDATE;
+          # Recupero el saldo de la cuentaA en la variable saldo_actual_cuentaA.
+          # Al utilizar FOR UPDATE se indica que los datos involucrados en la
+          # consulta van a ser actualizados luego.
+          # De esta forma se obtiene un write_lock sobre estos datos, que se      
+          # mantiene hasta que la trans. comete. Esto garantiza que nadie pueda
+          # leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
+      
+	      IF saldo_actual_cuentaA >= MonT THEN 	  
+	       # si el saldo actual de la cuentaA es suficiente para realizar 
+           # la transferencia, entonces actualizo el saldo de ambas cuentas 
+	         UPDATE cuentas SET saldo = saldo - MonT  WHERE numero=Cod_Caja0;
+	         UPDATE cuentas SET saldo = saldo + MonT  WHERE numero=Cod_CajaD;
+             SELECT 'La transferencia se realizo con exito' AS resultado;               
+	      ELSE  
+            SELECT 'Saldo insuficiente para realizar la transferencia' 
+		        AS resultado;
+	      END IF;  
+	   ELSE  
+            SELECT 'ERROR: Cuenta inexistente' 
+		        AS resultado;  
+	   END IF;  	 		
+		
+	 COMMIT;   # Comete la transacción  
+	END; !
 
-	end; !
+CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
+	BEGIN
+	DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
 
-CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT, OUT nro_trans INT)
-	begin
+	DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
+	 DECLARE codigo_MYSQL INT DEFAULT 0;
+	 DECLARE mensaje_error TEXT;
+	 DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
+	  BEGIN #En caso de una excepción SQLEXCEPTION retrocede la transacción y
+         	# devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
+			# el código de error SQL  (SQLSTATE) y el mensaje de error  	  
+	    # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6, 
+		GET DIAGNOSTICS CONDITION 1  codigo_MYSQL= MYSQL_ERRNO,  
+		                             codigo_SQL= RETURNED_SQLSTATE, 
+									 mensaje_error= MESSAGE_TEXT;
+	    SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, 
+		        codigo_MySQL, codigo_SQL,  mensaje_error;		
+        ROLLBACK;
+	  END;		      
+     
 
-	end; !
+	START TRANSACTION;
+		IF EXISTS(SELECT * FROM Tarjeta NATURAL JOIN trans_cajas_ahorro WHERE nro_ca = Cod_Caja)
+			SELECT saldo INTO Saldo_Actual 
+	      		FROM cuentas  WHERE nro_ca = Cod_Caja FOR UPDATE;
+	      IF Saldo_Actual >= MonT THEN 	  
+	       # si el saldo actual de la cuenta es suficiente para realizar 
+           # la extracción, entonces actualizo el saldo
+	        UPDATE cuentas SET saldo = saldo - monto  WHERE numero=Cod_Caja;
+	      	SELECT 'La Extracción se realizo con exito' AS resultado;               
+	      ELSE  
+            SELECT 'Saldo insuficiente para realizar la transferencia' 
+		        AS resultado;
+	      END IF;  
+	   ELSE  
+            SELECT 'ERROR: Cuenta inexistente' 
+		        AS resultado;  
+	   END IF; 
+	COMMIT;
+	END; !
 
 CREATE TRIGGER CargoCuotas
 AFTER UPDATE ON Prestamo
