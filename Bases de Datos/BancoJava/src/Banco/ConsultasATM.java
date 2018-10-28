@@ -146,7 +146,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	               {
 	                  btnUltimosMovimientos = new JButton();
 	                  pnlBotones.add(btnUltimosMovimientos);
-	                  btnUltimosMovimientos.setText("Mostrar Ultimos Movimientos (ultimos 15 dias)");
+	                  btnUltimosMovimientos.setText("Mostrar Ultimos Movimientos");
 	                  btnUltimosMovimientos.addActionListener(new ActionListener() {
 	                     public void actionPerformed(ActionEvent evt) {
 	                        btnUltimosMoviminetosActionPerformed(evt);
@@ -355,21 +355,36 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    */
 	   private void thisComponentShown(ComponentEvent evt) {
 		      boolean Verif = false;
+		      boolean ok = true;
 			  this.conectarBD ();
-		      while(!Verif) {
+		      while(!Verif & ok) {
 					login(); //Obtengo los datos del empleado
-					Verif = VerificarLogin();
+					//Encontre un bug que cuando se intenta entrar con alguno de los campos del login vacios, la app explota
+					//Asi que añado un chequeo adicional para capturar este tipo de errores
+					if(!(Tarj.equals("") | Pin.equals("")))
+						Verif = VerificarLogin();
+					else {
+						int canc = JOptionPane.showConfirmDialog(null, "Alguno de los campos del login eran vacios,"
+								+ "	por favor, ingrese los datos nuevamente","Error" , JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+						//Como es posible trabar al usuario en un loop infinito por más que cancele
+						if(canc == JOptionPane.NO_OPTION)
+							Salir = true;
+					}
 					if (Salir == true) {
+						ok = false; //Evito un ciclo infinito de pop-ups
 						thisComponentHidden(evt);
-						System.exit(0);
+						this.dispose();
 					}
 			  }
 		      try {
-			      @SuppressWarnings("unused")
-			      Statement stmt = this.conexionBD.createStatement();
-			      //Muestro datos de las transacciones del cliente, no toda la info del banco
-			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
-			      this.refrescarTabla (sql);
+		    	  if(ok) { //Aquí tengo que verificar si realmente entré bien al romper forzadamaente el ciclo while
+				      @SuppressWarnings("unused")
+				      Statement stmt = this.conexionBD.createStatement();
+				      //Muestro datos de las transacciones del cliente, no toda la info del banco
+				      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino "
+				      		+ "FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
+				      this.refrescarTabla (sql);
+		    	  }
 		      }
 		      catch(SQLException e) {
 		    	  e.printStackTrace();

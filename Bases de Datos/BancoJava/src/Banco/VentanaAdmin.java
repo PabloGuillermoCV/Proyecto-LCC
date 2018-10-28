@@ -193,6 +193,17 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 			e.printStackTrace();
 		}
 	}
+
+	private void btnEjecutarActionPerformed (ActionEvent evt) {
+	    try {
+	    	String SQL = txtConsulta.getText().trim();
+	    	tabla.setSelectSql(SQL);
+			tabla.refresh();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+    }
+	
 	
 	private void thisComponentShown (ComponentEvent evt) {
 		//Para manejar Logins, hago lo siguiente:
@@ -216,16 +227,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    clave = "";
 	}
 
-	private void btnEjecutarActionPerformed (ActionEvent evt) {
-	    try {
-	    	String SQL = txtConsulta.getText().trim();
-	    	tabla.setSelectSql(SQL);
-			tabla.refresh();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} 
-    }
-	
+
 	private void conectarBD () {
 		if (conexionBD == null) {
 			try {

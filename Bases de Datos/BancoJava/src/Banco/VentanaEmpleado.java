@@ -309,8 +309,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        //Corrobore este Query en SQL y anda 
 		        //NO solo corroboro que el periodo y el monto sean legales, sino que de una obtengo la tasa asociada
 		        //Al nuevo prestamo con los datos dados,que trucazo, no? ;)
-		        //BETWEEN hace comparacion <= / >=, asi que no hay riesgo de que me ingresen un monto lite y la cosa no ande
-		        R = stmt.executeQuery("SELECT TP.tasa FROM Tasa_Prestamo TP WHERE TP.periodo = " + p + " AND " + m + " BETWEEN TP.monto_inf AND TP.monto_sup");
+		        //BETWEEN hace comparacion <= / >=, asi que no hay riesgo de que me ingresen un monto limite y la cosa no ande
+		        R = stmt.executeQuery("SELECT TP.tasa "
+		        		+ "FROM Tasa_Prestamo TP "
+		        		+ "WHERE TP.periodo = " + p + " AND " + m + " BETWEEN TP.monto_inf AND TP.monto_sup");
 		        
 		        if (R.next()) {
 		        	int t = R.getInt(1);
@@ -394,7 +396,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	//Metodo auxiliar para cargar las cuotas
-	//DEBE BORRARSE UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!
+	//DEBE  UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!
 	private void cargarCuotas(int c, String fechaD, int nro_pre, int periodo) {
 		Statement stmt;
 		try {
@@ -436,10 +438,21 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			this.conectarBD(); //Conecto a la Vista
 			while(!Verif) {
 				login(); //Obtengo los datos del empleado
-				Verif = VerificarLogin();
+				//Encontre un bug que cuando se intenta entrar con alguno de los campos del login vacios, la app explota
+				//Asi que añado un chequeo adicional para capturar este tipo de errores
+				if(!(legajo.equals("") | clave.equals("")))
+					Verif = VerificarLogin();
+				else {
+					int canc = JOptionPane.showConfirmDialog(null, "Alguno de los campos del login eran vacios,"
+							+ "	por favor, ingrese los datos nuevamente","Error" , JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+					//Como es posible trabar al usuario en un loop infinito por más que cancele
+					if(canc == JOptionPane.NO_OPTION)
+						Salir = true;
+				}
 				if (Salir == true) {
+					Verif = true; //Esto es para evitar quedar trabado en un ciclo infinito de Logins
 					thisComponentHidden(evt);
-					System.exit(0);
+					this.dispose(); //En vez de cerrar toda la aplicación, solo cierro este frame
 				}
 			}
 		}

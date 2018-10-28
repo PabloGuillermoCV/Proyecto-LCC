@@ -113,7 +113,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	               {
 	                  mniEmpleado = new JMenuItem();
 	                  mnuEjemplos.add(mniEmpleado);
-	                  mniEmpleado.setText("Busqueda para Empleados (Utilizando JTable)");
+	                  mniEmpleado.setText("Busqueda para Empleados");
 	                  mniEmpleado.addActionListener(new ActionListener() {
 	                     public void actionPerformed(ActionEvent evt) {
 	                        mniEmpleadoActionPerformed(evt);
@@ -123,7 +123,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	               {
 	                  mniATM = new JMenuItem();
 	                  mnuEjemplos.add(mniATM);
-	                  mniATM.setText("Busqueda para ATM (Utilizando DBTable)");
+	                  mniATM.setText("Busqueda para ATM");
 	                  mniATM.addActionListener(new ActionListener() {
 	                     public void actionPerformed(ActionEvent evt) {
 	                        mniATMActionPerformed(evt);
@@ -133,7 +133,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	               {
 	                  mniAdmin = new JMenuItem();
 	                  mnuEjemplos.add(mniAdmin);
-	                  mniAdmin.setText("Busqueda para Admin (Utilizando DBTable)");
+	                  mniAdmin.setText("Busqueda para Admin");
 	                  mniAdmin.addActionListener(new ActionListener() {
 	                     public void actionPerformed(ActionEvent evt) {
 	                        mniAdminActionPerformed(evt);
