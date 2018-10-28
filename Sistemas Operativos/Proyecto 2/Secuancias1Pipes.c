@@ -56,35 +56,35 @@ int main () {
     	fprintf (stderr,"Error al crear el Proceso Hijo A");
     }
     else {
-    	if (pid != 0) {
+    	if (pid == 0) {
         	pid = fork ();
 			if (pid == -1) {
 				fprintf (stderr,"Error al crear el Proceso Hijo B");
 			}
 			else {
-				if (pid == 0) A ();
-				if (pid != 0) {
+				if (pid != 0) A ();
+				if (pid == 0) {
 					pid = fork ();
 					if (pid == -1) {
 						fprintf (stderr,"Error al crear el Proceso Hijo C");
 					}
 					else {
-						if (pid == 0) B ();
-						if (pid != 0) {
+						if (pid != 0) B ();
+						if (pid == 0) {
 							pid = fork ();
 							if (pid == -1) {
 								fprintf (stderr,"Error al crear el Proceso Hijo D");
 							}
 							else {
-								if (pid == 0) C ();
-								if (pid != 0) {
+								if (pid != 0) C ();
+								if (pid == 0) {
 									pid = fork ();
 									if (pid == -1) {
 										fprintf (stderr,"Error al crear el Proceso Hijo E");
 									}
 									else {
-										if (pid == 0) D ();
-										if (pid != 0) {
+										if (pid != 0) D ();
+										if (pid == 0) {
 											E ();
 										}
 									}
@@ -98,7 +98,7 @@ int main () {
     	}
     }
 
-	if (pid == 0){
+	if (pid != 0){
     	wait(NULL);
 	}
 	
