@@ -19,7 +19,7 @@
 
 - Usuario ATM: 
 	1) Cuando se loguean en un ATM con una tarjeta, deberían mostrar solamente la información 
-	sobre la caja de ahorro y cliente vinculados a esa tarjeta (no toda la información del banco). -VER SQL
+	sobre la caja de ahorro y cliente vinculados a esa tarjeta (no toda la información del banco). -LISTO
 	
 	Si se loguean con una tarjeta/password inválido, la aplicación me deja acceder igual
 	Esto no debería ser así. LISTO 
@@ -89,7 +89,7 @@
 	Puedo apretar varias veces el botón "registrar Pago" y se ve un cartel de pago de la cuota
 	pero no se almacena en la BD.
 
-	- Al listar los clientes morosos que deban 2 o más cuotas se deberia mostrar: -PROBAR
+	- Al listar los clientes morosos que deban 2 o más cuotas se deberia mostrar: -LISTO
 
 	+-------------+----------+---------+-------------+---------------+--------------+----------+------------+-------------+-----------------------+
 	| nro_cliente | tipo_doc | nro_doc | nombre      | apellido      | nro_prestamo | monto    | cant_meses | valor_cuota | cant_cuotas_atrasadas |

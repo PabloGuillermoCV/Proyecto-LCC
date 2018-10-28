@@ -203,23 +203,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String fechaAInsertar = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();
-			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) AS cant_cuotas_atrasadas"
-					+ " FROM (Cliente C JOIN Prestamo PR ON C.nro_cliente = PR.nro_cliente) "
-					+ "JOIN Pago PA ON PR.nro_prestamo = PA.nro_prestamo WHERE PA.fecha_pago IS NULL "
-					+ "AND PA.fecha_venc < " + fechaAInsertar + " GROUP BY C.nro_cliente, PR.nro_prestamo "
-							+ "HAVING COUNT(PA.fecha_pago IS NULL) > 1";
+			String SQL1 = "SELECT C.nro_cliente, C.tipo_doc , C.nro_doc, C.apellido, C.nombre, PR.nro_prestamo, PR.monto, PR.cant_meses, PR.valor_cuota, COUNT(PA.nro_pago) AS cant_cuotas_atrasadas FROM (Cliente C JOIN Prestamo PR ON C.nro_cliente = PR.nro_cliente) JOIN Pago PA ON PR.nro_prestamo = PA.nro_prestamo WHERE PA.fecha_pago IS NULL AND PA.fecha_venc < '" + fechaAInsertar + "' GROUP BY C.nro_cliente, PR.nro_prestamo HAVING COUNT(PA.fecha_pago IS NULL) > 1";
 			ResultSet R = stmt.executeQuery(SQL1);
 			tabla.refresh(R);
-			
-			//para que esta esto de abajo? lo de arriba ^ deberia hacer todo automaticamente
-			//Aunque DBTable no tiene SetAutoCreateRowSorter, ver esto
-	        /*int I = 0;
-	        while (R.next()) {
-	            tabla.setValueAt(R.getInt("nro_cliente"), I, 0);
-	            tabla.setValueAt(R.getString("tipo_doc"), I, 1);
-	            tabla.setValueAt(R.getInt("nro_doc"), I, 2);
-	            I++;
-	        }*/
 			
 			R.close();
 	        stmt.close();
@@ -246,6 +232,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			ResultSet R;
 			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = '" + nro + "' AND PA.fecha_pago is NULL");
 			tabla.refresh(R);
+			stmt.close();
+			R.close();
 		}
 		catch(SQLException f) {
 			System.out.println("SQLException: " + f.getMessage());
@@ -254,7 +242,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			f.printStackTrace();
 		}
 		catch(NumberFormatException ex) {
-			System.out.println(ex.getMessage());
+			JOptionPane.showMessageDialog(this, "Numero o Tipo de documento es vacio", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -263,9 +251,14 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e ActionEvent del Boton, no se usa para mucho, hay que agarrar los textos de los JTextField
 	 */
 	private void CrearPrest(ActionEvent e) {
-		nro = Integer.parseInt(Num_doc.getText());
-		tipo = Tipo_Doc.getText();
-		noPrestActual(nro, tipo);
+		try {
+			nro = Integer.parseInt(Num_doc.getText());
+			tipo = Tipo_Doc.getText();
+			noPrestActual(nro, tipo);
+		}
+		catch(NumberFormatException ex) {
+			JOptionPane.showMessageDialog(this, "Numero o Tipo de documento es vacio", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	
