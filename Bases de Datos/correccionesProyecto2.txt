@@ -76,18 +76,18 @@
 	La aplicación no muestra nada. -listo
 	
 	- Al crear un préstamo para el cliente 5 con DNI= 5(no tiene prestamos vigentes).
-	Con un monto de $2000 y periodo de 18 meses, éste no se almacena en la BD
+	Con un monto de $2000 y periodo de 18 meses, éste no se almacena en la BD -LISTO??
 	
 	- Al crear un préstamo la aplicación no debe permitir ingresar un monto superior a $20000,
     que es el máximo monto estipulado en la tabla tasa_prestamo. - LISTO
 	
 	- La aplicación no debe permitir ingresar un periodo que no existan en 
-    en la tabla tasa_prestamo.
+    en la tabla tasa_prestamo. -LISTO
 	
 	- Al pagar una cuota, debería reflejarse en la tabla que se pagó, o mostrar algún cartel de 
-	éxito u error. 
+	éxito u error. -LISTO
 	Puedo apretar varias veces el botón "registrar Pago" y se ve un cartel de pago de la cuota
-	pero no se almacena en la BD.
+	pero no se almacena en la BD. -LISTO
 
 	- Al listar los clientes morosos que deban 2 o más cuotas se deberia mostrar: -LISTO
 

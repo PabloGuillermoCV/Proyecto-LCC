@@ -150,36 +150,46 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void seleccionarFila() {
 		try {
 			this.seleccionado = this.tabla.getSelectedRow();
-			//Obtengo los valores en la Tabla por la fila que se selecciono
-			String nroCuota = tabla.getValueAt(seleccionado, 1).toString().trim();
-			String valor = tabla.getValueAt(seleccionado, 2).toString().trim();
-			//hago un pop up para que se confirme, si se confirma, se registra el pago
-			int ok = JOptionPane.showConfirmDialog(null, null,"Desea registrar el pago de la cuota numero " + nroCuota + " con valor " + valor + "?", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
-			if(ok == JOptionPane.OK_OPTION) {
-				registrarPago(nroCuota,valor);
+			if (tabla.getRowCount()>0) {
+				//Obtengo los valores en la Tabla por la fila que se selecciono
+				String nroCuota = tabla.getValueAt(seleccionado, 0).toString().trim();
+				String valor = tabla.getValueAt(seleccionado, 1).toString().trim();
+				//hago un pop up para que se confirme, si se confirma, se registra el pago
+				int ok = JOptionPane.showConfirmDialog(null, "Desea registrar el pago de la cuota numero " + nroCuota + " con valor " + valor + "?","Aviso", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+				if(ok == JOptionPane.OK_OPTION) {
+					registrarPago(nroCuota,valor);
+				}
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "No quedan mas cuotas por pagar.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		catch(ArrayIndexOutOfBoundsException e) {
 			System.out.println(e.getMessage());
+		}
+		catch(NullPointerException e) {
+			JOptionPane.showMessageDialog(this, "No quedan mas cuotas por pagar.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
 	private void registrarPago(String nroC, String money) {
 		try {
 			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String d = now.format(formatter);
 			Statement stmt = this.conexionBD.createStatement();
-			//Hago un UPDATE Query, revisar si esta bien
-			stmt.executeUpdate("UPDATE Pago SET fecha_pago = STR_TO_DATE(" + d + ", '%d-%m-%Y')" + 
-						" WHERE Pago.nro_pago = " + nroC);
+			//Hago un UPDATE Query
+			stmt.executeUpdate("UPDATE Pago P SET P.fecha_pago = '" + d + "' WHERE P.nro_pago = " + nroC);
 			//Si devuelve un ResultSet la cosa me devuelve -1
 			if(stmt.getUpdateCount() != -1) {
 				//El Update tuvo exito
-				JOptionPane.showConfirmDialog(null, "Se ha registrado el Pago de la Cuota con exito");
+				Object[] Opcion = {"OK"};
+				JOptionPane.showOptionDialog(null, "Se ha registrado el Pago de la Cuota con exito","Exito",JOptionPane.PLAIN_MESSAGE,JOptionPane.QUESTION_MESSAGE,null,Opcion,Opcion[0]);
 				//Refresco la tabla para que se note que se pago la cuota
-				ResultSet r = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
-				tabla.refresh(r);
+				ResultSet R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
+				tabla.refresh(R);
+				stmt.close();
+				R.close();
 			}
 		} catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
@@ -338,8 +348,10 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private void EjecutarCreacion(int plata, int periodo, int tasa) {
 		int i = 2;
 		try {
-			Statement stmt = this.conexionBD.createStatement();
-			ResultSet R;
+			Statement stmt1 = this.conexionBD.createStatement();
+			Statement stmt2 = this.conexionBD.createStatement();
+			ResultSet R1;
+			ResultSet R2;
 			//cargo el Prestamo
 			int Interes;
 			int ValCuota;
@@ -347,31 +359,31 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Interes = (plata + tasa + periodo)/1200;
 			ValCuota = (plata + tasa)/periodo;
 			String sql = "SELECT C.nro_cliente FROM Cliente C WHERE C.nro_doc = " + nro + " AND C.tipo_doc = '" + tipo + "'";
-			R = stmt.executeQuery(sql);
-			if (R.next()) {
-				intC = R.getInt(1);
+			R1 = stmt1.executeQuery(sql);
+			if (R1.next()) {
+				intC = R1.getInt(1);
 			}
 			LocalDateTime now = LocalDateTime.now(); 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String fechaAInsertar = now.format(formatter);
-			sql = "INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (STR_TO_DATE('" + fechaAInsertar + "', '%d-%m-%Y')," + periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," + legajo + "," + intC + ")";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			R.close();
+			sql = "INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES ('" + fechaAInsertar + "'," + periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," + legajo + "," + intC + ")";
+			stmt1.executeUpdate(sql);
+			stmt1.close();
+			R1.close();
 			
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
-			sql = "SELECT nro_prestamo FROM prestamo WHERE nro_cliente = " + intC;
-			stmt = this.conexionBD.createStatement();
-			R = stmt.executeQuery(sql);
+			sql = "SELECT P.nro_prestamo FROM prestamo P WHERE P.nro_cliente = " + intC;
+			stmt2 = this.conexionBD.createStatement();
+			R2 = stmt2.executeQuery(sql);
 			int nro_pre = 0;
-			if (R.next()) {
-				nro_pre = R.getInt(1);
+			if (R2.next()) {
+				nro_pre = R2.getInt(1);
 			}
 			//ESTE METODO DEBE BORRARSE UNA VEZ QUE SE CORROBORE QUE EL TRIGGER DE CUOTAS FUNCIONA!!!!!!!
 			cargarCuotas(intC,fechaAInsertar,nro_pre,periodo);
 			
-			stmt.close();
-			R.close();
+			stmt2.close();
+			R2.close();
 		} 
 		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
@@ -387,23 +399,25 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		Statement stmt;
 		try {
 			stmt = this.conexionBD.createStatement();
-		 	ResultSet R;
 		 	String sql;
 			int i = 2;
 			//Cargo la primera cuota
-			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + 1 + ",STR_TO_DATE(" + "'" + fechaD + "'" + ",'%d-%m-%Y')" + ", NULL)");
+			stmt.executeUpdate("INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + 1 + ",'" + fechaD + "', NULL)");
 			//Cargo el resto de las cuotas
-			while(i <= periodo) {
-				sql = "SELECT DATE_ADD(STR_TO_DATE('"+fechaD+"','%d-%m-%Y'), INTERVAL 1 MONTH)";
+			while (i <= periodo) {
+				ResultSet R;
+				sql = "SELECT DATE_ADD('" + fechaD + "', INTERVAL 1 MONTH)";
 				R = stmt.executeQuery(sql);
 				//Aca cargo las cuotas una por una
-				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",STR_TO_DATE('" + fechaD + "','%d-%m-%Y')" + ", NULL)";
+				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",'" + fechaD + "', NULL)";
 				stmt.executeUpdate(sql); 
 				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
 				if (R.next()) {
 					fechaD = R.getString(1);
 				}
+				R.close();
 			}
+			stmt.close();
 		}
 		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
@@ -411,7 +425,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
-
 	}
 
 	   /**
