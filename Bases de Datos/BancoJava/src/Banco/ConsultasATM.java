@@ -465,7 +465,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		        	String driver ="com.mysql.cj.jdbc.Driver";
 		            String usuario = "atm";
 		            String password = "atm";
-		            String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
+		            String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=America/Argentina/Buenos_Aires&useSSL=false&allowPublicKeyRetrieval=true";
 		            tabla.connectDatabase (driver, urlConexion, usuario, password);
 		            conexionBD = DriverManager.getConnection (urlConexion, usuario, password);
 		         }
