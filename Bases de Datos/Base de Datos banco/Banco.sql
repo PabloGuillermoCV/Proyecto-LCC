@@ -490,7 +490,7 @@ delimiter ! # defino ! como delimitador
 CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT)
 	BEGIN
 		 # Declaro una variable local saldo_actual	
-	 DECLARE saldo_actual_cuentaA DECIMAL(7,2);
+	 DECLARE saldo_actual DECIMAL(7,2);
      
      # Declaro variables locales para recuperar los errores 
 	 DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
@@ -514,8 +514,8 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	   IF EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_Caja0) AND
           EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_CajaD)
 	   THEN  # verifico que existan ambas cuentas
-			SELECT saldo INTO Saldo_Actual 
-	      		FROM cuentas  WHERE nro_ca = Cod_Caja ORDER BY fecha DESC, hora DESC LIMIT 1 FOR UPDATE;
+			SELECT saldo INTO Saldo_actual 
+	      		FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
           # Recupero el saldo de la cuenta Origen en Saldo_Actual.
           # Al utilizar FOR UPDATE se indica que los datos involucrados en la
           # consulta van a ser actualizados luego.
@@ -523,15 +523,21 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
           # mantiene hasta que la trans. comete. Esto garantiza que nadie pueda
           # leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
       
-	      IF saldo_actual_cuentaA >= MonT THEN 	  
+	      IF Saldo_actual >= MonT THEN 	  
 	       # si el saldo actual de la cuentaA es suficiente para realizar 
            # la transferencia, entonces actualizo el saldo de ambas cuentas 
-	         UPDATE trans_cajas_ahorro SET saldo = saldo - MonT  WHERE numero=Cod_Caja0;
-	         UPDATE trans_cajas_ahorro SET saldo = saldo + MonT  WHERE numero=Cod_CajaD;
+	         UPDATE Caja_Ahorro SET saldo = saldo - MonT  WHERE numero=Cod_Caja0;
+	         UPDATE Caja_Ahorro SET saldo = saldo + MonT  WHERE numero=Cod_CajaD;
 	         #Hecha la transferencia, tengo que reflejar que el cambio se hizo en la BD
-	         SELECT saldo INTO saldo_actual_cuentaA FROM  trans_cajas_ahorro WHERE numero = Cod_Caja0 AND ;
+	          
 	         	#Inserto la transferencia hecha en la caja Origen
-	         	INSERT INTO trans_cajas_ahorro
+	         	INSERT INTO transacción VALUES
+	         	INSERT INTO	Transaccion_por_caja VALUES
+	         	INSERT INTO transferencia VALUES
+	         	#Inserto el depósito en la caja destino
+	         	INSERT INTO transacción VALUES
+	         	INSERT INTO	Transaccion_por_caja VALUES
+	         	INSERT INTO deposito VALUES
              SELECT 'La transferencia se realizo con exito' AS resultado;               
 	      ELSE  
             SELECT 'Saldo insuficiente para realizar la transferencia' 
@@ -569,11 +575,16 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 	START TRANSACTION;
 		IF EXISTS(SELECT * FROM Tarjeta NATURAL JOIN trans_cajas_ahorro WHERE nro_ca = Cod_Caja)
 			SELECT saldo INTO Saldo_Actual 
-	      		FROM cuentas  WHERE nro_ca = Cod_Caja ORDER BY fecha DESC, hora DESC LIMIT 1 FOR UPDATE;
+	      		FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
 	      IF Saldo_Actual >= MonT THEN 	 
 	       # si el saldo actual de la cuenta es suficiente para realizar 
            # la extracción, entonces actualizo el saldo
 	        UPDATE cuentas SET saldo = saldo - monto  WHERE numero=Cod_Caja;
+
+	       #Hay que cargar la transacción hecha
+				INSERT INTO transacción VALUES
+	         	INSERT INTO	Transaccion_por_caja VALUES
+	         	INSERT INTO extraccion VALUES
 	      	SELECT 'La Extracción se realizo con exito' AS resultado;               
 	      ELSE  
             SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado;
@@ -585,7 +596,7 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 	END; !
 
 CREATE TRIGGER CargoCuotas
-AFTER UPDATE ON Prestamo
+AFTER INSERT ON Prestamo
 FOR EACH ROW
 	BEGIN
 
