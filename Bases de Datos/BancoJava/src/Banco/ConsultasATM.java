@@ -192,14 +192,16 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   }
 	   }
 	   /**
-	    * Primer metodo para la Extreaccion, obtengo el monto a extraer y delego la extraccion en si en otro metodo
+	    * Primer metodo para la Extreaccion, obtengo el monto a extraer 
+	    * y delego la extraccion en si en otro metodo
 	    */
 	   private void RealizarExtra() {
 		   int okcx1 = JOptionPane.showConfirmDialog(null,montos,"Ingrese el Monto a Extraer", JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
 		   if(okcx1 == JOptionPane.OK_OPTION) {
 			   int m = Integer.parseInt(montos.getText().trim());
 			   String x = Extraer(m);
-			   JOptionPane.showConfirmDialog(null,null,x,JOptionPane.OK_OPTION,JOptionPane.PLAIN_MESSAGE); //Devuelvo el resultado de la Extracción en un PopUp
+			 //Devuelvo el resultado de la Extracción en un PopUp
+			   JOptionPane.showConfirmDialog(null,null,x,JOptionPane.OK_OPTION,JOptionPane.PLAIN_MESSAGE); 
 		   }
 	   }
 	   
@@ -210,18 +212,20 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    */
 	   private String Extraer(int m) {
 		   try {
-			   int Out = 0;
 			   Statement stm = this.conexionBD.createStatement();
+			   ResultSet R;
 			   //Aca asumo que el S.P existe y funciona, hay que primero hacer los S.P y corroborar que funcionan con MySQL primero
-			   String sql = "call RealizarExtraccion(" + m + "," + Cod_Caja + "," + Out + ")";
-			   stm.executeQuery(sql);
+			   String sql = "call RealizarExtraccion(" + m + "," + Cod_Caja +")";
+			   R = stm.executeQuery(sql);
+			   return R.getString(1);
 			   
 		   }
 		   catch(SQLException e) {
 			   	//Devuelvo que la Transaccion fallo a mi metodo padre para que lo maneje
-                      return  "Se produjo un error al realizar la Extraccion.\n" + e.getMessage();
+                      return  "Se produjo un error al realizar la Extraccion.\n" 
+			   			+ e.getMessage() + "\n" + "SQL State: " + e.getSQLState() + "\n" 
+                      + "Error Code: " + e.getErrorCode();
 		   }
-		   return "Extraccion Realizada con Exito";
 	   }
 	   
 	   /**
@@ -231,7 +235,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private void RealizarTrans() {
 		   int CajaD = 0;
 		   int mon = 0;
-		   //OBtengo el monto a transferir y la caja destino con Pop-ups
+		   //Obtengo el monto a transferir y la caja destino con Pop-ups
 		   int okcx1 = JOptionPane.showConfirmDialog(null,montos,"Ingrese el Monto a Transferir", 
 				   		JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
 		   if(okcx1 == JOptionPane.OK_OPTION)
@@ -259,7 +263,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			JOptionPane.showConfirmDialog(null, null, res, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		} catch (SQLException e) {
 	    	  JOptionPane.showMessageDialog(this,
-                      "Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
+                      "Se produjo un error al intentar Realizar la Transacción.\n" + e.getMessage(),
                       "Error",
                       JOptionPane.ERROR_MESSAGE);
 				System.out.println("SQLException: " + e.getMessage());

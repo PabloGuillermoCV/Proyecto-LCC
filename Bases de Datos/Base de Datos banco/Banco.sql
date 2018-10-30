@@ -511,8 +511,8 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
          
          #Verificar los SELECT, hay que ver que datos se estan consiguiendo
 	 START TRANSACTION;	# Comienza la transacción  
-	   IF EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_Caja0) AND
-          EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_CajaD)
+	   IF EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0) AND
+          EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD)
 	   THEN  # verifico que existan ambas cuentas
 			SELECT saldo INTO Saldo_actual 
 	      		FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
@@ -531,7 +531,7 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	         #Hecha la transferencia, tengo que reflejar que el cambio se hizo en la BD
 	          
 	         	#Inserto la transferencia hecha en la caja Origen
-	         	INSERT INTO transacción VALUES
+	         	INSERT INTO transacción () VALUES ()
 	         	INSERT INTO	Transaccion_por_caja VALUES
 	         	INSERT INTO transferencia VALUES
 	         	#Inserto el depósito en la caja destino
@@ -573,13 +573,13 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
      
 
 	START TRANSACTION;
-		IF EXISTS(SELECT * FROM Tarjeta NATURAL JOIN trans_cajas_ahorro WHERE nro_ca = Cod_Caja)
+		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja)
 			SELECT saldo INTO Saldo_Actual 
 	      		FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
 	      IF Saldo_Actual >= MonT THEN 	 
 	       # si el saldo actual de la cuenta es suficiente para realizar 
            # la extracción, entonces actualizo el saldo
-	        UPDATE cuentas SET saldo = saldo - monto  WHERE numero=Cod_Caja;
+	        UPDATE Caja_Ahorro SET saldo = saldo - monto  WHERE numero=Cod_Caja;
 
 	       #Hay que cargar la transacción hecha
 				INSERT INTO transacción VALUES
@@ -587,7 +587,7 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 	         	INSERT INTO extraccion VALUES
 	      	SELECT 'La Extracción se realizo con exito' AS resultado;               
 	      ELSE  
-            SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado;
+            SELECT 'Saldo insuficiente para realizar la extraccion' AS resultado;
 	      END IF;  
 	   ELSE  
             SELECT 'ERROR: Cuenta inexistente' AS resultado;  
@@ -599,7 +599,11 @@ CREATE TRIGGER CargoCuotas
 AFTER INSERT ON Prestamo
 FOR EACH ROW
 	BEGIN
-
+		DECLARE nro_pres INT; #Defino un entero para obtener el numero de prestamo
+		#Intento de conseguir el prestamo recien creado
+		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();
+		#Dejo esqueleto de la Inserción de una cuota
+		INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES ();
 	END; !
 
 delimiter ; # devuelvo todo a la normalidad
