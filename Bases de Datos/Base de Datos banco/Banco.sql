@@ -524,22 +524,22 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
           # mantiene hasta que la trans. comete. Esto garantiza que nadie pueda
           # leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
       
-	      IF Saldo_actual >= MonT THEN 	  
+	      IF (Saldo_actual >= MonT) THEN 	  
 		     BEGIN
 			 
-	         UPDATE Caja_Ahorro SET saldo = (saldo - MonT)  WHERE numero=Cod_Caja0;
+	         UPDATE Caja_Ahorro SET (saldo = (saldo - MonT))  WHERE numero=Cod_Caja0;
 			 
-	         UPDATE Caja_Ahorro SET saldo = (saldo + MonT)  WHERE numero=Cod_CajaD;
+	         UPDATE Caja_Ahorro SET (saldo = (saldo + MonT))  WHERE numero=Cod_CajaD;
 
 	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
-	         INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
+	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
 				
 	         INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
 				
 	         INSERT INTO transacción(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
-	         INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
 				
 	         INSERT INTO deposito(nro_trans,nro_ca) VALUES (LAST_INSERT_ID(),Cod_CajaD);
 				
@@ -600,7 +600,7 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 		  
 			BEGIN
 		  
-				(UPDATE Caja_Ahorro SET Caja_Ahorro.saldo = (saldo - monto) WHERE numero=Cod_Caja);
+				(UPDATE Caja_Ahorro SET (Caja_Ahorro.saldo = (saldo - monto)) WHERE (numero = Cod_Caja));
 	      
 				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
