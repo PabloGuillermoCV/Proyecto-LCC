@@ -306,9 +306,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        //Pregunto si el periodo de meses que me ingresaron ES ALGUNO DE LOS DISPONIBLES
 		        //Tambien verifico que dado ese periodo, el monto ingresado este ENTRE
 		        	//un Monto Inferior Y superior PARA DICHO PERIODO
-		        //Corrobore este Query en SQL y anda 
 		        //NO solo corroboro que el periodo y el monto sean legales, sino que de una obtengo la tasa asociada
-		        //Al nuevo prestamo con los datos dados,que trucazo, no? ;)
+		        //Al nuevo prestamo con los datos dados
 		        //BETWEEN hace comparacion <= / >=, asi que no hay riesgo de que me ingresen un monto limite y la cosa no ande
 		        R = stmt.executeQuery("SELECT TP.tasa "
 		        		+ "FROM Tasa_Prestamo TP "
@@ -393,7 +392,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			if(nro != -10) {
 				//En la segunda, corroboro que se hayan cargado las cuotas, cuento cuantas cuotas se crearon para el Prestamo que cree
 				//Y corroboro que sea la cantidad correcta de cuotas
-				R2 = stmt2.executeQuery("SELECT COUNT(nro_pago) FROM pago WHERE nro_prestamo = " + nro);
+				R2 = stmt2.executeQuery("SELECT COUNT(nro_prestamo) FROM pago WHERE nro_prestamo = " + nro);
 				nro = R2.getInt(1);
 				if(nro == periodo) {
 					JOptionPane.showConfirmDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", 
@@ -442,6 +441,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				String d = R.getString(1);
 				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",'" + d + "', NULL)";
 				stmt.executeUpdate(sql); 
+				fechaD = d;
 				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
 			}
 			stmt.close();
