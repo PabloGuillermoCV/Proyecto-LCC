@@ -477,6 +477,8 @@ CREATE TABLE Transferencia(
 	
 	GRANT UPDATE ON banco.tarjeta TO 'atm'@'%';
 
+	GRANT EXECUTE ON banco.* TO 'atm'@'%';
+
 #-------------------------------------------------------------------------
 
 #Cosas a Chequear
@@ -512,9 +514,9 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	   IF EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_Caja0) AND
           EXISTS (SELECT * FROM trans_cajas_ahorro WHERE numero=Cod_CajaD)
 	   THEN  # verifico que existan ambas cuentas
-	      SELECT saldo INTO saldo_actual_cuentaA 
-	      FROM cuentas  WHERE numero=cuentaA FOR UPDATE;
-          # Recupero el saldo de la cuentaA en la variable saldo_actual_cuentaA.
+			SELECT saldo INTO Saldo_Actual 
+	      		FROM cuentas  WHERE nro_ca = Cod_Caja ORDER BY fecha DESC, hora DESC LIMIT 1 FOR UPDATE;
+          # Recupero el saldo de la cuenta Origen en Saldo_Actual.
           # Al utilizar FOR UPDATE se indica que los datos involucrados en la
           # consulta van a ser actualizados luego.
           # De esta forma se obtiene un write_lock sobre estos datos, que se      
@@ -524,8 +526,12 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	      IF saldo_actual_cuentaA >= MonT THEN 	  
 	       # si el saldo actual de la cuentaA es suficiente para realizar 
            # la transferencia, entonces actualizo el saldo de ambas cuentas 
-	         UPDATE cuentas SET saldo = saldo - MonT  WHERE numero=Cod_Caja0;
-	         UPDATE cuentas SET saldo = saldo + MonT  WHERE numero=Cod_CajaD;
+	         UPDATE trans_cajas_ahorro SET saldo = saldo - MonT  WHERE numero=Cod_Caja0;
+	         UPDATE trans_cajas_ahorro SET saldo = saldo + MonT  WHERE numero=Cod_CajaD;
+	         #Hecha la transferencia, tengo que reflejar que el cambio se hizo en la BD
+	         SELECT saldo INTO saldo_actual_cuentaA FROM  trans_cajas_ahorro WHERE numero = Cod_Caja0 AND ;
+	         	#Inserto la transferencia hecha en la caja Origen
+	         	INSERT INTO trans_cajas_ahorro
              SELECT 'La transferencia se realizo con exito' AS resultado;               
 	      ELSE  
             SELECT 'Saldo insuficiente para realizar la transferencia' 
@@ -563,19 +569,17 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 	START TRANSACTION;
 		IF EXISTS(SELECT * FROM Tarjeta NATURAL JOIN trans_cajas_ahorro WHERE nro_ca = Cod_Caja)
 			SELECT saldo INTO Saldo_Actual 
-	      		FROM cuentas  WHERE nro_ca = Cod_Caja FOR UPDATE;
-	      IF Saldo_Actual >= MonT THEN 	  
+	      		FROM cuentas  WHERE nro_ca = Cod_Caja ORDER BY fecha DESC, hora DESC LIMIT 1 FOR UPDATE;
+	      IF Saldo_Actual >= MonT THEN 	 
 	       # si el saldo actual de la cuenta es suficiente para realizar 
            # la extracción, entonces actualizo el saldo
 	        UPDATE cuentas SET saldo = saldo - monto  WHERE numero=Cod_Caja;
 	      	SELECT 'La Extracción se realizo con exito' AS resultado;               
 	      ELSE  
-            SELECT 'Saldo insuficiente para realizar la transferencia' 
-		        AS resultado;
+            SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado;
 	      END IF;  
 	   ELSE  
-            SELECT 'ERROR: Cuenta inexistente' 
-		        AS resultado;  
+            SELECT 'ERROR: Cuenta inexistente' AS resultado;  
 	   END IF; 
 	COMMIT;
 	END; !
