@@ -526,17 +526,12 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	      IF Saldo_actual >= MonT THEN 	  
 	         UPDATE Caja_Ahorro SET saldo = (saldo - MonT)  WHERE numero=Cod_Caja0;
 	         UPDATE Caja_Ahorro SET saldo = (saldo + MonT)  WHERE numero=Cod_CajaD;
-	         #Hecha la transferencia, tengo que reflejar que el cambio se hizo en la BD
-	          
-	         	#Inserto la transferencia hecha en la caja Origen
-				
+
 	         	INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
 	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
 				
 	         	INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
-				
-	         	#Inserto el depósito en la caja destino
 				
 	         	INSERT INTO transacción(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
@@ -582,11 +577,7 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 			SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
 			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
 	      IF Saldo_Actual >= MonT THEN (UPDATE Caja_Ahorro SET Caja_Ahorro.saldo = (saldo - monto) WHERE numero=Cod_Caja);
-			# si el saldo actual de la cuenta es suficiente para realizar 
-            # la extracción, entonces actualizo el saldo
-
-	       #Hay que cargar la transacción hecha
-		   
+	      
 				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
 	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja);
