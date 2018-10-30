@@ -511,11 +511,11 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	  END;		      
          
 	 START TRANSACTION;	# Comienza la transacción  
-	   IF EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0) AND
-          EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD)
-	   THEN  # verifico que existan ambas cuentas
+	   IF (EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0) AND
+           EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD))
+	   THEN
 			SELECT saldo INTO Saldo_actual FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
-			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja0 LIMIT 1
+			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja0 LIMIT 1;
           # Recupero el saldo de la cuenta Origen en Saldo_Actual.
           # Al utilizar FOR UPDATE se indica que los datos involucrados en la
           # consulta van a ser actualizados luego.
@@ -581,10 +581,9 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja)
 			SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
 			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
-	      IF Saldo_Actual >= MonT THEN 	 
-	       # si el saldo actual de la cuenta es suficiente para realizar 
-           # la extracción, entonces actualizo el saldo
-	        UPDATE Caja_Ahorro SET Caja_Ahorro.saldo = (saldo - monto) WHERE numero=Cod_Caja;
+	      IF Saldo_Actual >= MonT THEN (UPDATE Caja_Ahorro SET Caja_Ahorro.saldo = (saldo - monto) WHERE numero=Cod_Caja);
+			# si el saldo actual de la cuenta es suficiente para realizar 
+            # la extracción, entonces actualizo el saldo
 
 	       #Hay que cargar la transacción hecha
 		   
