@@ -443,9 +443,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",'" + d + "', NULL)";
 				stmt.executeUpdate(sql); 
 				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
-				if (R.next()) {
-					fechaD = R.getString(1);
-				}
 			}
 			stmt.close();
 		}
