@@ -384,6 +384,33 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			//ESTE METODO DEBE BORRARSE UNA VEZ QUE SE CORROBORE QUE EL TRIGGER DE CUOTAS FUNCIONA!!!!!!!
 			cargarCuotas(intC,fechaAInsertar,nro_pre,periodo);
 			
+			int nro = -10;
+			//Para corroborar que las cosas se cargaron bien, hago dos consultas:
+			//La primera obtiene si se cargo el nuevo prestamo obteniendo el ultimo ID insertado que coincida
+			//COn el legajo del empleado, el cliente que lo solicito y cuya fecha de creacion sea ahora
+			R2 = stmt2.executeQuery("SELECT nro_prestamo FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID(nro_Prestamo) AND legajo = " + legajo + " AND nro_cliente = " + intC + "AND fecha = CURDATE()");
+			nro = R2.getInt(1);
+			if(nro != -10) {
+				//En la segunda, corroboro que se hayan cargado las cuotas, cuento cuantas cuotas se crearon para el Prestamo que cree
+				//Y corroboro que sea la cantidad correcta de cuotas
+				R2 = stmt2.executeQuery("SELECT COUNT(nro_pago) FROM pago WHERE nro_prestamo = " + nro);
+				nro = R2.getInt(1);
+				if(nro == periodo) {
+					JOptionPane.showConfirmDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", 
+							"Carga de Prestamo exitosa",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+				}
+				else {
+					JOptionPane.showConfirmDialog(null, "Ha ocurrido un error al cargar las cuotas asociadas al prestamo", 
+							"Carga de Prestamo erronea",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+				}
+			}
+			else {
+				JOptionPane.showConfirmDialog(null, "Ha ocurrido un error que impidió cargar el prestamo", 
+						"Carga de Prestamo erronea",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+			}
+			
+			
+			nro = -10;
 			stmt2.close();
 			R2.close();
 		} 
@@ -396,7 +423,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	//Metodo auxiliar para cargar las cuotas
-	//DEBE  UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!
+	//DEBE  "Borrarse" UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!
 	private void cargarCuotas(int c, String fechaD, int nro_pre, int periodo) {
 		Statement stmt;
 		try {
@@ -411,13 +438,14 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				sql = "SELECT DATE_ADD('" + fechaD + "', INTERVAL 1 MONTH)";
 				R = stmt.executeQuery(sql);
 				//Aca cargo las cuotas una por una
-				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",'" + fechaD + "', NULL)";
+				//Obtengo la nueva fecha de vencimiento producto de mover la fecha 1 mes adelante
+				String d = R.getString(1);
+				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",'" + d + "', NULL)";
 				stmt.executeUpdate(sql); 
 				//Fecha_Pago = NULL ya que es una cuota que NO se ha pagado todavia
 				if (R.next()) {
 					fechaD = R.getString(1);
 				}
-				R.close();
 			}
 			stmt.close();
 		}

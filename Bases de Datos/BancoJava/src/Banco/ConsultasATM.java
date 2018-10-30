@@ -211,13 +211,16 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    * @return un String que determina la naturaleza de la Extracción, si fue exitosa o no
 	    */
 	   private String Extraer(int m) {
+		  String ret ="";
 		   try {
 			   Statement stm = this.conexionBD.createStatement();
 			   ResultSet R;
 			   //Aca asumo que el S.P existe y funciona, hay que primero hacer los S.P y corroborar que funcionan con MySQL primero
 			   String sql = "call RealizarExtraccion(" + m + "," + Cod_Caja +")";
 			   R = stm.executeQuery(sql);
-			   return R.getString(1);
+			   ret = R.getString(1);
+			   R.close();
+			   stm.close();
 			   
 		   }
 		   catch(SQLException e) {
@@ -226,6 +229,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   			+ e.getMessage() + "\n" + "SQL State: " + e.getSQLState() + "\n" 
                       + "Error Code: " + e.getErrorCode();
 		   }
+		   return ret;
 	   }
 	   
 	   /**
@@ -260,6 +264,8 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			Statement stmt = conexionBD.createStatement();
 			ResultSet R = stmt.executeQuery("call RealizarTransferencia(" + Cod_Caja + ", " + CajaD + ", " + plataT + ")");
 			String res = R.getString(1);
+			R.close();
+			stmt.close();
 			JOptionPane.showConfirmDialog(null, null, res, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		} catch (SQLException e) {
 	    	  JOptionPane.showMessageDialog(this,
@@ -340,8 +346,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 				   Date FDate = Fechas.convertirStringADate(Fin);
 				   String I = Fechas.convertirDateAStringDB(IDate);
 				   String F = Fechas.convertirDateAStringDB(FDate);
-				   System.out.println(I);
-				   System.out.println(F);
 				   Statement stmt = this.conexionBD.createStatement();
 			       String sql = "SELECT TCA.fecha, TCA.hora, TCA.tipo, TCA.monto, TCA.cod_caja AS codCaja, TCA.destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE TCA.fecha >= '" + I + "' AND TCA.fecha <= '" + F + "' AND T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
 			       refrescarTabla(sql); //Delego el Refresco en el metodo que lo hace como la gente
@@ -363,8 +367,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			  this.conectarBD ();
 		      while(!Verif & ok) {
 					login(); //Obtengo los datos del empleado
-					//Encontre un bug que cuando se intenta entrar con alguno de los campos del login vacios, la app explota
-					//Asi que añado un chequeo adicional para capturar este tipo de errores
+					//Verifico si alguno de los campos del login fueron vacios
 					if(!(Tarj.equals("") | Pin.equals("")))
 						Verif = VerificarLogin();
 					else {
@@ -381,23 +384,13 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 						this.setVisible(false); 
 					}
 			  }
-		      try {
-		    	  if(ok) { //Aquí tengo que verificar si realmente entré bien al romper forzadamaente el ciclo while
-				      @SuppressWarnings("unused")
-				      Statement stmt = this.conexionBD.createStatement();
-				      //Muestro datos de las transacciones del cliente, no toda la info del banco
-				      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino "
-				      		+ "FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
-				      this.refrescarTabla (sql);
-		    	  }
-		      }
-		      catch(SQLException e) {
-		    	  e.printStackTrace();
-		    	  JOptionPane.showMessageDialog(this,"Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
-			      System.out.println("SQLException: " + e.getMessage());
-				  System.out.println("SQLState: " + e.getSQLState());
-				  System.out.println("VendorError: " + e.getErrorCode());
-		      }
+		     
+	    	  if(ok) { //Aquí tengo que verificar si realmente entré bien al romper forzadamaente el ciclo while
+			      //Muestro datos de las transacciones del cliente
+			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino "
+			      		+ "FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
+			      this.refrescarTabla (sql);
+	    	  }
 	   }
 	   
 	   /**
