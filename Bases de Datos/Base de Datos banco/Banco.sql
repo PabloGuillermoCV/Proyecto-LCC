@@ -496,6 +496,7 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	 DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
 	 DECLARE codigo_MYSQL INT DEFAULT 0;
 	 DECLARE mensaje_error TEXT;
+	 DECLARE N_Cl SMALLINT;
 	 DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
 	  BEGIN #En caso de una excepción SQLEXCEPTION retrocede la transacción y
          	# devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
@@ -514,8 +515,8 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	   IF EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0) AND
           EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD)
 	   THEN  # verifico que existan ambas cuentas
-			SELECT saldo INTO Saldo_actual 
-	      		FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
+			SELECT saldo INTO Saldo_actual FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
+			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja0 LIMIT 1
           # Recupero el saldo de la cuenta Origen en Saldo_Actual.
           # Al utilizar FOR UPDATE se indica que los datos involucrados en la
           # consulta van a ser actualizados luego.
@@ -531,17 +532,24 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	         #Hecha la transferencia, tengo que reflejar que el cambio se hizo en la BD
 	          
 	         	#Inserto la transferencia hecha en la caja Origen
-	         	INSERT INTO transacción () VALUES ()
-	         	INSERT INTO	Transaccion_por_caja VALUES
-	         	INSERT INTO transferencia VALUES
+				
+	         	INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+				
+	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
+				
+	         	INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
+				
 	         	#Inserto el depósito en la caja destino
-	         	INSERT INTO transacción VALUES
-	         	INSERT INTO	Transaccion_por_caja VALUES
-	         	INSERT INTO deposito VALUES
+				
+	         	INSERT INTO transacción(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+				
+	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+				
+	         	INSERT INTO deposito(nro_trans,nro_ca) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+				
              SELECT 'La transferencia se realizo con exito' AS resultado;               
 	      ELSE  
-            SELECT 'Saldo insuficiente para realizar la transferencia' 
-		        AS resultado;
+            SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado;
 	      END IF;  
 	   ELSE  
             SELECT 'ERROR: Cuenta inexistente' 
@@ -558,6 +566,7 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 	DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
 	 DECLARE codigo_MYSQL INT DEFAULT 0;
 	 DECLARE mensaje_error TEXT;
+	 DECLARE N_Cl SMALLINT;
 	 DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
 	  BEGIN #En caso de una excepción SQLEXCEPTION retrocede la transacción y
          	# devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
@@ -566,25 +575,28 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 		GET DIAGNOSTICS CONDITION 1  codigo_MYSQL= MYSQL_ERRNO,  
 		                             codigo_SQL= RETURNED_SQLSTATE, 
 									 mensaje_error= MESSAGE_TEXT;
-	    SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, 
-		        codigo_MySQL, codigo_SQL,  mensaje_error;		
+	    SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, codigo_MySQL, codigo_SQL,  mensaje_error;		
         ROLLBACK;
 	  END;		      
      
 
 	START TRANSACTION;
 		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja)
-			SELECT saldo INTO Saldo_Actual 
-	      		FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
+			SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
+			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
 	      IF Saldo_Actual >= MonT THEN 	 
 	       # si el saldo actual de la cuenta es suficiente para realizar 
            # la extracción, entonces actualizo el saldo
-	        UPDATE Caja_Ahorro SET saldo = saldo - monto  WHERE numero=Cod_Caja;
+	        UPDATE Caja_Ahorro SET saldo = saldo - monto WHERE numero=Cod_Caja;
 
 	       #Hay que cargar la transacción hecha
-				INSERT INTO transacción VALUES
-	         	INSERT INTO	Transaccion_por_caja VALUES
-	         	INSERT INTO extraccion VALUES
+		   
+				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+				
+	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja);
+				
+	         	INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja);
+				
 	      	SELECT 'La Extracción se realizo con exito' AS resultado;               
 	      ELSE  
             SELECT 'Saldo insuficiente para realizar la extraccion' AS resultado;
@@ -600,10 +612,18 @@ AFTER INSERT ON Prestamo
 FOR EACH ROW
 	BEGIN
 		DECLARE nro_pres INT; #Defino un entero para obtener el numero de prestamo
+		DECLARE fecha_v DATE;
+		DECLARE N_P INT;
+		DECLARE Meses INT;
+		DECLARE I INT DEFAULT 0;
+		SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 		#Intento de conseguir el prestamo recien creado
 		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();
-		#Dejo esqueleto de la Inserción de una cuota
-		INSERT INTO pago(nro_prestamo, nro_pago, fecha_venc, fecha_pago) VALUES ();
+		WHILE I < Meses DO
+			SELECT fecha INTO fecha_v FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
+			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (nro_pres,I,DATE_ADD(fecha_v,INTERVAL 1 MONTH),NULL);
+			SET I = I + 1;
+		END WHILE
 	END; !
 
 delimiter ; # devuelvo todo a la normalidad
