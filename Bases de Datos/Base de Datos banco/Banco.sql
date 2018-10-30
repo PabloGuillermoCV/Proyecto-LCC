@@ -511,9 +511,10 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	  END;		      
          
 	 START TRANSACTION;	# Comienza la transacción  
-	   IF (EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0) AND
-           EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD))
+	   IF (EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0)) AND (EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD))
+	   
 	   THEN
+	    BEGIN
 			SELECT saldo INTO Saldo_actual FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
 			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja0 LIMIT 1;
           # Recupero el saldo de la cuenta Origen en Saldo_Actual.
@@ -524,28 +525,44 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
           # leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
       
 	      IF Saldo_actual >= MonT THEN 	  
+		     BEGIN
+			 
 	         UPDATE Caja_Ahorro SET saldo = (saldo - MonT)  WHERE numero=Cod_Caja0;
+			 
 	         UPDATE Caja_Ahorro SET saldo = (saldo + MonT)  WHERE numero=Cod_CajaD;
 
-	         	INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
-	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
+	         INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
 				
-	         	INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
+	         INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
 				
-	         	INSERT INTO transacción(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+	         INSERT INTO transacción(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
-	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+	         INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
 				
-	         	INSERT INTO deposito(nro_trans,nro_ca) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+	         INSERT INTO deposito(nro_trans,nro_ca) VALUES (LAST_INSERT_ID(),Cod_CajaD);
 				
-             SELECT 'La transferencia se realizo con exito' AS resultado;               
-	      ELSE  
-            SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado;
-	      END IF;  
-	   ELSE  
-            SELECT 'ERROR: Cuenta inexistente' 
-		        AS resultado;  
+             SELECT 'La transferencia se realizo con exito' AS resultado;
+			 
+			 END
+	      ELSE 
+		    BEGIN
+			
+            SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado; 
+			
+			END
+			
+	      END IF;
+		  
+		END
+		  
+	   ELSE
+	     BEGIN
+		 
+            SELECT 'ERROR: Cuenta inexistente' AS resultado; 
+			
+		 END
 	   END IF;  	 		
 		
 	 COMMIT;   # Comete la transacción  
@@ -573,10 +590,17 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
      
 
 	START TRANSACTION;
-		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja)
-			SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
-			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
-	      IF Saldo_Actual >= MonT THEN (UPDATE Caja_Ahorro SET Caja_Ahorro.saldo = (saldo - monto) WHERE numero=Cod_Caja);
+		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja) THEN
+		 BEGIN
+		
+		  SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
+		  SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
+		  
+	      IF Saldo_Actual >= MonT THEN 
+		  
+			BEGIN
+		  
+				(UPDATE Caja_Ahorro SET Caja_Ahorro.saldo = (saldo - monto) WHERE numero=Cod_Caja);
 	      
 				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
@@ -584,12 +608,26 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 				
 	         	INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja);
 				
-	      	SELECT 'La Extracción se realizo con exito' AS resultado;               
+	      	    SELECT 'La Extracción se realizo con exito' AS resultado;         
+			
+			END
+			
 	      ELSE  
+		   BEGIN
+		  
             SELECT 'Saldo insuficiente para realizar la extraccion' AS resultado;
-	      END IF;  
+			
+		   END
+	      END IF; 
+		  
+		 END
+		 
 	   ELSE  
+	      BEGIN
+		  
             SELECT 'ERROR: Cuenta inexistente' AS resultado;  
+			
+		  END
 	   END IF; 
 	COMMIT;
 END; !
