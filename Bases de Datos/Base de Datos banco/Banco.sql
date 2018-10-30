@@ -511,7 +511,8 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	  END;		      
          
 	 START TRANSACTION;	# Comienza la transacción  
-	   IF (EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_Caja0)) AND (EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca=Cod_CajaD))
+	   IF EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_Caja0) AND 
+	      EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_CajaD)
 	   
 	   THEN
 	    BEGIN
@@ -524,12 +525,12 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
           # mantiene hasta que la trans. comete. Esto garantiza que nadie pueda
           # leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
       
-	      IF (Saldo_actual >= MonT) THEN 	  
+	      IF Saldo_actual >= MonT THEN 	  
 		     BEGIN
 			 
-	         UPDATE Caja_Ahorro SET (saldo = (saldo - MonT))  WHERE numero=Cod_Caja0;
+	         UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE numero=Cod_Caja0;
 			 
-	         UPDATE Caja_Ahorro SET (saldo = (saldo + MonT))  WHERE numero=Cod_CajaD;
+	         UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE numero=Cod_CajaD;
 
 	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
@@ -593,14 +594,14 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja) THEN
 		 BEGIN
 		
-		  SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
+		  SELECT saldo INTO Saldo_Actual FROM caja_ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
 		  SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
 		  
 	      IF Saldo_Actual >= MonT THEN 
 		  
 			BEGIN
 		  
-				(UPDATE Caja_Ahorro SET (Caja_Ahorro.saldo = (saldo - monto)) WHERE (numero = Cod_Caja));
+				UPDATE caja_ahorro SET caja_ahorro.saldo = (saldo - monto) WHERE numero = Cod_Caja;
 	      
 				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
