@@ -365,30 +365,26 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		      boolean Verif = false;
 		      boolean ok = true;
 			  this.conectarBD ();
-		      while(!Verif & ok) {
+		      while (!Verif & ok) {
 					login(); //Obtengo los datos del empleado
 					//Verifico si alguno de los campos del login fueron vacios
-					if(!(Tarj.equals("") | Pin.equals("")))
-						Verif = VerificarLogin();
-					else {
-						int canc = JOptionPane.showConfirmDialog(null, "Alguno de los campos del login eran vacios,"
-								+ "	por favor, ingrese los datos nuevamente","Error" , JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-						//Como es posible trabar al usuario en un loop infinito por más que cancele
-						if(canc == JOptionPane.NO_OPTION)
+					if (Tarj == "" || Pin == "") {
+						int Reply = JOptionPane.showConfirmDialog(null, "Alguno de los campos del login eran vacios, por favor, ingrese los datos nuevamente","Error" , JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+						if (Reply == JOptionPane.NO_OPTION)
 							Salir = true;
 					}
+					else {
+						Verif = VerificarLogin();
+					}
 					if (Salir == true) {
-						ok = false; //Evito un ciclo infinito de pop-ups
-						//Si hago la componente invisible, deebria ser capaz de seguir trabajando
-						//ademas, al hacer eso deberia de ejecutarse ThisCOmponentHidden solo, lo cual desconecta todo
-						this.setVisible(false); 
+						thisComponentHidden(evt);
+						System.exit(0);
 					}
 			  }
 		     
-	    	  if(ok) { //Aquí tengo que verificar si realmente entré bien al romper forzadamaente el ciclo while
+	    	  if (ok) { //Aqui tengo que verificar si realmente entre bien al romper forzadamaente el ciclo while
 			      //Muestro datos de las transacciones del cliente
-			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino "
-			      		+ "FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
+			      String sql = "SELECT fecha, hora, tipo, monto, cod_caja AS codCaja, destino FROM trans_cajas_ahorro TCA NATURAL JOIN Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" + Pin + "') ORDER BY nro_ca DESC";
 			      this.refrescarTabla (sql);
 	    	  }
 	   }
@@ -403,8 +399,9 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 				Statement st = this.conexionBD.createStatement();
 				String sql = "SELECT nro_tarjeta, PIN FROM Tarjeta T WHERE T.nro_tarjeta = " + Tarj + " AND T.PIN = md5('" +  Pin + "')";
 				ResultSet R = st.executeQuery(sql);
+				
 				ret = R.next(); //Pregunto si el ResultSet tiene un dato
-				if(!ret) {
+				if (!ret) {
 					//Hago pop-ups para decir que fallo
 					int reply = JOptionPane.showConfirmDialog(null, "Ocurrio un error al buscar su usuario, por favor, ingrese los datos nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
 					if (reply == JOptionPane.NO_OPTION) {
@@ -422,14 +419,16 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 		 * Hace login de la Tarjeta por medio de Pop Ups
 		 */
 	   private void login () {
+		   Tarj = "";
+		   Pin = "";
 		   Card = new JPasswordField();
-	       PIN_Field = new JPasswordField();
 	       int okCxl = JOptionPane.showConfirmDialog(null, Card, "Ingresar nro de Tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	       if (okCxl == JOptionPane.OK_OPTION) {
+	       if (okCxl == JOptionPane.OK_OPTION && Card.getPassword().length > 0) {
 	           Tarj = new String (Card.getPassword());
 	       }
+	       PIN_Field = new JPasswordField();
 		   int okCx2 = JOptionPane.showConfirmDialog(null, PIN_Field, "Ingresar Pin", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		   if (okCx2 == JOptionPane.OK_OPTION) {
+		   if (okCx2 == JOptionPane.OK_OPTION && PIN_Field.getPassword().length > 0) {
 			   Pin = new String (PIN_Field.getPassword());
 		   }
 	   }

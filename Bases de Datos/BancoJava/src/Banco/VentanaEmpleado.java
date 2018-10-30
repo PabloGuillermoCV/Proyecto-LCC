@@ -32,6 +32,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private JScrollPane scrConsulta;
 	private String legajo;
 	private String clave;
+	private JTextField Leg;
 	private JPasswordField pf;
 	private JTextField nf;
 	private JTextField Num_doc;
@@ -41,7 +42,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	private String tipo;
 	private boolean Salir = false;
 	protected Connection conexionBD = null;
-	int seleccionado = -1;
+	private int seleccionado = -1;
+	private JButton btnRegistrarPago;
 	
 	
 	public VentanaEmpleado () {
@@ -86,7 +88,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		getContentPane().add(Tipo_Doc);
 		Tipo_Doc.setColumns(10);
 		
-		JButton btnRegistrarPago = new JButton("Registrar Pago");
+		btnRegistrarPago = new JButton("Registrar Pago");
 		btnRegistrarPago.setEnabled(false);
 		btnRegistrarPago.setBounds(213, 54, 112, 23);
 		getContentPane().add(btnRegistrarPago);
@@ -252,6 +254,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			f.printStackTrace();
 		}
 		catch(NumberFormatException ex) {
+			btnRegistrarPago.setEnabled(false);
 			JOptionPane.showMessageDialog(this, "Numero o Tipo de documento es vacio", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -267,6 +270,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			noPrestActual(nro, tipo);
 		}
 		catch(NumberFormatException ex) {
+			btnRegistrarPago.setEnabled(false);
 			JOptionPane.showMessageDialog(this, "Numero o Tipo de documento es vacio", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -309,9 +313,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		        //NO solo corroboro que el periodo y el monto sean legales, sino que de una obtengo la tasa asociada
 		        //Al nuevo prestamo con los datos dados
 		        //BETWEEN hace comparacion <= / >=, asi que no hay riesgo de que me ingresen un monto limite y la cosa no ande
-		        R = stmt.executeQuery("SELECT TP.tasa "
-		        		+ "FROM Tasa_Prestamo TP "
-		        		+ "WHERE TP.periodo = " + p + " AND " + m + " BETWEEN TP.monto_inf AND TP.monto_sup");
+		        R = stmt.executeQuery("SELECT TP.tasa FROM Tasa_Prestamo TP WHERE TP.periodo = " + p + " AND " + m + " BETWEEN TP.monto_inf AND TP.monto_sup");
 		        
 		        if (R.next()) {
 		        	int t = R.getInt(1);
@@ -404,7 +406,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				}
 			}
 			else {
-				JOptionPane.showConfirmDialog(null, "Ha ocurrido un error que impidió cargar el prestamo", 
+				JOptionPane.showConfirmDialog(null, "Ha ocurrido un error que impidio cargar el prestamo", 
 						"Carga de Prestamo erronea",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
 			}
 			
@@ -463,20 +465,18 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			this.conectarBD(); //Conecto a la Vista
 			while(!Verif) {
 				login(); //Obtengo los datos del empleado
-				//Encontre un bug que cuando se intenta entrar con alguno de los campos del login vacios, la app explota
-				//Asi que añado un chequeo adicional para capturar este tipo de errores
-				if(!(legajo.equals("") | clave.equals("")))
-					Verif = VerificarLogin();
-				else {
-					int canc = JOptionPane.showConfirmDialog(null, "Alguno de los campos del login eran vacios,"
-							+ "	por favor, ingrese los datos nuevamente","Error" , JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-					//Como es posible trabar al usuario en un loop infinito por más que cancele
-					if(canc == JOptionPane.NO_OPTION)
+				if (legajo == "" || clave == "") {
+			        int Reply = JOptionPane.showConfirmDialog(null,"El Legajo y Password no pueden ser vacios, Ingrese los datos nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
+					if (Reply == JOptionPane.NO_OPTION) {
 						Salir = true;
+					}
+			    }
+				else {
+					Verif = VerificarLogin();
 				}
 				if (Salir == true) {
-					Verif = true; //Esto es para evitar quedar trabado en un ciclo infinito de Logins
-					this.setVisible(false);
+					thisComponentHidden(evt);
+					System.exit(0);
 				}
 			}
 		}
@@ -489,11 +489,11 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			boolean ret = true;
 			try {
 				Statement st = this.conexionBD.createStatement();
-				String sql = "SELECT legajo, password FROM Empleado E WHERE E.legajo = " + legajo + " AND E.password = md5('" +  clave + "')";
+				String sql = "SELECT E.legajo, E.password FROM Empleado E WHERE E.legajo = " + legajo + " AND E.password = md5('" +  clave + "')";
 				ResultSet R = st.executeQuery(sql);
 				
 				ret = R.next(); //Pregunto si el ResultSet tiene un dato
-				if(!ret) {
+				if (!ret) {
 					//Hago pop-ups para decir que fallo
 					int reply = JOptionPane.showConfirmDialog(null, "Ocurrio un error al buscar su usuario, por favor, ingrese los datos nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
 					if (reply == JOptionPane.NO_OPTION) {
@@ -511,14 +511,16 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * Hace login del Empleado por medio de Pop Ups
 	 */
 	private void login() {
-		JTextField Leg = new JTextField();
+		legajo = "";
+		clave = "";
+		Leg = new JTextField();
         int okCx2 = JOptionPane.showConfirmDialog(null,Leg,"Ingrese numero de Legajo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if(okCx2 == JOptionPane.OK_OPTION) {
+        if(okCx2 == JOptionPane.OK_OPTION && !Leg.getText().isEmpty()) {
         	legajo = Leg.getText().trim();
         }
-        pf = new JPasswordField();
+	    pf = new JPasswordField();
 		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (okCxl == JOptionPane.OK_OPTION) {
+		if (okCxl == JOptionPane.OK_OPTION && pf.getPassword().length > 0) {
 			clave = new String (pf.getPassword());
 		}
 	}

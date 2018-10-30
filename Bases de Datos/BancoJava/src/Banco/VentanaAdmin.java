@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.sql.Types;
 import java.util.Arrays;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,12 +19,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
@@ -41,7 +38,6 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private DBTable tabla = new DBTable();
 	private JScrollPane scrConsulta;
 	protected int Seleccionado = -1;
-	private String clave;
 	private JPasswordField pf;
 	private JList <String> listaTablas;
 	private DefaultListModel <String> modeloTablas;
@@ -49,6 +45,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private DefaultListModel <String> modeloListaAtributos;
 	private JButton btnMostrarTablas;
 	private Connection conexionBD = null;
+	private boolean Salir = false;
 	
 	public VentanaAdmin () {
 		super ();
@@ -200,7 +197,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	tabla.setSelectSql(SQL);
 			tabla.refresh();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog (this,"La consulta ingresada no es correcta","Error",JOptionPane.ERROR_MESSAGE);
 		} 
     }
 	
@@ -209,22 +206,40 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 		//Para manejar Logins, hago lo siguiente:
 		/*
 		 * uso JOptionPane.DialogPane para nombres de usuario,/Legajos
-		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para levantar el password ingresado
+		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para verificar el password ingresado
 		 */
+		boolean Verif = false;
+		this.conectarBD();
 		char [] pass = {'a','d','m','i','n'};
-		pf = new JPasswordField();
-		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (okCxl == JOptionPane.OK_OPTION) {
-			if(Arrays.equals(pf.getPassword(),pass)) {
-				clave = "admin";
+		while (!Verif) {
+			pf = new JPasswordField();
+			int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			if (okCxl == JOptionPane.OK_OPTION) {
+				if(Arrays.equals(pf.getPassword(),pass)) {
+					Verif = true;
+				}
+				else {
+					int Reply = JOptionPane.showConfirmDialog(null,"El Password de Admin es incorrecto, ingrese el dato nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
+					if (Reply == JOptionPane.NO_OPTION) {
+						Salir = true;
+					}
+				}
+			}
+			else {
+				int Reply = JOptionPane.showConfirmDialog(null,"El Password de Admin es incorrecto, ingrese el dato nuevamente","Error",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
+				if (Reply == JOptionPane.NO_OPTION) {
+					Salir = true;
+				}
+			}
+			if (Salir == true) {
+				thisComponentHidden(evt);
+				System.exit(0);
 			}
 		}
-		this.conectarBD();
 	}
 	   
 	private void thisComponentHidden (ComponentEvent evt) {
 	    this.desconectarBD();
-	    clave = "";
 	}
 
 
@@ -234,6 +249,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 				//en clave admin, va lo que ingrese el usuario por pantalla, en los otros casos, se hace directamente
 			    String driver = "com.mysql.cj.jdbc.Driver";
 			    String usuario = "admin";
+			    String clave = "admin";
 			    String urlConexion = "jdbc:mysql://localhost/banco?serverTimezone=America/Argentina/Buenos_Aires&useSSL=false&allowPublicKeyRetrieval=true";
 			    //Establece una conexion con la  B.D. "banco" una tabla DBTabla y una Connection
 			    tabla.connectDatabase (driver, urlConexion, usuario, clave);
@@ -268,45 +284,4 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 			}
 		}
 	}
-	
-	@SuppressWarnings("unused")
-	private void refrescarTabla () {
-	    try {    
-	        // seteamos la consulta a partir de la cual se obtendran los datos para llenar la tabla
-	    	Statement St = conexionBD.createStatement();
-	    	String S = this.txtConsulta.getText().trim();
-	    	St.execute(S);
-	    	
-	    	// obtenemos el modelo de la tabla a partir de la consulta para 
-	    	// modificar la forma en que se muestran de algunas columnas  
-	    	tabla.createColumnModelFromQuery();
-	    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
-	    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-	    		if (tabla.getColumn(i).getType()==Types.TIME) {    		 
-	    		    tabla.getColumn(i).setType(Types.CHAR);  
-	  	       	}
-	    		// cambiar el formato en que se muestran los valores de tipo DATE
-	    		if (tabla.getColumn(i).getType()==Types.DATE) {
-	    		    tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-	    		}
-	        }  
-	    	// actualizamos el contenido de la tabla.   	     	  
-	    	tabla.refresh();
-	    	// No es necesario establecer  una conexion, crear una sentencia y recuperar el 
-	    	// resultado en un resultSet, esto lo hace automaticamente la tabla (DBTable) a 
-	    	// patir de la conexion y la consulta seteadas con connectDatabase()
-	    }
-	    catch (SQLException ex) {
-	    	ex.printStackTrace();
-	        // en caso de error, se muestra la causa en la consola
-	        System.out.println("SQLException: " + ex.getMessage());
-	        System.out.println("SQLState: " + ex.getSQLState());
-	        System.out.println("VendorError: " + ex.getErrorCode());
-	        JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-	                            ex.getMessage() + "\n", 
-	                            "Error al ejecutar la consulta.",
-	                            JOptionPane.ERROR_MESSAGE);
-	    }
-    }
-	
 }
