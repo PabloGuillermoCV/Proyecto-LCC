@@ -10,46 +10,128 @@
 
 /*
 	
-	sem(A) = 1
-		A hace: down(A), Imprimir, up(B)
-	sem(B) = 0
-		B hace: down(B), Imprimir, up(C)
-	sem(C) = 0
-		C hace: down(C), Imprimir, up(D) 
-	sem(D) = 0
-		D hace: down(D), Imprimir, up(E)
-	sem(E) = 0
-		E hace: down(E), Imprimir, up(A)
+	A Hace: Recibe Mensaje PipeA; Imprime A; Envia Mensaje PipeB;
+	
+	B Hace: Recibe Mensaje PipeB; Imprime B; Envia Mensaje PipeC;
+	
+	C Hace: Recibe Mensaje PipeC; Imprime C; Envia Mensaje PipeD;
+	
+	D Hace: Recibe Mensaje PipeD; Imprime D; Envia Mensaje PipeE;
+		
+	E Hace: Recibe Mensaje PipeE; Imprime E; Envia Mensaje PipeA;
 	
 */
 
+//0 es para leer y 1 es para escribir
+
+    char writeMessage;
+	char readMessage;
+
+	int PipeA[2];
+	int PipeB[2];
+    int PipeC[2];
+	int PipeD[2];
+	int PipeE[2];
+
 void A () {
-	
+	close (PipeA[1]);
+	close (PipeB[0]);
+	close (PipeC[0]);
+	close (PipeC[1]);
+	close (PipeD[0]);
+	close (PipeD[1]);
+	close (PipeE[0]);
+	close (PipeE[1]);
+	while (true) {
+		read(PipeA[0],&readMessage,1);
+		printf("A");
+		fflush(NULL);
+        writeMessage = 'X';
+		write(PipeB[1],&writeMessage,1);
+	}
 }
 
 void B () {
-	
+	close (PipeA[0]);
+	close (PipeA[1]);
+	close (PipeB[1]);
+	close (PipeC[0]);
+	close (PipeD[0]);
+	close (PipeD[1]);
+	close (PipeE[0]);
+	close (PipeE[1]);
+	while (true) {
+		read(PipeB[0],&readMessage,1);
+		printf("B");
+		fflush(NULL);
+        writeMessage = 'X';
+		write(PipeC[1],&writeMessage,1);
+	}
 }
 
 void C () {
-	
+	close (PipeA[0]);
+	close (PipeA[1]);
+	close (PipeB[0]);
+	close (PipeB[1]);
+	close (PipeC[1]);
+	close (PipeD[0]);
+	close (PipeE[0]);
+	close (PipeE[1]);
+	while (true) {
+		read(PipeC[0],&readMessage,1);
+		printf("C");
+		fflush(NULL);
+        writeMessage = 'X';
+		write(PipeD[1],&writeMessage,1);
+	}
 }
 
 void D () {
-	
+	close (PipeA[0]);
+	close (PipeA[1]);
+	close (PipeB[0]);
+	close (PipeB[1]);
+	close (PipeC[0]);
+	close (PipeC[1]);
+	close (PipeD[1]);
+	close (PipeE[0]);
+	while (true) {
+		read(PipeD[0],&readMessage,1);
+		printf("D");
+		fflush(NULL);
+        writeMessage = 'X';
+		write(PipeE[1],&writeMessage,1);
+	}
 }
 
 void E () {
-	
+	close (PipeA[0]);
+	close (PipeB[0]);
+	close (PipeB[1]);
+	close (PipeC[0]);
+	close (PipeC[1]);
+	close (PipeD[0]);
+	close (PipeD[1]);
+	close (PipeE[1]);
+	writeMessage = 'X';
+    write(PipeA[1],&writeMessage,1);
+	while (true) {
+		read(PipeE[0],&readMessage,1);
+		printf("E");
+		fflush(NULL);
+        writeMessage = 'X';
+		write(PipeA[1],&writeMessage,1);
+	}
 }
 
 int main () {
 	
-	char writeMessage[20];
-	char readMessage[20];
-	
-	int pdf [2];
-	pipe (pdf);
+	pipe (PipeA);
+	pipe (PipeB);
+	pipe (PipeC);
+	pipe (PipeD);
+	pipe (PipeE);
 	
     int pid = fork ();
     if (pid == -1) {
