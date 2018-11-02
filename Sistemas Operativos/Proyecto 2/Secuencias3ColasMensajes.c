@@ -7,6 +7,7 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/ipc.h>
+#include <sys/wait.h>
 
 //ACDE BCDE ABCDE  ACDE BCDE ABCDE...
 
@@ -83,6 +84,9 @@ void D () { //Lee los mensajes de tipo 4
 
 void E () { //Lee los mensajes de tipo 5
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
+	Mensaje.Tipo = 1;
+	Mensaje.Texto = 'X';
+	msgsnd(MsgID,&Mensaje,1,0666);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
@@ -107,6 +111,11 @@ void E () { //Lee los mensajes de tipo 5
 int main () {
 	
 	Key = ftok("File",10);
+	
+	if (Key < 0) {
+		fprintf (stderr,"Error al crear la clave");
+		exit(0);
+	}
 	
 	int pid = fork ();
     if (pid == -1) {
@@ -151,11 +160,11 @@ int main () {
 					}
 				}
 			}
+			exit(0);
     	}
-		exit(0);
     }
 
-	if (pid != 0){
+	if (pid > 0){
     	wait(NULL);
 	}
 	
