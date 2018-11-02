@@ -16,9 +16,9 @@
 	
 	C Hace: Recibe Mensaje PipeC; Imprime C; Envia Mensaje PipeD;
 	
-	D Hace: Recibe Mensaje PipeD; Imprime D; Envia Mensaje PipeE; Recibe Mensaje PipeDAux;
+	D Hace: Recibe Mensaje PipeDAux; Recibe Mensaje PipeD; Imprime D; Envia Mensaje PipeE;
 	
-	E Hace: Recibe Mensaje PipeE; Imprime E; Envia Mensaje (PipeAoBoC); Recibe Mensaje PipeD; Envia Mensaje PipeDAux; Envia Mensaje (PipeAoBoC);
+	E Hace: Recibe Mensaje PipeD; Envia Mensaje PipeDAux; Envia Mensaje Pipe(AoBoC); Recibe Mensaje PipeE; Envia Mensaje Pipe(AoBoC);
 	
 */
 
@@ -47,7 +47,7 @@ void A () {
 	close (PipeDAux[1]);
 	while (true) {
 		read(PipeA[0],&readMessage,1);
-		printf("C");
+		printf("A");
 		fflush(NULL);
         writeMessage = 'X';
 		write(PipeD[1],&writeMessage,1);
@@ -104,14 +104,15 @@ void D () {
 	close (PipeD[1]);
 	close (PipeE[0]);
 	close (PipeDAux[1]);
-	read(PipeDAux[0],&readMessage,1);
 	while (true) {
-		read(PipeD[0],&readMessage,1);
-		printf("D");
+		read(PipeDAux[0],&readMessage,1);
 		fflush(NULL);
+		read(PipeD[0],&readMessage,1);
+		fflush(NULL);
+		printf("D");
 		writeMessage = 'X';
 		write(PipeE[1],&writeMessage,1);
-		read(PipeDAux[0],&readMessage,1);
+		fflush(NULL);
 	}
 }
 
@@ -123,27 +124,31 @@ void E () {
 	close (PipeE[1]);
 	close (PipeDAux[0]);
 	
-	writeMessage = 'X';
-	int NumRandom = rand() % 3 + 1;
-	fflush(NULL);
-	write(PipeDAux[1],&writeMessage,1);
-	NumRandom = rand() % 3 + 1;
-		switch (NumRandom) {
-			case 1 : write(PipeA[1],&writeMessage,1);
-			case 2 : write(PipeB[1],&writeMessage,1);
-			case 3 : write(PipeB[1],&writeMessage,1);
-	}
-	
-	read(PipeD[0],&readMessage,1);
-	fflush(NULL);
+	int NumRandom;
 	writeMessage = 'X';
 	NumRandom = rand() % 3 + 1;
 	switch (NumRandom) {
-			case 1 : write(PipeA[1],&writeMessage,1);
-			case 2 : write(PipeB[1],&writeMessage,1);
-			case 3 : write(PipeB[1],&writeMessage,1);
+		case 1 : write(PipeA[1],&writeMessage,1); break;
+		case 2 : write(PipeB[1],&writeMessage,1); break;
+		case 3 : write(PipeC[1],&writeMessage,1); break;
 	}
+	fflush(NULL);
+	
 	while (true) {
+		read(PipeD[0],&readMessage,1);
+		fflush(NULL);
+		writeMessage = 'X';
+		write(PipeDAux[1],&writeMessage,1);
+		fflush(NULL);
+		
+		NumRandom = rand() % 3 + 1;
+		switch (NumRandom) {
+			case 1 : write(PipeA[1],&writeMessage,1); break;
+			case 2 : write(PipeB[1],&writeMessage,1); break;
+			case 3 : write(PipeC[1],&writeMessage,1); break;
+		}
+		fflush(NULL);
+		
 		read(PipeE[0],&readMessage,1);
 		printf("E");
 		fflush(NULL);
@@ -151,21 +156,11 @@ void E () {
 		
 		NumRandom = rand() % 3 + 1;
 		switch (NumRandom) {
-			case 1 : write(PipeA[1],&writeMessage,1);
-			case 2 : write(PipeB[1],&writeMessage,1);
-			case 3 : write(PipeB[1],&writeMessage,1);
+			case 1 : write(PipeA[1],&writeMessage,1); break;
+			case 2 : write(PipeB[1],&writeMessage,1); break;
+			case 3 : write(PipeC[1],&writeMessage,1); break;
 		}
-		
-		read(PipeD[0],&readMessage,1);
 		fflush(NULL);
-		write(PipeDAux[1],&writeMessage,1);
-		
-		NumRandom = rand() % 3 + 1;
-		switch (NumRandom) {
-			case 1 : write(PipeA[1],&writeMessage,1);
-			case 2 : write(PipeB[1],&writeMessage,1);
-			case 3 : write(PipeB[1],&writeMessage,1);
-		}
 	}
 }
 
@@ -228,8 +223,6 @@ int main () {
 	if (pid != 0){
     	wait(NULL);
 	}
-	
-	
 	
 	return 0;
 }

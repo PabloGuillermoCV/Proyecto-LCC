@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/ipc.h>
 
 //ACDE BCDE ABCDE  ACDE BCDE ABCDE...
 
@@ -33,73 +34,73 @@ struct Buffer_M {
 void A () { //Lee los mensajes de tipo 1
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,1,0666);
+		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("A");
 		Mensaje.Tipo = 3;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 		
-		msgrcv(msgID,&Mensaje,1,1,0666);
+		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("A");
 		Mensaje.Tipo = 2;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,10,0666);
+		msgsnd(MsgID,&Mensaje,10,0666);
 	}
 }
 
 void B () { //Lee los mensajes de tipo 2
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,2,0666);
+		msgrcv(MsgID,&Mensaje,1,2,0666);
 		printf("B");
 		Mensaje.Tipo = 3;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
 void C () { //Lee los mensajes de tipo 3
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,3,0666);
+		msgrcv(MsgID,&Mensaje,1,3,0666);
 		printf("C");
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
 void D () { //Lee los mensajes de tipo 4
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,4,0666);
+		msgrcv(MsgID,&Mensaje,1,4,0666);
 		printf("D");
 		Mensaje.Tipo = 5;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
 void E () { //Lee los mensajes de tipo 5
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,5,0666);
+		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
 		Mensaje.Tipo = 2;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 		
-		msgrcv(msgID,&Mensaje,1,5,0666);
+		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 		
-		msgrcv(msgID,&Mensaje,1,5,0666);
+		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 

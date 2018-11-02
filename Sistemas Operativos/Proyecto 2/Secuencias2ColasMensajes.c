@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/ipc.h>
 
 //(AoBoC)(AoBoC)DE (AoBoC)(AoBoC)DE (AoBoC)(AoBoC)DE...
 
@@ -33,65 +34,65 @@ struct Buffer_M {
 void A () { //Lee los mensajes de tipo 1
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,1,0666);
+		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("A");
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
 void B () { //Lee los mensajes de tipo 2
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,2,0666);
+		msgrcv(MsgID,&Mensaje,1,2,0666);
 		printf("B");
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
 void C () { //Lee los mensajes de tipo 3
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,3,0666);
+		msgrcv(MsgID,&Mensaje,1,3,0666);
 		printf("C");
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
 void D () { //Lee los mensajes de tipo 4 y 6
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,4,0666);
+		msgrcv(MsgID,&Mensaje,1,4,0666);
 		printf("D");
 		//D envia un mensaje a E
 		Mensaje.Tipo = 5;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 		//D espera a que el grupo ABC pase dos veces
 		//E le envia un mensaje avisandole cuando puede seguir
-		msgrcv(msgID,&Mensaje,1,6,0666);
+		msgrcv(MsgID,&Mensaje,1,6,0666);
 	}
 }
 
 void E () { //Lee los mensajes de tipo 4 y 5
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(msgID,&Mensaje,1,5,0666);
+		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
 		//E envia un mensaje aleatorio a ABC
 		int NumRandom = rand() % 3 + 1;
 		Mensaje.Tipo = NumRandom;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 		
 		//E es notificado que ABC termino por pimera vez
 		//Le avisa a D para que en el siguiente ciclo reciba el mensaje
-		msgrcv(msgID,&Mensaje,1,4,0666);
+		msgrcv(MsgID,&Mensaje,1,4,0666);
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
 		
@@ -99,7 +100,7 @@ void E () { //Lee los mensajes de tipo 4 y 5
 		NumRandom = rand() % 3 + 1;
 		Mensaje.Tipo = NumRandom;
 		Mensaje.Texto = 'X';
-		msgsnd(msgID,&Mensaje,1,0666);
+		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
