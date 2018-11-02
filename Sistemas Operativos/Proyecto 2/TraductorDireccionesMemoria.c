@@ -29,17 +29,30 @@
 		También puedo representar el numero completo y poner el literal de representación al final
 		1111b es un número binario de 4 bits, por ejemplo
 
+	Sobre Enmascarado:
+		La cosa funciona asi, yo al enmascarar, me quedo con los bits que me "Importan" al aplicar una operación AND entre el 
+		Numero original en binario y un número binario arbitrario cuyas posiciones en 1 denotan QUE posiciones de bits dejaré como están
+
+		asumamos que el numero es 101011010111111 y la máscara es 1111111100000000
+		al hacer 101011010111111 & 1111111100000000 obtengo 1010110100000000
+
+	Sobre Shifting:
+		la operación >> o << denota un shifting de los bits del número a derecha o a izquierda respectivamente (igual que haciamos en Orga)
+		se permite usar potencias de dos para hacer shifting de varias posiciones de una.
+		LOS BITS QUE SE CAEN DEL NÚMERO SE PIERDEN
+		si mi numero es 010110, hacer 010110 >> resulta en 001011
+
 	Una cosa que estoy viendo es que uint_x NO es un tipo "standard", preguntar si su uso esta bien
 	También una cosa que estoy leyendo es que al usar ">>", el numero pasa a int si o si, preguntar 
 	preguntar que deberia contener la tabla de paginas, si numeros random o algo en particular
 
 	lo que hace >> es mover los bits del numero, si muevo mal, puedo perder bits, lo que yo necesito es CORTAR los bits innecesarios 
-	despues de usar la máscara, preguntar como hacer, si se puede usar /10 o %10 o si hayq ue usar >> pero de alguna forma que no estoy entendiendo
+	despues de usar la máscara, preguntar como hacer, si se puede usar /10 o %10 o si hay que usar >> pero de alguna forma que no estoy entendiendo
 	Otra cosa a preguntar es CUALES son los contenidos de la tabla de páginas, si números random, si se tienen que buscar en algún lado.... 
 */
 
 /*
- * Dado un numero en decimal, pasarlo a binario
+ * Dado un numero en decimal, pasarlo a binario, uso método de la División
 */
 uint16_t DecimalABinario(int n){
 	uint16_t ret = 0x00; //000000000000000
@@ -57,7 +70,7 @@ uint16_t DecimalABinario(int n){
 }
 
 /*
- * Dado un Numero binario, lo paso a Decimal
+ * Dado un Numero binario, lo paso a Decimal, uso método del producto
 */
 int BinarioADecimal(uint8_t n){
 	int i = 7; //acordarse que las posiciones van de 0 a n-1 cuando haciamos las conversiones en Orga
@@ -101,7 +114,15 @@ int BusquedaTLB(uint8_t PN){
  * Método que concatenará dos cadenas de numeros
 */
 uint16_t concatenar(uint8_t FP, uint8_t Off){
-
+	uint16_t ret = 0x00;
+	int i = 10;
+	ret = FP * 100000000;
+	while(off > 0){
+		ret = ret + ((Off % 10)*i);
+		i = i*10;
+		Off = Off / 10;
+	}
+	return ret;
 }
 
 /*
@@ -131,6 +152,7 @@ void main(){
 	int framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
 	int TLB [16][2]; //TLB
+	inicializar(&Direcciones, &TablaPaginas, &TLB); //función para inicializar todos los arreglos
 	uint16_t MaskI = 0000000011111111b; //Máscaras que usaré para obtener el Page Number y el Offset de la Dirección Lógica
 	uint16_t MaskS = 1111111100000000b; //Recordar que la dirección Lógica es de 16 bits, necesito comparaciones en 16 bits 
 										//(Preguntar igual porque el tema es obtener 8 bits, no 16)
@@ -143,14 +165,15 @@ void main(){
 	int i;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
 	int size = NELEMS(Direcciones); //MACRO para obtener el tamaño final del arreglo
-	for(i = 0; i < size; i++){ //la longitud del arreglo "Direcciones" es desconocida a este punto, ver que hacer
-		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits 
+	for(i = 0; i < size; i++){ //Para cada dirección lógica en el arreglo
+		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario 
 		//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
 		//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
 		PageNum = (num & MaskS) / 100000000; 
 		Offset = ((num & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
 		framePag = BusquedaTabla(PageNum, &TablaPaginas); //Ver esto del pasaje
 		DirFis = concatenar(framePag,Offset);
+		printf("Direccion Logica = %d, Direccion Fisica = %d ", num,DirFis); //Hecha la traducción, imprimo, preguntar si es correcto
 
 	}
 
