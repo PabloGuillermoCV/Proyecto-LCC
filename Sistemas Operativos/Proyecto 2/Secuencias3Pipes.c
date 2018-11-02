@@ -196,11 +196,9 @@ int main () {
     	}
     }
 
-	if (pid != 0){
+	if (pid > 0){
     	wait(NULL);
 	}
-	
-	
 	
 	return 0;
 }
