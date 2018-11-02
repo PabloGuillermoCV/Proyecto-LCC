@@ -1,9 +1,12 @@
 #include<stdlib.h>
+#include<math.h>
+
+#define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
 
 /*PASOS A SEGUIR:
 	
-	0) Leer el archio y obtener todas las direcciones lógicas a traducir
+	0) Leer el archivo y obtener todas las direcciones lógicas a traducir
 	1) Obtener la Dirección Lógica 
 		Lo que debo hacer es, dado el numero entero, Pasarlo a Base 2 
 		y de ahí usar Enmascarado de Bits para separar el numero de 16 bits resultante en dos secuencias de 8 bits
@@ -32,6 +35,7 @@
 
 	lo que hace >> es mover los bits del numero, si muevo mal, puedo perder bits, lo que yo necesito es CORTAR los bits innecesarios 
 	despues de usar la máscara, preguntar como hacer, si se puede usar /10 o %10 o si hayq ue usar >> pero de alguna forma que no estoy entendiendo
+	Otra cosa a preguntar es CUALES son los contenidos de la tabla de páginas, si números random, si se tienen que buscar en algún lado.... 
 */
 
 /*
@@ -61,12 +65,14 @@ int BinarioADecimal(uint8_t n){
 	int aux = 0;
 	while(i >= 0){
 		//Agarrar bit por bit y pasarlo a decimal
-		aux = n >> i; //Bit shifting, lo que intento obtener el la compenente i-esima del numero binario
-		ret = ret + (/*2*Bit del numero elevado a la i*/);
+		aux = n % 10;
+		ret = ret + (2*pow(aux,i)); /*2*Bit del numero elevado a la i*/
+		n = n / 10;
+		i--;
 
 	}
 
-	return ret + 1; //Esto lo teniamos que hacer en Organización si mal no recuerdo... 
+	return ret + 1; //Esto lo teniamos que hacer en Organización si mal no recuerdo... (Representaciones)
 }
 
 
@@ -88,6 +94,13 @@ int BusquedaTabla(uint8_t PN){
  * NOTA: Devolver -1 significa que NO se encontró el número de página en el TLB
 */
 int BusquedaTLB(uint8_t PN){
+
+}
+
+/*
+ * Método que concatenará dos cadenas de numeros
+*/
+uint16_t concatenar(uint8_t FP, uint8_t Off){
 
 }
 
@@ -116,7 +129,7 @@ void main(){
 	int Direcciones [10]; //Arreglo donde guardaremos las direcciones, valor inicial para 10 direcciones, se debe poder agrandar
 	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
 	int framePag; //Numero de frame resultante
-	int DirFis; //Dirección física Resultante
+	uint16_t DirFis; //Dirección física Resultante
 	int TLB [16][2]; //TLB
 	uint16_t MaskI = 0000000011111111b; //Máscaras que usaré para obtener el Page Number y el Offset de la Dirección Lógica
 	uint16_t MaskS = 1111111100000000b; //Recordar que la dirección Lógica es de 16 bits, necesito comparaciones en 16 bits 
@@ -129,13 +142,16 @@ void main(){
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
-	for(i = 0; i < 1000; i++){ //la longitud del arreglo "Direcciones" es desconocida a este punto, ver que hacer
+	int size = NELEMS(Direcciones); //MACRO para obtener el tamaño final del arreglo
+	for(i = 0; i < size; i++){ //la longitud del arreglo "Direcciones" es desconocida a este punto, ver que hacer
 		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits 
 		//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
 		//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
 		PageNum = (num & MaskS) / 100000000; 
 		Offset = ((num & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
 		framePag = BusquedaTabla(PageNum, &TablaPaginas); //Ver esto del pasaje
+		DirFis = concatenar(framePag,Offset);
+
 	}
 
 	
