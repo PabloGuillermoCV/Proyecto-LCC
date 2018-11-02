@@ -115,9 +115,11 @@ void main(){
 
 	int Direcciones [10]; //Arreglo donde guardaremos las direcciones, valor inicial para 10 direcciones, se debe poder agrandar
 	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
+	int framePag; //Numero de frame resultante
+	int DirFis; //Dirección física Resultante
 	int TLB [16][2]; //TLB
 	uint16_t MaskI = 0000000011111111b; //Máscaras que usaré para obtener el Page Number y el Offset de la Dirección Lógica
-	uint16_t MaskS = 1111111100000000b; //Recordar que la dirección Lógica es de 16 bits, necesito comapraciones en 16 bits 
+	uint16_t MaskS = 1111111100000000b; //Recordar que la dirección Lógica es de 16 bits, necesito comparaciones en 16 bits 
 										//(Preguntar igual porque el tema es obtener 8 bits, no 16)
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
@@ -126,10 +128,16 @@ void main(){
 	LeerArchivo(Direcc, &Direcciones); //Paso el arreglo por puntero (?)
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
+	uint16_t num; //variable que mantendrá el valor original en 16 bits
 	for(i = 0; i < 1000; i++){ //la longitud del arreglo "Direcciones" es desconocida a este punto, ver que hacer
-		
+		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits 
+		//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
+		//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
+		PageNum = (num & MaskS) / 100000000; 
+		Offset = ((num & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
+		framePag = BusquedaTabla(PageNum, &TablaPaginas); //Ver esto del pasaje
 	}
 
-	uint16_t num; //variable que mantendrá el valor original en 16 bits
+	
 
 }
