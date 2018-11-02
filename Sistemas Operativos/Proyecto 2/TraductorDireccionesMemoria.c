@@ -13,21 +13,42 @@
 		Una vez implementada la Tabla de Páginas (arreglo de 256 componentes) y probada, se debe añadir el TLB el cual es un arreglo de 16x2
 		OJO, para el TLB es necesario implementar un algoritmo de reemplazo (FIFO, LRU, etc)
 		Lo que hago aquí es, dado el número de 8 bits, pasarlo a decimal y acceder al arreglo directamente a la componente que apunte el numero convertido (preguntar)
-			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame 
+			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un TLB Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame 
 			debo agregarlo al TLB para futuro uso
 	3) Obtener la Dirección Física
 		Hecho todo el trámite, deberia de terminar con al dirección física a devolver (preguntar que se hace acá, si realmente debo acceder a algún lado interno de la PC
 		a por la dirección Física o si el FramexOffset es ya la dirección física)
+
+	Sobre uint_x:
+		0x.. -> el número lo represento en Hexadecimal
+		0b.. -> el número lo represento en Binario
+		Sin literal despues del primer cero lo estoy trabajando en Decimal
+		También puedo representar el numero completo y poner el literal de representación al final
+		1111b es un número binario de 4 bits, por ejemplo
+
+	Una cosa que estoy viendo es que uint_x NO es un tipo "standard", preguntar si su uso esta bien
+	También una cosa que estoy leyendo es que al usar ">>", el numero pasa a int si o si, preguntar 
+	preguntar que deberia contener la tabla de paginas, si numeros random o algo en particular
+
+	lo que hace >> es mover los bits del numero, si muevo mal, puedo perder bits, lo que yo necesito es CORTAR los bits innecesarios 
+	despues de usar la máscara, preguntar como hacer, si se puede usar /10 o %10 o si hayq ue usar >> pero de alguna forma que no estoy entendiendo
 */
 
 /*
- * Dado el numero inicial, pasarlo a binario
+ * Dado un numero en decimal, pasarlo a binario
 */
 uint16_t DecimalABinario(int n){
 	uint16_t ret = 0x00; //000000000000000
+	int aux;
+	int i = 1; //para ir sumando 1, 10, 100, etc
+	while(n > 0){
+		aux = n % 2;
+		n = n / 2;
+		ret = ret + (aux * i); 
+		i = i * 10; 
+	}
 
-
-	return ret;
+	return ret; //Dudo de si esto esta bien.
 
 }
 
@@ -55,8 +76,19 @@ int BinarioADecimal(uint8_t n){
 */
 int BusquedaTabla(uint8_t PN){
 	int Nro = BinarioADecimal(PN);
+	int frame = 0;
+	//Lo que hago es acceder a la tabla de Paginas y buscar el valor, preguntar si pasar la tabla por puntero o como parámtero
+	frame = TablaPaginas[Nro + 1];
+	return frame; //NO tengo idea de como manejar el frame, preguntar
+	
+}
 
-	return Nro;
+/*
+ * Dado un número de Página, lo intento buscar en el TLB, en caso de no encontrarlo, debo bajar a la Tabla de Páginas
+ * NOTA: Devolver -1 significa que NO se encontró el número de página en el TLB
+*/
+int BusquedaTLB(uint8_t PN){
+
 }
 
 /*
@@ -67,22 +99,37 @@ void Reemplazar(){
 
 }
 
-/* Método que se encargará de agrandar el arreglod e direcciones a traducir en caso que sea necesario
+/* Método que se encargará de agrandar el arreglo de direcciones a traducir en caso que sea necesario
  *
 */
 void agrandarArreglo(){
 
 }
 
-//EL código de lectura de archivos hayq eu probarlo por separado en algún otro lado, hay que probar quye esa cosa ande si la vamos a agarrar del Proyecto 1
+//EL código de lectura de archivos hay que probarlo por separado en algún otro lado, hay que probar que esa cosa ande si la vamos a agarrar del Proyecto 1
+void LeerArchivo(){
+
+}
 
 void main(){
 
 	int Direcciones [10]; //Arreglo donde guardaremos las direcciones, valor inicial para 10 direcciones, se debe poder agrandar
 	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
 	int TLB [16][2]; //TLB
+	uint16_t MaskI = 0000000011111111b; //Máscaras que usaré para obtener el Page Number y el Offset de la Dirección Lógica
+	uint16_t MaskS = 1111111100000000b; //Recordar que la dirección Lógica es de 16 bits, necesito comapraciones en 16 bits 
+										//(Preguntar igual porque el tema es obtener 8 bits, no 16)
+	uint8_t PageNum = 0x00;
+	uint8_t Offset = 0x00;
 	FILE *Direcc; //Archivo de entrada del proyecto
+	Direcc = fopen("memoria.txt");
+	LeerArchivo(Direcc, &Direcciones); //Paso el arreglo por puntero (?)
+	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
+	int i;
+	for(i = 0; i < 1000; i++){ //la longitud del arreglo "Direcciones" es desconocida a este punto, ver que hacer
+		
+	}
 
-	uint16_t num;
+	uint16_t num; //variable que mantendrá el valor original en 16 bits
 
 }
