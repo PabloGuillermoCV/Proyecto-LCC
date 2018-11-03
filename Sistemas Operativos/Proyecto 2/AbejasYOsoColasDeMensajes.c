@@ -9,18 +9,18 @@
 #include <sys/ipc.h>
 #include <sys/wait.h>
 
-//Tipo 1: Abeja produce miel (recibe el mensaje) y Oso consume miel (envia el mensaje)
-//Tipo 2: No hay miel (En el caso de que una Abeja no recibe un mensaje de tipo 1, para despertar al Oso)
+//Tipo 1: Abeja produce miel (recibe un mensaje) y Oso consume miel (envia M-1 mensajes)
+//Tipo 2: Ultimo espacio libre de miel (lo recibe la ultima Abeja, la cual se encarga de llamar al Oso) (El Oso envia este mensaje despues de M-1 mensajes de tipo 1)
 //Tipo 4: Abeja entra a producir miel (Recibido por las Abejas y es enviado por otra Abeja o por un Oso cuando termina de consumir la miel)
 //Tipo 6: Despertar Oso (Abeja envia cuando recibe un mensaje de tipo 2 y Oso recibe)
 
 /*
 	
-	El ciclo comienza con el Oso enviando M mensajes de tipo 1, uno de tipo 2 y otro de tipo 4, antes de entrar al while
+	El ciclo comienza con el Oso enviando M-1 mensajes de tipo 1, uno de tipo 2 y otro de tipo 4, antes de entrar al while
 	
 	Oso:
 		Recibe Mensaje Tipo 6;
-		Envia M Mensajes Tipo 1;
+		Envia M-1 Mensajes Tipo 1;
 		Envia Mensaje Tipo 2;
 		Envia Mensaje Tipo 4;
 	
@@ -34,8 +34,8 @@
 	
 */
 
-int const N = 6;
-int const M = 3;
+int const N = 6; //Tengo N Abejas
+int const M = 14; //Tengo M espacios para la miel
 
 key_t Key;
 
@@ -47,7 +47,7 @@ struct Buffer_M {
 void Oso () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	int I;
-	for (I = 0; I < M; I++) {
+	for (I = 0; I < M-1; I++) {
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
@@ -63,7 +63,7 @@ void Oso () {
 	
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,6,0666);
-		for (I = 0; I < M; I++) {
+		for (I = 0; I < M-1; I++) {
 			Mensaje.Tipo = 1;
 			Mensaje.Texto = 'X';
 			msgsnd(MsgID,&Mensaje,1,0666);
@@ -87,7 +87,7 @@ void Abeja () {
 		msgrcv(MsgID,&Mensaje,1,-2,0666);
 		
 		if (Mensaje.Tipo == 1) {
-			printf("Se produjo miel, pasa la siguiente Abeja.\n");
+			printf("Se produjo miel y quedan espacios, pasa la siguiente Abeja.\n");
 			Mensaje.Tipo = 4;
 			Mensaje.Texto = 'X';
 			msgsnd(MsgID,&Mensaje,1,0666);
@@ -95,7 +95,7 @@ void Abeja () {
 		
 		else {
 			if (Mensaje.Tipo == 2) {
-				printf("No se puede poner mas miel, se despierta al Oso.\n");
+				printf("Se produjo miel y se lleno el tarro, se despierta al Oso.\n");
 				Mensaje.Tipo = 6;
 				Mensaje.Texto = 'X';
 				msgsnd(MsgID,&Mensaje,1,0666);
