@@ -40,7 +40,7 @@ char ALLOWED_GROUPS[4] = {'u','g','o','a'} //Arreglo Global para saber los carac
 		3) UNA VEZ VERIFICADO QUE LA SECCIÓN DE PERMISOS ES CORECTA, SE HACE LA LLAMADA A CHMOD 
 
 Código original de la llamada a chmod:
-	fprintf(stderr, "%s: error in chmod(%s, %s) - %d (%s)\n",
+	fprintf(stderr, "%s: error en chmod(%s, %s) - %d (%s)\n",
                 argv[0], buf, mode, errno, strerror(errno));
         exit(1);
 
@@ -54,10 +54,13 @@ int PerteneceNums(char n){
 	int a = (int)n; 
 	int ret = 0;
 	for(i = 0; i < NELEMS(ALLOWED_OCTAL) && ret == 0; i++){
-		if(!(a == (int)(ALLOWED_OCTAL[i]))){
-			ret = -3; //Codigo de error propio, "Código de permisos Ilegal"
+		if(a == (int)(ALLOWED_OCTAL[i])){
+			ret = 1;  //El numero obtenido es un octal legal para chmod
 		}
 	}
+	if(ret != 1)
+		ret = -3; //Codigo de error propio, "Código de permisos Ilegal"
+
 	return ret;
 }
 
@@ -65,7 +68,7 @@ int PerteneceNums(char n){
  * Método con el cual intento corroborar que la llamada EN OCTAL de chmod sea correcta
 */
 int LeerOctal(char *Perms){
-	int ret = 0;
+	int ret = 1;
 	int i;
 	if (sizeof(Perms) > 3)
 		ret = -1; //Código de error propio, como hay más parámetros de los permitidos (OJO, NO CONSIDERO STICKY BIT, PREGUNTAR), corto y guardo esto como código de error 
@@ -73,7 +76,7 @@ int LeerOctal(char *Perms){
 		if(sizeof(Perms) < 3)
 			ret = -2; //Código de error propio "Cantidad de permisos a setear insuficiente, debe ser del tipo ugo"
 		else{
-			for(i = 1; i < sizeof(Perms) && ret == 0; i++){
+			for(i = 1; i < sizeof(Perms) && ret == 1; i++){
 				ret = PerteneceNums(Perms[i]);
 			}		
 		}
@@ -89,35 +92,62 @@ int perteneceChar(char c){
 	int i;
 	int ret = 0;
 	for(i = 0; i < NELEMS(ALLOWED_PERMS) && ret == 0; i++){
-		if(!(c == ALLOWED_PERMS[i]))
-			ret = -4; //Codigo de error propio "Permiso en caracteres incorrecto"
+		if(c == ALLOWED_PERMS[i])
+			ret = 1; //Codigo de error propio "Permiso en caracteres incorrecto"
 	}
+	if(ret != 1) //si NO encontré el literal
+		ret = -4;
+
 	return ret;
 }
+
 
 /*
  * Método con el cual intento corroborar que la llamada POR STRING de chmod sea correcta 
 */
 int LeerChars(char *Perms){
-	int ret = 0;
+	int ret = 1;
 	int i = 0;
 	char comp = 'a';
+	char lect = '';
 	if(Perms[0] == comp){
 		if(Perms[1] == '='){
-			for(i = 2; i < sizeof(Perms) && ret == 0; i++){
+			for(i = 2; i < sizeof(Perms) && ret == 1; i++){
 				if(comp != Perms[i]) //Pregunto que NO se me estén repitiendo permisos (chmod no permite a=wrr, por ejemplo), la primera vez debe entrar
 					ret = perteneceChar(Perms[i]); //de ahi en más, se que los permisos son del tipo a=<algo>, tengo que corroborar que cada caracter de <algo> sea legal
 				comp = Perms[i]; //guardo el caracter usado para ver luego que no se me repita
 			}
 		}
+		else{
+			ret = -7; //Error: "El tipo de usuario NO es acompañado por el caracter "=" "
+		}
 	}
-	else{
+	else{ //EL caracteter de usuario NO es 'a', debe ser 'u' inicialmente (u=...,g=...,o=...)
 		if(Perms[0] == 'u'){
 			comp = 'u';
+			while(i < sizeof(Perms)){ //Mientras haya algo que leer en el string de permisos
+				while (lect != ',' && ret == 1){ //Mientras NO este pasando de grupo de usuarios
+
+					lect = Perms[i];
+					if(comp != Perms[i]) //Pregunto que NO se me estén repitiendo permisos (chmod no permite u=wrr, por ejemplo), la primera vez debe entrar
+						ret = perteneceChar(Perms[i]); 
+					comp = Perms[i]; //guardo el caracter usado para ver luego que no se me repita
+					i++;
+				}
+				i++;
+				comp = ALLOWED_GROUPS[i]; //terminé de verificar los permisos para un grupo, paso al siguiente
+				if(comp != Perms[i]) //Verifico que el siguiente tipo de usuario sea válido (debe ser 'g' u 'o')
+					ret = -6; //Error: "tipo de usuario inválido"
+				else{
+					i++;
+					if(Perms[i] != '=')
+						ret = -7;
+				}
+			}
 		}
 		else{
-			ret = -5; //codigo de error propio "Usuario Incorrecto para los permisos"
-		}
+			ret = -5; //codigo de error propio: "Usuario Incorrecto para los permisos"
+		}		
 	}
 
 }
@@ -129,7 +159,7 @@ int main(int argc, const char * argv[]){
 	char *FILE;
 	int errno; //entero para códigos de error, sean propios o producto de la llamada a chmod
 
-	if(argc == 1 | argc == 2 | argc > 3){ //ERROR, me pasaron una cantidad insuficiente o de más de argumentos
+	if(argc != 3){ //ERROR, me pasaron una cantidad insuficiente o de más de argumentos
 		printf("ERROR: NO se han especificado la cantidad de argumentos correctos para la llamada a chmod\n");
 		printf("Por favor, ingrese una linea de la forma <permisos> <Nombre_Arcivo> de acuerdo a la funcion chmod\n");
 		exit(1);
