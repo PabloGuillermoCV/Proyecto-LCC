@@ -129,7 +129,9 @@ uint16_t concatenar(uint8_t FP, uint8_t Off){
 	Método que despues se encargará de hacer un reemplazo cuando el TLB este lleno
 	Mi idea es usar un algoritmo FIFO para reemplazar, preguntar
 */
-void Reemplazar(){
+void Reemplazar(int FP, uint8_t PN){
+	int i = 0;
+	
 
 }
 
