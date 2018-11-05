@@ -19,6 +19,7 @@ char ALLOWED_GROUPS[4] = {'u','g','o','a'} //Arreglo Global para saber los carac
 #define ERR_WRONG_USER -5
 #define ERR_INVALID_USER_TYPE -6
 #define ERR_WRONG_LITERAL -7
+#define ERR_REPEAT_PERM -8
 
 
 /*NOTAS:
@@ -120,11 +121,14 @@ int LeerChars(char *Perms){
 	char comp = 'a';
 	char lect = '';
 	if(Perms[0] == comp){
-		if(Perms[1] == '='){
+		if(Perms[1] == '=' && ret == 1){
 			for(i = 2; i < sizeof(Perms) && ret == 1; i++){
-				if(comp != Perms[i]) //Pregunto que NO se me estén repitiendo permisos (chmod no permite a=wrr, por ejemplo), la primera vez debe entrar
+				if(comp != Perms[i]){ //Pregunto que NO se me estén repitiendo permisos (chmod no permite a=wrr, por ejemplo), la primera vez debe entrar
 					ret = perteneceChar(Perms[i]); //de ahi en más, se que los permisos son del tipo a=<algo>, tengo que corroborar que cada caracter de <algo> sea legal
-				comp = Perms[i]; //guardo el caracter usado para ver luego que no se me repita
+					comp = Perms[i]; //guardo el caracter usado para ver luego que no se me repita
+				}
+				else
+					ret = ERR_REPEAT_PERM; //Si NO entré al if, es porque hay permisos repetidos, es un error
 			}
 		}
 		else{
@@ -134,16 +138,21 @@ int LeerChars(char *Perms){
 	else{ //EL caracteter de usuario NO es 'a', debe ser 'u' inicialmente (u=...,g=...,o=...)
 		if(Perms[0] == 'u'){
 			comp = 'u';
-			while(i < sizeof(Perms)){ //Mientras haya algo que leer en el string de permisos
+			while(i < sizeof(Perms) && ret == 1){ //Mientras haya algo que leer en el string de permisos
 				while (lect != ',' && ret == 1){ //Mientras NO este pasando de grupo de usuarios
 
 					lect = Perms[i];
-					if(comp != Perms[i]) //Pregunto que NO se me estén repitiendo permisos (chmod no permite u=wrr, por ejemplo), la primera vez debe entrar
+					if(comp != Perms[i]){ //Pregunto que NO se me estén repitiendo permisos (chmod no permite u=wrr, por ejemplo), la primera vez debe entrar
 						ret = perteneceChar(Perms[i]); 
-					comp = Perms[i]; //guardo el caracter usado para ver luego que no se me repita
+						comp = Perms[i]; //guardo el caracter usado para ver luego que no se me repita
+					}
+					else{
+						ret = ERR_REPEAT_PERM; //Se repitió un permiso y ademas estoy en un ciclo interno, tengo que salir de aquí!
+						break;
+					}
 					i++;
 				}
-				i++;
+				i++; //Estoy en una ',', hago un paso hacia adelante, hacia el siguiente grupo
 				comp = ALLOWED_GROUPS[i]; //terminé de verificar los permisos para un grupo, paso al siguiente
 				if(comp != Perms[i]) //Verifico que el siguiente tipo de usuario sea válido (debe ser 'g' u 'o')
 					ret = ERR_INVALID_USER_TYPE; //Error: "tipo de usuario inválido"
@@ -177,9 +186,14 @@ int main(int argc, const char * argv[]){
 		Permisos = argv[1]; 
 		FILE = argv[2];
 		if(PerteneceNums(Permisos[0]))
-				errno = LeerOctal(Permisos);
+				errno = LeerOctal(Permisos); //Me estan intentando ejecutar chmod en Octal, chequear sintaxis
 		else
-			errno = LeerChars(Permisos);
+			if(perteneceChar(Permisos[0]))
+				errno = LeerChars(Permisos); //Me estan intentando ejecutar chmod en modo texto, chequear sintaxis
+			else{ //Si no entra por ingún lado, me mandaron cualquier cosa, abortar y reportar
+				fprintf(stderr, "La llamada que se esta intentando hacer NO coincide con chmod");
+				exit(1);
+			}
 
 		if(errno == 1){
 			//Si llegué hasta aquí, el control fue correcto, puedo invocar a chmod
