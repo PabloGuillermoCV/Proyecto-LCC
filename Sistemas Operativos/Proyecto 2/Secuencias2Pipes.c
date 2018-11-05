@@ -10,15 +10,15 @@
 
 /*
 	
-	A Hace: Recibe Mensaje PipeA; Imprime A; Envia Mensaje PipeD;
+	A Hace: Recibe Mensaje PipeABC; Imprime A; Envia Mensaje PipeD;
 	
-	B Hace: Recibe Mensaje PipeB; Imprime B; Envia Mensaje PipeD;
+	B Hace: Recibe Mensaje PipeABC; Imprime B; Envia Mensaje PipeD;
 	
-	C Hace: Recibe Mensaje PipeC; Imprime C; Envia Mensaje PipeD;
+	C Hace: Recibe Mensaje PipeABC; Imprime C; Envia Mensaje PipeD;
 	
 	D Hace: Recibe Mensaje PipeDAux; Recibe Mensaje PipeD; Imprime D; Envia Mensaje PipeE;
 	
-	E Hace: Recibe Mensaje PipeD; Envia Mensaje PipeDAux; Envia Mensaje Pipe(AoBoC); Recibe Mensaje PipeE; Envia Mensaje Pipe(AoBoC);
+	E Hace: Recibe Mensaje PipeD; Envia Mensaje PipeDAux; Envia Mensaje PipeABC; Recibe Mensaje PipeE; Imprime E; Envia Mensaje PipeABC;
 	
 */
 
@@ -27,6 +27,7 @@
     char writeMessage;
 	char readMessage;
 
+	int PipeABC[2];
 	int PipeA[2];
 	int PipeB[2];
     int PipeC[2];
@@ -35,81 +36,77 @@
 	int PipeDAux[2];
 
 void A () {
-	close (PipeA[1]);
-	close (PipeB[0]);
-	close (PipeB[1]);
-	close (PipeC[0]);
-	close (PipeC[1]);
+	close (PipeABC[1]);
 	close (PipeD[0]);
 	close (PipeE[0]);
 	close (PipeE[1]);
 	close (PipeDAux[0]);
 	close (PipeDAux[1]);
+	
 	while (true) {
-		read(PipeA[0],&readMessage,1);
+		read(PipeABC[0],&readMessage,1);
 		printf("A");
 		fflush(NULL);
-        writeMessage = 'X';
+
+		writeMessage = 'X';
 		write(PipeD[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
 void B () {
-	close (PipeA[0]);
-	close (PipeA[1]);
-	close (PipeB[1]);
-	close (PipeC[0]);
-	close (PipeC[1]);
+	close (PipeABC[1]);
 	close (PipeD[0]);
 	close (PipeE[0]);
 	close (PipeE[1]);
 	close (PipeDAux[0]);
 	close (PipeDAux[1]);
+
 	while (true) {
-		read(PipeB[0],&readMessage,1);
+		read(PipeABC[0],&readMessage,1);
 		printf("B");
 		fflush(NULL);
-        writeMessage = 'X';
+
+		writeMessage = 'X';
 		write(PipeD[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
 void C () {
-	close (PipeA[0]);
-	close (PipeA[1]);
-	close (PipeB[0]);
-	close (PipeB[1]);
-	close (PipeC[1]);
+	close (PipeABC[1]);
 	close (PipeD[0]);
 	close (PipeE[0]);
 	close (PipeE[1]);
 	close (PipeDAux[0]);
 	close (PipeDAux[1]);
+
 	while (true) {
-		read(PipeC[0],&readMessage,1);
+		read(PipeABC[0],&readMessage,1);
 		printf("C");
 		fflush(NULL);
-        writeMessage = 'X';
+
+		writeMessage = 'X';
 		write(PipeD[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
 void D () {
-	close (PipeA[0]);
-	close (PipeA[1]);
-	close (PipeB[0]);
-	close (PipeB[1]);
-	close (PipeC[0]);
-	close (PipeC[1]);
+	close (PipeABC[0]);
+	close (PipeABC[1]);
 	close (PipeD[1]);
 	close (PipeE[0]);
 	close (PipeDAux[1]);
+
 	while (true) {
 		read(PipeDAux[0],&readMessage,1);
 		fflush(NULL);
+
 		read(PipeD[0],&readMessage,1);
-		fflush(NULL);
 		printf("D");
+		fflush(NULL);
+		
 		writeMessage = 'X';
 		write(PipeE[1],&writeMessage,1);
 		fflush(NULL);
@@ -117,58 +114,40 @@ void D () {
 }
 
 void E () {
-	close (PipeA[0]);
-	close (PipeB[0]);
-	close (PipeC[0]);
+	close (PipeABC[0]);
 	close (PipeD[1]);
 	close (PipeE[1]);
 	close (PipeDAux[0]);
 	
-	int NumRandom;
 	writeMessage = 'X';
-	NumRandom = rand() % 3 + 1;
-	switch (NumRandom) {
-		case 1 : write(PipeA[1],&writeMessage,1); break;
-		case 2 : write(PipeB[1],&writeMessage,1); break;
-		case 3 : write(PipeC[1],&writeMessage,1); break;
-	}
+	write(PipeABC[1],&writeMessage,1);
 	fflush(NULL);
 	
 	while (true) {
 		read(PipeD[0],&readMessage,1);
 		fflush(NULL);
+
 		writeMessage = 'X';
 		write(PipeDAux[1],&writeMessage,1);
 		fflush(NULL);
 		
-		NumRandom = rand() % 3 + 1;
-		switch (NumRandom) {
-			case 1 : write(PipeA[1],&writeMessage,1); break;
-			case 2 : write(PipeB[1],&writeMessage,1); break;
-			case 3 : write(PipeC[1],&writeMessage,1); break;
-		}
+		writeMessage = 'X';
+		write(PipeABC[1],&writeMessage,1);
 		fflush(NULL);
 		
 		read(PipeE[0],&readMessage,1);
 		printf("E");
 		fflush(NULL);
+
 		writeMessage = 'X';
-		
-		NumRandom = rand() % 3 + 1;
-		switch (NumRandom) {
-			case 1 : write(PipeA[1],&writeMessage,1); break;
-			case 2 : write(PipeB[1],&writeMessage,1); break;
-			case 3 : write(PipeC[1],&writeMessage,1); break;
-		}
+		write(PipeABC[1],&writeMessage,1);
 		fflush(NULL);
 	}
 }
 
 int main () {
 	
-	pipe (PipeA);
-	pipe (PipeB);
-	pipe (PipeC);
+	pipe (PipeABC);
 	pipe (PipeD);
 	pipe (PipeE);
 	pipe (PipeDAux);

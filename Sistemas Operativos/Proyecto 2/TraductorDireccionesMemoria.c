@@ -149,7 +149,7 @@ void LeerArchivo(){
 
 void main(){
 
-	int Direcciones [10]; //Arreglo donde guardaremos las direcciones, valor inicial para 10 direcciones, se debe poder agrandar
+	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones, valor inicial para 10 direcciones, se debe poder agrandar
 	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
 	int framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
@@ -171,8 +171,9 @@ void main(){
 		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario 
 		//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
 		//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
-		PageNum = (num & MaskS) / 100000000; 
-		Offset = ((num & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
+		uint16_t numCopy = num;
+		PageNum = (numCopy & MaskS) / 100000000; 
+		Offset = ((numCopy & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
 		framePag = BusquedaTabla(PageNum, &TablaPaginas); //Ver esto del pasaje
 		DirFis = concatenar(framePag,Offset);
 		printf("Direccion Logica = %d, Direccion Fisica = %d ", num,DirFis); //Hecha la traducción, imprimo, preguntar si es correcto

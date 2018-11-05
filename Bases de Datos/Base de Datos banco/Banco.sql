@@ -538,7 +538,7 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 				
 	         INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
 				
-	         INSERT INTO transacción(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
 				
 	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
 				
@@ -546,24 +546,24 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 				
              SELECT 'La transferencia se realizo con exito' AS resultado;
 			 
-			 END
+			 END;
 	      ELSE 
 		    BEGIN
 			
             SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado; 
 			
-			END
+			END;
 			
 	      END IF;
 		  
-		END
+		END;
 		  
 	   ELSE
 	     BEGIN
 		 
             SELECT 'ERROR: Cuenta inexistente' AS resultado; 
 			
-		 END
+		 END;
 	   END IF;  	 		
 		
 	 COMMIT;   # Comete la transacción  
@@ -611,24 +611,24 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 				
 	      	    SELECT 'La Extracción se realizo con exito' AS resultado;         
 			
-			END
+			END;
 			
 	      ELSE  
 		   BEGIN
 		  
             SELECT 'Saldo insuficiente para realizar la extraccion' AS resultado;
 			
-		   END
+		   END;
 	      END IF; 
 		  
-		 END
+		 END;
 		 
 	   ELSE  
 	      BEGIN
 		  
             SELECT 'ERROR: Cuenta inexistente' AS resultado;  
 			
-		  END
+		  END;
 	   END IF; 
 	COMMIT;
 END; !

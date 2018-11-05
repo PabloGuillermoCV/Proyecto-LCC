@@ -15,13 +15,13 @@
 	
 	A Hace: Recibe Mensaje 1; Imprime A; Envia Mensaje 4;
 	
-	B Hace: Recibe Mensaje 2; Imprime B; Envia Mensaje 4;
+	B Hace: Recibe Mensaje 1; Imprime B; Envia Mensaje 4;
 	
-	C Hace: Recibe Mensaje 3; Imprime C; Envia Mensaje 4;
+	C Hace: Recibe Mensaje 1; Imprime C; Envia Mensaje 4;
 	
 	D Hace: Recibe Mensaje 6; Recibe Mensaje 4; Imprime D; Envia Mensaje 5;
 	
-	E Hace: Recibe Mensaje 4; Envia Mensaje 6; Envia Mensaje (1o2o3); Recibe Mensaje 5; Imprime E; Envia Mensaje (1o2o3);
+	E Hace: Recibe Mensaje 4; Envia Mensaje 6; Envia Mensaje 1; Recibe Mensaje 5; Imprime E; Envia Mensaje 1;
 	
 */
 
@@ -46,7 +46,7 @@ void A () { //Lee los mensajes de tipo 1
 void B () { //Lee los mensajes de tipo 2
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(MsgID,&Mensaje,1,2,0666);
+		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("B");
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
@@ -57,7 +57,7 @@ void B () { //Lee los mensajes de tipo 2
 void C () { //Lee los mensajes de tipo 3
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
-		msgrcv(MsgID,&Mensaje,1,3,0666);
+		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("C");
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
@@ -84,8 +84,7 @@ void D () { //Lee los mensajes de tipo 4 y 6
 
 void E () { //Lee los mensajes de tipo 4 y 5
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
-	int NumRandom;
-	Mensaje.Tipo = NumRandom;
+	Mensaje.Tipo = 1;
 	Mensaje.Texto = 'X';
 	msgsnd(MsgID,&Mensaje,1,0666);
 	while (true) {
@@ -97,8 +96,7 @@ void E () { //Lee los mensajes de tipo 4 y 5
 		msgsnd(MsgID,&Mensaje,1,0666);
 		
 		//E envia un mensaje aleatorio a ABC
-		NumRandom = rand() % 3 + 1;
-		Mensaje.Tipo = NumRandom;
+		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 		
@@ -107,8 +105,7 @@ void E () { //Lee los mensajes de tipo 4 y 5
 		printf("E");
 		
 		//E vuelve a enviar un mensaje aleatorio a ABC
-		NumRandom = rand() % 3 + 1;
-		Mensaje.Tipo = NumRandom;
+		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
