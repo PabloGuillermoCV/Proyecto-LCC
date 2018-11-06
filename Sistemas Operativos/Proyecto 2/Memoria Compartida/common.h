@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <semaphore.h>
 
+int const N = 6; //Tengo N Abejas
 int const M = 14; //Tengo M espacios para la miel
 
 struct MemoryStruct {

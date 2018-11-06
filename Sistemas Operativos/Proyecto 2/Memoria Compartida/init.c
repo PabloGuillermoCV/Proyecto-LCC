@@ -1,6 +1,7 @@
 #include "common.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <semaphore.h>
@@ -40,12 +41,14 @@
 int main(int argc, char* argv[]) {
 
 	Memoria* MemoriaCompartida;
-
+	
+	int pid;
+	
 	int I;
 
 	key_t Key = generateKey();
 
-	int shmid = shmget(key, sizeof(Memoria), 0660 | IPC_CREAT);
+	int shmid = shmget(Key, sizeof(Memoria), 0660 | IPC_CREAT);
 	if (shmid == -1) {
 		perror("Failed GET!");
 		exit(1);
