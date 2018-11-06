@@ -32,76 +32,95 @@ struct Buffer_M {
     char Texto;
 } Mensaje; 
 
-void A () { //Lee los mensajes de tipo 1
+void A () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("A");
+		
+		//A envia un mensaje a C
 		Mensaje.Tipo = 3;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 		
 		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("A");
+		
+		//A envia un mensaje a B
 		Mensaje.Tipo = 2;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,10,0666);
 	}
 }
 
-void B () { //Lee los mensajes de tipo 2
+void B () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,2,0666);
 		printf("B");
+		
+		//B envia un mensaje a C
 		Mensaje.Tipo = 3;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
-void C () { //Lee los mensajes de tipo 3
+void C () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,3,0666);
 		printf("C");
+		
+		//C envia un mensaje a D
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
-void D () { //Lee los mensajes de tipo 4
+void D () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,4,0666);
 		printf("D");
+		
+		//D envia un mensaje a E
 		Mensaje.Tipo = 5;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
-void E () { //Lee los mensajes de tipo 5
+void E () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
+	
+	//E le envia un mensaje a A para empezar el ciclo con ACDE
 	Mensaje.Tipo = 1;
 	Mensaje.Texto = 'X';
 	msgsnd(MsgID,&Mensaje,1,0666);
+	
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
+		
+		//E le envia un mensaje a B para imprimir la parte BCDE
 		Mensaje.Tipo = 2;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 		
 		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
+		
+		//E le envia un mensaje a B para imprimir la parte ABCDE
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 		
 		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
+		
+		//E le envia un mensaje a B para imprimir la parte ACDE
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
@@ -111,11 +130,6 @@ void E () { //Lee los mensajes de tipo 5
 int main () {
 	
 	Key = ftok("File",10);
-	
-	if (Key < 0) {
-		fprintf (stderr,"Error al crear la clave");
-		exit(0);
-	}
 	
 	int pid = fork ();
     if (pid == -1) {

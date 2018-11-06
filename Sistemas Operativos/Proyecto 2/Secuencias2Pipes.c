@@ -28,9 +28,6 @@
 	char readMessage;
 
 	int PipeABC[2];
-	int PipeA[2];
-	int PipeB[2];
-    int PipeC[2];
 	int PipeD[2];
 	int PipeE[2];
 	int PipeDAux[2];

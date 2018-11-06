@@ -32,70 +32,77 @@ struct Buffer_M {
     char Texto;
 } Mensaje; 
 
-void A () { //Lee los mensajes de tipo 1
+void A () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("A");
+		
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
-void B () { //Lee los mensajes de tipo 2
+void B () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("B");
+		
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
-void C () { //Lee los mensajes de tipo 3
+void C () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,1,0666);
 		printf("C");
+		
 		Mensaje.Tipo = 4;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 	}
 }
 
-void D () { //Lee los mensajes de tipo 4 y 6
+void D () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
 	while (true) {
 		//D espera a que E le avise que puede recibir el mensaje de (AoBoC)
 		msgrcv(MsgID,&Mensaje,1,6,0666);
-		//D espera el mensaje de (AoBoC)
+		
+		//D espera el mensaje del segundo (AoBoC)
 		msgrcv(MsgID,&Mensaje,1,4,0666);
 		printf("D");
+		
 		//D envia un mensaje a E
 		Mensaje.Tipo = 5;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
-		//D espera a que el grupo ABC pase dos veces
-		//E le envia un mensaje avisandole cuando puede seguir
 	}
 }
 
-void E () { //Lee los mensajes de tipo 4 y 5
+void E () {
 	int MsgID = msgget(Key, 0666 | IPC_CREAT);
+	
+	//E envia un mensaje a (AoBoC) para comenzar el ciclo
 	Mensaje.Tipo = 1;
 	Mensaje.Texto = 'X';
 	msgsnd(MsgID,&Mensaje,1,0666);
+	
 	while (true) {
 		//E es notificado que ABC termino por pimera vez
-		//Le avisa a D para que en el siguiente ciclo reciba el mensaje
 		msgrcv(MsgID,&Mensaje,1,4,0666);
+		
+		//Le avisa a D para que en el siguiente ciclo reciba el mensaje
 		Mensaje.Tipo = 6;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
 		
-		//E envia un mensaje aleatorio a ABC
+		//E envia un mensaje a (AoBoC)
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
@@ -104,7 +111,7 @@ void E () { //Lee los mensajes de tipo 4 y 5
 		msgrcv(MsgID,&Mensaje,1,5,0666);
 		printf("E");
 		
-		//E vuelve a enviar un mensaje aleatorio a ABC
+		//E vuelve a enviar un mensaje a (AoBoC)
 		Mensaje.Tipo = 1;
 		Mensaje.Texto = 'X';
 		msgsnd(MsgID,&Mensaje,1,0666);
@@ -114,11 +121,6 @@ void E () { //Lee los mensajes de tipo 4 y 5
 int main () {
 	
 	Key = ftok("File",10);
-	
-	if (Key < 0) {
-		fprintf (stderr,"Error al crear la clave");
-		exit(0);
-	}
 	
     int pid = fork ();
     if (pid == -1) {

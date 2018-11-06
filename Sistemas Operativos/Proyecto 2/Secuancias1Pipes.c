@@ -42,12 +42,15 @@ void A () {
 	close (PipeD[1]);
 	close (PipeE[0]);
 	close (PipeE[1]);
+	
 	while (true) {
 		read(PipeA[0],&readMessage,1);
 		printf("A");
 		fflush(NULL);
+		
         writeMessage = 'X';
 		write(PipeB[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
@@ -60,12 +63,15 @@ void B () {
 	close (PipeD[1]);
 	close (PipeE[0]);
 	close (PipeE[1]);
+	
 	while (true) {
 		read(PipeB[0],&readMessage,1);
 		printf("B");
 		fflush(NULL);
+		
         writeMessage = 'X';
 		write(PipeC[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
@@ -78,12 +84,15 @@ void C () {
 	close (PipeD[0]);
 	close (PipeE[0]);
 	close (PipeE[1]);
+	
 	while (true) {
 		read(PipeC[0],&readMessage,1);
 		printf("C");
 		fflush(NULL);
+		
         writeMessage = 'X';
 		write(PipeD[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
@@ -96,12 +105,15 @@ void D () {
 	close (PipeC[1]);
 	close (PipeD[1]);
 	close (PipeE[0]);
+	
 	while (true) {
 		read(PipeD[0],&readMessage,1);
 		printf("D");
 		fflush(NULL);
+		
         writeMessage = 'X';
 		write(PipeE[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 
@@ -114,14 +126,19 @@ void E () {
 	close (PipeD[0]);
 	close (PipeD[1]);
 	close (PipeE[1]);
+	
 	writeMessage = 'X';
     write(PipeA[1],&writeMessage,1);
+	fflush(NULL);
+	
 	while (true) {
 		read(PipeE[0],&readMessage,1);
 		printf("E");
 		fflush(NULL);
+		
         writeMessage = 'X';
 		write(PipeA[1],&writeMessage,1);
+		fflush(NULL);
 	}
 }
 

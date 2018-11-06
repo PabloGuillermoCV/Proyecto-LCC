@@ -63,6 +63,7 @@ void Oso () {
 	
 	while (true) {
 		msgrcv(MsgID,&Mensaje,1,6,0666);
+		
 		for (I = 0; I < M-1; I++) {
 			Mensaje.Tipo = 1;
 			Mensaje.Texto = 'X';

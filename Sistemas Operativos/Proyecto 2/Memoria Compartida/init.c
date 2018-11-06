@@ -47,12 +47,14 @@ int main(int argc, char* argv[]) {
 
 	int shmid = shmget(key, sizeof(Memoria), 0660 | IPC_CREAT);
 	if (shmid == -1) {
-		perror("Failed GET!"); exit(1);
+		perror("Failed GET!");
+		exit(1);
 	}
 
 	void* P = shmat(shmid, NULL, 0);
 	if (P == (void*)-1) {
-		perror("Failed ATTACH!"); exit(1);
+		perror("Failed ATTACH!");
+		exit(1);
 	}
 	MemoriaCompartida = (Memoria*) P;
 
@@ -89,7 +91,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (shmdt(P) != 0) {
-		perror("Failed DETTACH!"); exit(1);
+		perror("Failed DETTACH!");
+		exit(1);
 	}
 
 	return 0;
