@@ -3,6 +3,7 @@
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
+#define TLB_MISS -1
 
 /*PASOS A SEGUIR:
 	
@@ -108,6 +109,16 @@ int BusquedaTabla(uint8_t PN){
 */
 int BusquedaTLB(uint8_t PN){
 
+	int ret = 0;
+
+	//Buscar valor aquí
+	for(int C = 0; C <= 15 && ret == 0; C++){
+
+	}
+	if(ret == 0)
+		ret = TLB_MISS;
+
+	return ret;
 }
 
 /*
@@ -135,16 +146,33 @@ void Reemplazar(int FP, uint8_t PN){
 
 }
 
-/* Método que se encargará de agrandar el arreglo de direcciones a traducir en caso que sea necesario
- *
-*/
-void agrandarArreglo(){
-
-}
 
 //EL código de lectura de archivos hay que probarlo por separado en algún otro lado, hay que probar que esa cosa ande si la vamos a agarrar del Proyecto 1
-void LeerArchivo(){
+void LeerArchivo(FILE *file, int Dirs[]){
+	char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int i = 0;
+    const char *errstr = NULL;
+    FILE *fp = fopen(file, "r"); //Abro el archivo en modo lectura
+    if(fp = NULL)
+    	exit(EXIT_FAILURE);
 
+     while ((read = getline(&line, &len, fp)) != -1) {
+       //Guardo en line la linea, que en realidad es el numero que debo guardar
+     	int num = strtonum(line, 0 , 65536, errstr);
+     	if(errstr != NULL){
+     		fprintf(stderr, "Error al intentar obtener las direcciones logicas con mensaje %s", errstr);
+     		exit(1);
+     	}
+     	//Si no salí en este punto, todo salió bien y en num tengo la direccion logica a traducir
+     	Dirs[i] = num; 
+    }
+
+    fclose(fp); //cierro el archivo
+    if (line)
+        free(line); //Libero la memoria reservada
+ 
 }
 
 void main(){
@@ -161,8 +189,8 @@ void main(){
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
 	FILE *Direcc; //Archivo de entrada del proyecto
-	Direcc = fopen("memoria.txt");
-	LeerArchivo(Direcc, &Direcciones); //Paso el arreglo por puntero (?)
+	Direcc = "memoria.txt";
+	LeerArchivo(Direcc, Direcciones); 
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
@@ -176,7 +204,7 @@ void main(){
 		Offset = ((numCopy & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
 		framePag = BusquedaTabla(PageNum, &TablaPaginas); //Ver esto del pasaje
 		DirFis = concatenar(framePag,Offset);
-		printf("Direccion Logica = %d, Direccion Fisica = %d ", num,DirFis); //Hecha la traducción, imprimo, preguntar si es correcto
+		printf("Direccion Logica = %d, Direccion Fisica = %d ", num,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 
 	}
 

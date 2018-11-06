@@ -55,6 +55,39 @@ Código original de la llamada a chmod:
 
 */
 
+char* MensError(int n){
+
+	char *ret;
+
+	switch(n){
+		case -1:
+			ret = "Los parametros presentados sobran\n";
+			break;
+		case -2:
+			ret = "NO hay parametros suficientes para la llamada a chmod\n";
+			break;
+		case -3:
+			ret = "Codigo de permisos en sistema de representacion Octal ilegal\n";
+			break;
+		case -4:
+			ret = "El caracter de permisos ingresado NO es correcto\n";
+			break;
+		case -5:
+			ret = "Tipo de usuario ingresado en los permisos por caracter invalido\n";
+			break;
+		case -6:
+			ret = "Tipo de usuario invalido\n";
+			break;
+		case -7:
+			ret = "El tipo de usuario NO es acompañado por el literl '=' \n";
+			break;
+		case -8:
+			ret = "Se ha encontrado un tipo de permiso repetido en al secuencia, esto NO esta permitido\n";
+	}
+
+	return ret;
+}
+
 /*
  * Método para determinar que un número pertenezca a los valores permitidos en Octal de chmod
 */
@@ -190,7 +223,7 @@ int main(int argc, const char * argv[]){
 		else
 			if(perteneceChar(Permisos[0]))
 				errno = LeerChars(Permisos); //Me estan intentando ejecutar chmod en modo texto, chequear sintaxis
-			else{ //Si no entra por ingún lado, me mandaron cualquier cosa, abortar y reportar
+			else{ //Si no entra por ningún lado, me mandaron cualquier cosa, abortar y reportar
 				fprintf(stderr, "La llamada que se esta intentando hacer NO coincide con chmod");
 				exit(1);
 			}
@@ -206,11 +239,8 @@ int main(int argc, const char * argv[]){
 	    	return(0);
     	}
     	else{
-    		fprintf(stderr, "error en el analisis de los datos suministrados con codigo %d \n", errno);
+    		fprintf(stderr, "error en el analisis de los datos suministrados con codigo %d, lo que significa: %s \n", errno, MensError(errno));
     		exit(1);
     	}
 	}
-
-
-
 }
