@@ -1,0 +1,123 @@
+Comisión Ceballos-Gomez
+------------------------ 
+
+Correcciones entrega anterior:
+
+- 	Fíjense que tienen errores de sintaxis en el archivo banco.sql
+
+	En la línea 541 tienen usan la tabla transacción (con acento)
+	y después tambien lo usan con acento dentro de los resultados. 
+	Les recomiendo que los saquen de todos lados, incluso de los comentarios.
+	
+	También les falta un ";" luego de cada END dentro del IF-THEN-ELSE.
+	Esos BEGIN-END no son necesarios, pero si los ponen, deben terminar con ";"
+		
+- Usuario ADMIN: 
+	- Fijense que si se quiere ejecutar desde la aplicación la siguiente consulta: 
+		create table t (c int) 
+	no se puede e informa el siguiente error:  "La consulta ingresada no es correcta"
+	
+	Deberían corregirlo para que se puedan ingresar este tipo de consultas.
+	Sucede lo mismo al intentar insertar/actualizar datos en una tabla existente:
+		insert into tasa_prestamo values (5,0,1000,15)
+		update tasa_prestamo set tasa=16 where periodo=5
+		delete from tasa_prestamo where periodo=5
+	
+	Al haber ejecutado el Jar del proyecto por consola, me muestra el siguiente mensaje
+	cuando intento ingresar las sentencias anteriores:
+		Unable to automatically create rowcount sql. Optionally you can provide rowcount sql using 
+		DBTable.setRowCountSql(String rowCountSql) to get better performance. Refer api for setRowCountSql() for more info.
+		
+- Usuario EMPLEADO: 
+	
+	- Utilizando los datos de prueba datos2.sql 
+	Al crear un préstamo para el cliente 5 con DNI= 5(no tiene prestamos vigentes)
+	Con un monto de $2000 y periodo de 18 meses, éste se almacena correctamente en la BD
+	pero no puedo pagar las cuotas del préstamo recién creado. 
+	La aplicación debería mostrar 18 cuotas con un valor de $142.77 y
+	con su fecha de vencimiento correspondiente.
+	Al listar las cuotas del cliente 5, se ven, pero no entra todo el listado en la tabla.
+	
+
+--------------------------------------------------------------------------------------------
+
+Correcciones entrega 3:
+
+- Transacciones y Stored Procedures:
+	
+	- Transacción para hacer una extracción:
+	* los parametros de entrada deberían ser:
+	- número de caja de ahorro  
+	- número de cliente
+	- Monto
+	- código de caja (referido a un atm o ventanilla donde se realizo la transacción)
+	
+	En el Stored procedure acceden al cliente a través del número de la caja de ahorro
+	y se quedan con el primero de la tabla, pero dado que una caja de ahorro puede pertenecer a más 
+	de un cliente, no es posible identificar bien qué cliente hizo la extracción (quizás no sea el nro 1).
+	* cuando hacen el INSERT de la transacción, deberían ingresar el ID nuevo, y luevo usar LAST_INSERT_ID
+	en transacción_por_caja y en extracción.
+	Fíjense que cuando hacen:
+		INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja)
+	el cod_caja es el código de una Caja (referido a un atm o ventanilla) no de la caja de ahorro!
+	
+- Transacción para hacer una transferencia:	    
+	* los parametros de entrada deberían ser: 
+	- número de caja de ahorro origen, 
+	- número de caja de ahorro destino
+	- Monto
+	- número de cliente	
+	- código de caja (referido a un atm o ventanilla donde se realizó la transacción) 
+	
+	Les faltaría agregar los últimos 2, para determinar quién hizo la transferencia y por dónde.
+	Deberían controlar también que el cliente ingresado sea uno de los titulares de la caja de ahorro orígen.
+	
+	- Si se superan los controles y se debe realizar la transferencia
+	fíjense que cuando hacen el INSERT de la transacción, deberían ingresar el ID nuevo, no usar el que se insertó previamente (LAST_INSERT_ID())
+	Luego para transacción_por_caja y transferencia está bien que recuperen el último (el de la transacción recien insertada)
+	
+- Trigger:
+	
+		En lugar de hacer:
+			SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
+		deberían acceder a la cantidad de meses recientemente insertada en préstamo con
+		NEW.cant_meses. Idem para obtener el último nro de préstamo y fecha: NEW.nro_prestamo, NEW.fecha	
+		ya que si se ejecuta concurrentemente, el último ID insertado podría llegar a ser de otro préstamo.				
+		
+- SP a través de la Interfaz gráfica:
+	- Extracción
+		Al ingresar un monto y presionar aceptar, muestra un mensaje vacío con título:
+		"Se produjo un error al realizar la Extracción"
+		y los botones "Yes" "No"
+		Esto es poco intuitivo.
+		
+		Al presionar YES, la extracción no se almacenó...
+		
+		Les envío los datos de prueba, datos2.sql
+		fíjense de loguearse con tarjeta=1 Pin=1111 y extraer $400:
+		La extracción se debe realizar con éxito y la aplicación 
+		debe mostrar un mensaje con el saldo actual de la caja de ahorro= $600.
+		
+		Al consultarlos últimos movimientos, debería listarse la extracción.
+		
+	- Transferencia
+		Transferir $150 a la caja de ahorro numero 2: 
+		Se debería mostrar un mensaje diciendo que la  transferencia se realizo con éxito.
+		Sin embargo la aplicación responde:
+		"Se produjo un error al intentar realizar la transacción. Bedore start of result set"
+		
+		Una vez que se realiza con éxito la transferencia, lo pueden chequear con:
+
+		select * from transacciones_cajas_ahorro order by nro_trans desc;
+	
+		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+
+		| nro_ca | saldo   | nro_trans | fecha      | hora     | tipo          | monto   | cod_caja | nro_cliente | tipo_doc | nro_doc | nombre      | apellido      | destino |
+		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+                           
+		|      1 |  450.00 |      ...  |  <actual>  | <actual> | transferencia |  150.00 |      100 |           1 | DNI      |       1 | Nombre_Cli1 | Apellido_Cli1 |       2 | 
+		|      2 | 2150.00 |      ...  |  <actual>  | <actual> | deposito      |  150.00 |      100 |        NULL | NULL     |    NULL | NULL        | NULL          |    NULL |
+			...                                                    ...
+		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+	
+
+		
+		
+		
