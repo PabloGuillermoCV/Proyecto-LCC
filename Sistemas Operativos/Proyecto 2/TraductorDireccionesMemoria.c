@@ -20,8 +20,7 @@
 			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un TLB Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame 
 			debo agregarlo al TLB para futuro uso
 	3) Obtener la Dirección Física
-		Hecho todo el trámite, deberia de terminar con al dirección física a devolver (preguntar que se hace acá, si realmente debo acceder a algún lado interno de la PC
-		a por la dirección Física o si el FramexOffset es ya la dirección física)
+		Hecho todo el trámite, termino con al dirección física a devolver 
 
 	Sobre uint_x:
 		0x.. -> el número lo represento en Hexadecimal
@@ -43,12 +42,8 @@
 		LOS BITS QUE SE CAEN DEL NÚMERO SE PIERDEN
 		si mi numero es 010110, hacer 010110 >> resulta en 001011
 
-	Una cosa que estoy viendo es que uint_x NO es un tipo "standard", preguntar si su uso esta bien
-	También una cosa que estoy leyendo es que al usar ">>", el numero pasa a int si o si, preguntar 
 	preguntar que deberia contener la tabla de paginas, si numeros random o algo en particular
 
-	lo que hace >> es mover los bits del numero, si muevo mal, puedo perder bits, lo que yo necesito es CORTAR los bits innecesarios 
-	despues de usar la máscara, preguntar como hacer, si se puede usar /10 o %10 o si hay que usar >> pero de alguna forma que no estoy entendiendo
 	Otra cosa a preguntar es CUALES son los contenidos de la tabla de páginas, si números random, si se tienen que buscar en algún lado.... 
 */
 
@@ -89,6 +84,30 @@ int BinarioADecimal(uint8_t n){
 	return ret + 1; //Esto lo teniamos que hacer en Organización si mal no recuerdo... (Representaciones)
 }
 
+//estas funciones de conversión entre numeros en bits ESTAN PROBADAS Y ANDAN
+/*
+ * Función para transformar dos enteros de 8 Bits en un entero de 16 Bits
+*/
+uint16_t convertFrom8To16(uint8_t dataFirst, uint8_t dataSecond) {
+    uint16_t dataBoth = 0x0000;
+
+    dataBoth = dataFirst;
+    dataBoth = dataBoth << 8; //Muevo el primer valor a la parte alta del numero de  16 bits
+    dataBoth |= dataSecond; //Hago OR entre mi valor actual y el segundo valor introducido a la función, el OR hará la suma en binario entre los bits
+    return dataBoth;
+}
+
+/*
+* función para separar un entero de 16  bits en dos enteros de 8 bits
+* los resultados se devuelven en un arreglo de dos componentes
+*/
+uint8_t *convertFrom16To8(uint16_t dataAll) {
+    static uint8_t arrayData[2] = { 0x00, 0x00 };
+
+    *(arrayData) = (dataAll >> 8) & 0x00FF; //Obtengo la parte alta del numero de 16 bits y la mando a la primer componente del arreglo
+    arrayData[1] = dataAll & 0x00FF; //Obtengo la parte baja del numero de 16 bits
+    return arrayData;
+}
 
 
 /*
@@ -107,7 +126,7 @@ int BusquedaTabla(uint8_t PN){
  * Dado un número de Página, lo intento buscar en el TLB, en caso de no encontrarlo, debo bajar a la Tabla de Páginas
  * NOTA: Devolver -1 significa que NO se encontró el número de página en el TLB
 */
-int BusquedaTLB(uint8_t PN){
+int BusquedaTLB(uint8_t PN, int TLB [][2]){
 
 	int ret = 0;
 
@@ -118,21 +137,6 @@ int BusquedaTLB(uint8_t PN){
 	if(ret == 0)
 		ret = TLB_MISS;
 
-	return ret;
-}
-
-/*
- * Método que concatenará dos cadenas de numeros
-*/
-uint16_t concatenar(uint8_t FP, uint8_t Off){
-	uint16_t ret = 0x00;
-	int i = 10;
-	ret = FP * 100000000;
-	while(off > 0){
-		ret = ret + ((Off % 10)*i);
-		i = i*10;
-		Off = Off / 10;
-	}
 	return ret;
 }
 
@@ -160,13 +164,14 @@ void LeerArchivo(FILE *file, int Dirs[]){
 
      while ((read = getline(&line, &len, fp)) != -1) {
        //Guardo en line la linea, que en realidad es el numero que debo guardar
-     	int num = strtonum(line, 0 , 65536, errstr);
+     	int num = strtonum(line, 0 , 65536, errstr); //el 0 y 65536 representan los numeros mínimo y máximo que acepto, respectivamente
      	if(errstr != NULL){
      		fprintf(stderr, "Error al intentar obtener las direcciones logicas con mensaje %s", errstr);
      		exit(1);
      	}
      	//Si no salí en este punto, todo salió bien y en num tengo la direccion logica a traducir
      	Dirs[i] = num; 
+     	i++;
     }
 
     fclose(fp); //cierro el archivo
@@ -177,15 +182,13 @@ void LeerArchivo(FILE *file, int Dirs[]){
 
 void main(){
 
-	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones, valor inicial para 10 direcciones, se debe poder agrandar
+	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones
 	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
 	int framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
+	uint8_t direcc [2]; //arreglo para los cortes de 8 bits
 	int TLB [16][2]; //TLB
-	inicializar(&Direcciones, &TablaPaginas, &TLB); //función para inicializar todos los arreglos
-	uint16_t MaskI = 0000000011111111b; //Máscaras que usaré para obtener el Page Number y el Offset de la Dirección Lógica
-	uint16_t MaskS = 1111111100000000b; //Recordar que la dirección Lógica es de 16 bits, necesito comparaciones en 16 bits 
-										//(Preguntar igual porque el tema es obtener 8 bits, no 16)
+	inicializar(Direcciones, TablaPaginas, TLB); //función para inicializar todos los arreglos
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
 	FILE *Direcc; //Archivo de entrada del proyecto
@@ -194,17 +197,18 @@ void main(){
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
-	int size = NELEMS(Direcciones); //MACRO para obtener el tamaño final del arreglo
 	for(i = 0; i < size; i++){ //Para cada dirección lógica en el arreglo
+		int OG = Direcciones[i];
 		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario 
 		//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
 		//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
 		uint16_t numCopy = num;
-		PageNum = (numCopy & MaskS) / 100000000; 
-		Offset = ((numCopy & MaskI) << 8 ) / 100000000;  //Uso la máscara, como me quedo con los 8 LSB, los muevo para arriba y corto
-		framePag = BusquedaTabla(PageNum, &TablaPaginas); //Ver esto del pasaje
-		DirFis = concatenar(framePag,Offset);
-		printf("Direccion Logica = %d, Direccion Fisica = %d ", num,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
+		direcc = convertFrom16To8(numCopy);
+		PageNum = direcc[0];
+		Offset = direcc[1];
+		framePag = BusquedaTabla(PageNum, TablaPaginas); //Ver esto del pasaje
+		DirFis = convertFrom8To16(framePag,Offset);
+		printf("Direccion Logica = %d, Direccion Fisica = %d ", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 
 	}
 
