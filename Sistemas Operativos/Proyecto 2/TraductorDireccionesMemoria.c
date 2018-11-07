@@ -1,5 +1,6 @@
 #include<stdlib.h>
 #include<math.h>
+#include <bool.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
@@ -180,6 +181,14 @@ void LeerArchivo(FILE *file, int Dirs[]){
  
 }
 
+void inicializar(DirIni[]){
+	int i;
+	for(i = 0; i < NELEMS(DirIni); i++){
+		DirIni[i] = -1;
+	}
+}
+
+
 void main(){
 
 	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones
@@ -188,7 +197,7 @@ void main(){
 	uint16_t DirFis; //Dirección física Resultante
 	uint8_t direcc [2]; //arreglo para los cortes de 8 bits
 	int TLB [16][2]; //TLB
-	inicializar(Direcciones, TablaPaginas, TLB); //función para inicializar todos los arreglos
+	inicializar(Direcciones, TablaPaginas, TLB); //función para inicializar todos los arreglos (componentes de Direcciones se inicializa en -1)
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
 	FILE *Direcc; //Archivo de entrada del proyecto
@@ -196,22 +205,27 @@ void main(){
 	LeerArchivo(Direcc, Direcciones); 
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
+	bool corte = false;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
-	for(i = 0; i < size; i++){ //Para cada dirección lógica en el arreglo
-		int OG = Direcciones[i];
-		num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario 
-		//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
-		//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
-		uint16_t numCopy = num;
-		direcc = convertFrom16To8(numCopy);
-		PageNum = direcc[0];
-		Offset = direcc[1];
-		framePag = BusquedaTabla(PageNum, TablaPaginas); //Ver esto del pasaje
-		DirFis = convertFrom8To16(framePag,Offset);
-		printf("Direccion Logica = %d, Direccion Fisica = %d ", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
+	for(i = 0; i < size && !corte; i++){ //Para cada dirección lógica en el arreglo
+		if(Direcciones[i] != -1){ //Hago este chequeo por las dudas
+			int OG = Direcciones[i];
+			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario 
+			//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
+			//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
+			uint16_t numCopy = num;
+			direcc = convertFrom16To8(numCopy);
+			PageNum = direcc[0];
+			Offset = direcc[1];
+			framePag = BusquedaTabla(PageNum, TablaPaginas); //Ver esto del pasaje
+			DirFis = convertFrom8To16(framePag,Offset);
+			printf("Direccion Logica = %d, Direccion Fisica = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
+		}
+		corte = Direcciones[i+1] == -1; //Como NO es probable que me lllenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
 
 	}
 
+	printf("Se ha terminado de traducir las direcciones logicas presentadas\n");
 	return 0;
 
 }
