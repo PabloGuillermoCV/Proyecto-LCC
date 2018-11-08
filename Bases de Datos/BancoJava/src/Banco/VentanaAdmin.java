@@ -193,9 +193,14 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 
 	private void btnEjecutarActionPerformed (ActionEvent evt) {
 	    try {
+	    	Statement t = conexionBD.createStatement();
+	    	ResultSet R = null;
 	    	String SQL = txtConsulta.getText().trim();
-	    	tabla.setSelectSql(SQL);
-			tabla.refresh();
+	    	t.execute(SQL);
+	    	R = t.getResultSet();
+	    		if(R != null)
+	    			tabla.refresh(R);
+	    	//tabla.setSelectSql(SQL); //el problema es acá 
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog (this,"La consulta ingresada no es correcta","Error",JOptionPane.ERROR_MESSAGE);
 		} 

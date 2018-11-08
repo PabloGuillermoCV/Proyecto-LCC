@@ -1,4 +1,4 @@
-Comisión Ceballos-Gomez
+﻿Comisión Ceballos-Gomez
 ------------------------ 
 
 Correcciones entrega anterior:
@@ -7,15 +7,15 @@ Correcciones entrega anterior:
 
 	En la línea 541 tienen usan la tabla transacción (con acento)
 	y después tambien lo usan con acento dentro de los resultados. 
-	Les recomiendo que los saquen de todos lados, incluso de los comentarios.
+	Les recomiendo que los saquen de todos lados, incluso de los comentarios. -LISTO
 	
 	También les falta un ";" luego de cada END dentro del IF-THEN-ELSE.
-	Esos BEGIN-END no son necesarios, pero si los ponen, deben terminar con ";"
+	Esos BEGIN-END no son necesarios, pero si los ponen, deben terminar con ";" -LISTO
 		
 - Usuario ADMIN: 
 	- Fijense que si se quiere ejecutar desde la aplicación la siguiente consulta: 
 		create table t (c int) 
-	no se puede e informa el siguiente error:  "La consulta ingresada no es correcta"
+	no se puede e informa el siguiente error:  "La consulta ingresada no es correcta" -VER HORARIO
 	
 	Deberían corregirlo para que se puedan ingresar este tipo de consultas.
 	Sucede lo mismo al intentar insertar/actualizar datos en una tabla existente:

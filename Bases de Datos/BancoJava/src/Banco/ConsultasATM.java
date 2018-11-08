@@ -201,7 +201,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			   int m = Integer.parseInt(montos.getText().trim());
 			   String x = Extraer(m);
 			 //Devuelvo el resultado de la Extracción en un PopUp
-			   JOptionPane.showConfirmDialog(null,null,x,JOptionPane.OK_OPTION,JOptionPane.PLAIN_MESSAGE); 
+			   JOptionPane.showConfirmDialog(null,x,"Fin Extraccion",JOptionPane.OK_OPTION,JOptionPane.PLAIN_MESSAGE); 
 		   }
 	   }
 	   

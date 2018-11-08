@@ -23,6 +23,7 @@ import quick.dbtable.*;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
+import javax.swing.JScrollBar;
 
 @SuppressWarnings({"serial","unused"})
 public class VentanaEmpleado extends javax.swing.JInternalFrame {
@@ -98,6 +99,9 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			}
 		});
 		
+		//JScrollBar scrollBar = new JScrollBar();
+		//PaneTabla.add(scrollBar);
+		//scrollBar.add(tabla);
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
 		tabla.setEnabled(true);
@@ -289,7 +293,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			//SQL para determinar los prestamos actuales de un cliente
-			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc) ;
+			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc); //Esto es el problema
 			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
 				
 				int m = 0;
@@ -440,7 +444,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				R = stmt.executeQuery(sql);
 				//Aca cargo las cuotas una por una
 				//Obtengo la nueva fecha de vencimiento producto de mover la fecha 1 mes adelante
-				String d = R.getString(1);
+				String d = R.getString(0);
 				sql = "INSERT INTO Pago (nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (" + nro_pre + "," + i + ",'" + d + "', NULL)";
 				stmt.executeUpdate(sql); 
 				fechaD = d;

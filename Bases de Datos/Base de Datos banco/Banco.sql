@@ -485,9 +485,10 @@ CREATE TABLE Transferencia(
 #Las Cajas de ahorro Existen
 #El Monto no supera al saldo de la Caja Origen
 
+//al extraer, que en algun lado muestre el saldo que queda.
 
 delimiter ! # defino ! como delimitador
-CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT)
+CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT)//agregar cliente y codigo de caja
 	BEGIN
 		 # Declaro una variable local saldo_actual	
 	 DECLARE saldo_actual DECIMAL(7,2);
@@ -532,17 +533,17 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 			 
 	         UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE numero=Cod_CajaD;
 
-	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 				
-	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja0);
+	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_Caja0);
 				
-	         INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
+	         INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (transaccion.LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
 				
-	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 				
-	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_CajaD);
 				
-	         INSERT INTO deposito(nro_trans,nro_ca) VALUES (LAST_INSERT_ID(),Cod_CajaD);
+	         INSERT INTO deposito(nro_trans,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),Cod_CajaD);
 				
              SELECT 'La transferencia se realizo con exito' AS resultado;
 			 
@@ -569,7 +570,7 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
 	 COMMIT;   # Comete la transacción  
 	END; !
 
-CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
+CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN nro_tarjeta SMALLINT)//sacar el nro_ca asociado a nro_tarjeta
 	BEGIN
 	DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
 
@@ -591,7 +592,8 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
      
 
 	START TRANSACTION;
-		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja) THEN
+	//aca va un if verificando la tarjeta
+		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja) THEN //verificar que exista el numero de tarjeta y luego tomar el cliente
 		 BEGIN
 		
 		  SELECT saldo INTO Saldo_Actual FROM caja_ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
@@ -603,11 +605,11 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN Cod_Caja SMALLINT)
 		  
 				UPDATE caja_ahorro SET caja_ahorro.saldo = (saldo - monto) WHERE numero = Cod_Caja;
 	      
-				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (LAST_INSERT_ID(),CURDATE(),CURTIME(),MonT);
+				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 				
-	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja);
+	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_Caja);
 				
-	         	INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (LAST_INSERT_ID(),N_Cl,Cod_Caja);
+	         	INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_Cl,Cod_Caja);
 				
 	      	    SELECT 'La Extracción se realizo con exito' AS resultado;         
 			
@@ -642,12 +644,12 @@ FOR EACH ROW
 		DECLARE N_P INT;
 		DECLARE Meses INT;
 		DECLARE I INT DEFAULT 0;
-		SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
+		SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();//eliminar
 		#Intento de conseguir el prestamo recien creado
-		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();
-		WHILE I < Meses DO
-			SELECT fecha INTO fecha_v FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
-			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (nro_pres,I,DATE_ADD(fecha_v,INTERVAL 1 MONTH),NULL);
+		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();//eliminar
+		WHILE I < NEW.cant_meses DO
+			SELECT fecha INTO fecha_v FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();//eliminar
+			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (NEW.nro_prestamo,I,DATE_ADD(NEW.fecha,INTERVAL 1 MONTH),NULL);
 			SET I = I + 1;
 		END WHILE;
 	END; !
