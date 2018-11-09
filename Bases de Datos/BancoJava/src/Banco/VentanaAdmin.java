@@ -200,7 +200,6 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	R = t.getResultSet();
 	    		if(R != null)
 	    			tabla.refresh(R);
-	    	//tabla.setSelectSql(SQL); //el problema es acá 
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog (this,"La consulta ingresada no es correcta","Error",JOptionPane.ERROR_MESSAGE);
 		} 
@@ -210,7 +209,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private void thisComponentShown (ComponentEvent evt) {
 		//Para manejar Logins, hago lo siguiente:
 		/*
-		 * uso JOptionPane.DialogPane para nombres de usuario,/Legajos
+		 * uso JOptionPane.DialogPane para Legajos
 		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para verificar el password ingresado
 		 */
 		boolean Verif = false;
