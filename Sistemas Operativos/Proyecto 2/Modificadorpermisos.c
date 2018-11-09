@@ -93,10 +93,9 @@ char* MensError(int n){
 */
 int PerteneceNums(char n){
 	int i;
-	int a = (int)n; //Si mal no recuerdo, esto estaba bien, preguntar por las dudas
 	int ret = 0;
 	for(i = 0; i < NELEMS(ALLOWED_OCTAL) && ret == 0; i++){
-		if(a == (int)(ALLOWED_OCTAL[i])){
+		if(n == ALLOWED_OCTAL[i]){
 			ret = 1;  //El numero obtenido es un octal legal para chmod
 		}
 	}
@@ -187,14 +186,16 @@ int LeerChars(char *Perms){
 				}
 
 				i++; //Estoy en una ',', hago un paso hacia adelante, hacia el siguiente grupo
-				p++; //Uso el contador exclusivo de los permisos para pasar l siguiente grupo
+				p++; //Uso el contador exclusivo de los permisos para pasar al siguiente grupo
 				comp = ALLOWED_GROUPS[p]; //terminé de verificar los permisos para un grupo, paso al siguiente
 				if(comp != Perms[i]) //Verifico que el siguiente tipo de usuario sea válido (debe ser 'g' u 'o')
 					ret = ERR_INVALID_USER_TYPE; //Error: "tipo de usuario inválido"
 				else{
 					i++;
-					if(Perms[i] != '=')
+					if(Perms[i] != '='){
 						ret = ERR_WRONG_LITERAL;
+						i++; //Me muevo un lugar más, hacia el siguiente permiso para el nuevo grupo
+					}
 				}
 			}
 		}
