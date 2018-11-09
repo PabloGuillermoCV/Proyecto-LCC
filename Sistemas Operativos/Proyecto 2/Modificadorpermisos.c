@@ -79,7 +79,7 @@ char* MensError(int n){
 			ret = "Tipo de usuario invalido\n";
 			break;
 		case -7:
-			ret = "El tipo de usuario NO es acompañado por el literl '=' \n";
+			ret = "El tipo de usuario NO es acompañado por el literal '=' \n";
 			break;
 		case -8:
 			ret = "Se ha encontrado un tipo de permiso repetido en al secuencia, esto NO esta permitido\n";
@@ -93,7 +93,7 @@ char* MensError(int n){
 */
 int PerteneceNums(char n){
 	int i;
-	int a = (int)n; 
+	int a = (int)n; //Si mal no recuerdo, esto estaba bien, preguntar por las dudas
 	int ret = 0;
 	for(i = 0; i < NELEMS(ALLOWED_OCTAL) && ret == 0; i++){
 		if(a == (int)(ALLOWED_OCTAL[i])){
@@ -114,7 +114,6 @@ int LeerOctal(char *Perms){
 	int i;
 	if (sizeof(Perms) > 3)
 		ret = ERR_EXTRA_PARAMS; //Código de error propio, como hay más parámetros de los permitidos 
-								//(OJO, NO CONSIDERO STICKY BIT, PREGUNTAR), corto y guardo esto como código de error 
 	else{
 		if(sizeof(Perms) < 3)
 			ret = ERR_INSUFFICIENT_PARAMS; //Código de error propio "Cantidad de permisos a setear insuficiente, debe ser del tipo ugo"
@@ -151,10 +150,11 @@ int perteneceChar(char c){
 int LeerChars(char *Perms){
 	int ret = 1;
 	int i = 0;
+	int p = 0;
 	char comp = 'a';
 	char lect = '';
-	if(Perms[0] == comp){
-		if(Perms[1] == '=' && ret == 1){
+	if(Perms[0] == comp){ //Primer caso, se esta intentando setear los permisos de fora global usando "a=..."
+		if(Perms[1] == '=' && ret == 1){ //Si es asi, pregunto si hay un '=' acompañando a la "a", la parte de ret == 1 es por si al entrar corté el ciclo por un error 
 			for(i = 2; i < sizeof(Perms) && ret == 1; i++){
 				if(comp != Perms[i]){ //Pregunto que NO se me estén repitiendo permisos (chmod no permite a=wrr, por ejemplo), la primera vez debe entrar
 					ret = perteneceChar(Perms[i]); //de ahi en más, se que los permisos son del tipo a=<algo>, tengo que corroborar que cada caracter de <algo> sea legal
@@ -185,8 +185,10 @@ int LeerChars(char *Perms){
 					}
 					i++;
 				}
+
 				i++; //Estoy en una ',', hago un paso hacia adelante, hacia el siguiente grupo
-				comp = ALLOWED_GROUPS[i]; //terminé de verificar los permisos para un grupo, paso al siguiente
+				p++; //Uso el contador exclusivo de los permisos para pasar l siguiente grupo
+				comp = ALLOWED_GROUPS[p]; //terminé de verificar los permisos para un grupo, paso al siguiente
 				if(comp != Perms[i]) //Verifico que el siguiente tipo de usuario sea válido (debe ser 'g' u 'o')
 					ret = ERR_INVALID_USER_TYPE; //Error: "tipo de usuario inválido"
 				else{
@@ -224,7 +226,7 @@ int main(int argc, const char * argv[]){
 			if(perteneceChar(Permisos[0]))
 				errno = LeerChars(Permisos); //Me estan intentando ejecutar chmod en modo texto, chequear sintaxis
 			else{ //Si no entra por ningún lado, me mandaron cualquier cosa, abortar y reportar
-				fprintf(stderr, "La llamada que se esta intentando hacer NO coincide con chmod");
+				fprintf(stderr, "La llamada que se esta intentando hacer NO coincide con la llamada a chmod");
 				exit(1);
 			}
 

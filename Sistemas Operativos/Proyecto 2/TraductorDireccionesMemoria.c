@@ -43,16 +43,18 @@
 		LOS BITS QUE SE CAEN DEL NÚMERO SE PIERDEN
 		si mi numero es 010110, hacer 010110 >> resulta en 001011
 
-	preguntar que deberia contener la tabla de paginas, si numeros random o algo en particular
+	Preguntar si obtener un número entre 0 y 255 alcanza para el Número de Frame, lo cual haria el arreglo 
+	de la Tabla de Páginas innecesario
 
-	Otra cosa a preguntar es CUALES son los contenidos de la tabla de páginas, si números random, si se tienen que buscar en algún lado.... 
+	HAY UN TEMA CON INT, PUEDE QUE NO ME ALCANCE PARA REPRESENTAR LOS NUMEROS EN BITS AL HACER CASTEOS, DEPENDE DEL COMPILADOR
+	La alternativa a ^ seria usar long long int
 */
 
 /*
  * Dado un numero en decimal, pasarlo a binario, uso método de la División
 */
 uint16_t DecimalABinario(int n){
-	uint16_t ret = 0x00; //000000000000000
+	uint16_t ret = 0x00; //000000000000000 en binario usando representación en Hexa
 	int aux;
 	int i = 1; //para ir sumando 1, 10, 100, etc
 	while(n > 0){
@@ -113,6 +115,7 @@ uint8_t *convertFrom16To8(uint16_t dataAll) {
 
 /*
  * Dado un numero de página, buscar el numero de frame correspondiente en la Tabla de Páginas
+ * puede que esta función no se necesite, preguntar
 */
 int BusquedaTabla(uint8_t PN){
 	int Nro = BinarioADecimal(PN);
@@ -133,7 +136,8 @@ int BusquedaTLB(uint8_t PN, int TLB [][2]){
 
 	//Buscar valor aquí
 	for(int C = 0; C <= 15 && ret == 0; C++){
-
+		if(TLB[C][0] == (int)PN)
+			ret = TLB[C][1];
 	}
 	if(ret == 0)
 		ret = TLB_MISS;
@@ -144,10 +148,21 @@ int BusquedaTLB(uint8_t PN, int TLB [][2]){
 /*
 	Método que despues se encargará de hacer un reemplazo cuando el TLB este lleno
 	Mi idea es usar un algoritmo FIFO para reemplazar, preguntar
+	Asumo que la página más vieja es aquella que esta al final del arreglo!
 */
-void Reemplazar(int FP, uint8_t PN){
-	int i = 0;
-	
+void Reemplazar(int FP, uint8_t PN, int TLB[][2]){
+	int i;
+	//Lo que debo hacer es correr TODAS las posiciones un lugar hacia abajo, dejando el primer espacio libre
+	//de tal forma que la primer componente de la matriz quede libre para el nuevo valor
+	TLB[15][0] = 0;
+	TLB[15][1] = 0; //Borro la ultima componente (la más vieja) del TLB, dejando un espacio libre
+	for(i = 15; i >= 0; i--){
+		TLB[i][0] = TLB[i-1][0]; //Muevo los Page Number exstentes hacia abajo
+		TLB[i][1] = TLB [i -1][1]; //Muevo los FP existentes hacia abajo
+	}
+
+	TLB[0][0] = (int)PN;
+	TLB[0][1] = FP;
 
 }
 
@@ -186,14 +201,19 @@ void inicializar(DirIni[]){
 	for(i = 0; i < NELEMS(DirIni); i++){
 		DirIni[i] = -1;
 	}
+	for(i = 0; i < NELEMS(PageT); i++){
+		int r = rand() % 255; //numero random para llenar la tabla de páginas
+	}
 }
 
 
 void main(){
 
 	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones
+	//La tabla de páginas parece innecesaria, asuminedo que el numero de frame es el índice con el cual accederia al arreglo
+	//Eso facilitaria las cosas, preguntar
 	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
-	int framePag; //Numero de frame resultante
+	uint8_t framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
 	uint8_t direcc [2]; //arreglo para los cortes de 8 bits
 	int TLB [16][2]; //TLB
@@ -210,22 +230,22 @@ void main(){
 	for(i = 0; i < size && !corte; i++){ //Para cada dirección lógica en el arreglo
 		if(Direcciones[i] != -1){ //Hago este chequeo por las dudas
 			int OG = Direcciones[i];
-			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario 
-			//Aquí debo separar en Page Number y Offset, rever esto porque creo que estoy rompiendo el numero original al usar la Máscara
-			//Aplico la máscara, dejando los bits que me interesan en la parte superior y luego corto el numero a 8 bits 
+			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario  
 			uint16_t numCopy = num;
 			direcc = convertFrom16To8(numCopy);
 			PageNum = direcc[0];
 			Offset = direcc[1];
+			//Si lo que digo ariba es cierto, solo deberia buscar en el TLB si el numero ya esta, sino, basta con
+			//transformar el numero de 8 bits a decimal 
 			framePag = BusquedaTabla(PageNum, TablaPaginas); //Ver esto del pasaje
 			DirFis = convertFrom8To16(framePag,Offset);
-			printf("Direccion Logica = %d, Direccion Fisica = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
+			printf("Direccion Logica = %d, Direccion Fisica asociada = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
-		corte = Direcciones[i+1] == -1; //Como NO es probable que me lllenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
+		corte = Direcciones[i+1] == -1; //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
 
 	}
 
-	printf("Se ha terminado de traducir las direcciones logicas presentadas\n");
+	printf("Se ha terminado de traducir las direcciones logicas presentadas en el archivo\n");
 	return 0;
 
 }
