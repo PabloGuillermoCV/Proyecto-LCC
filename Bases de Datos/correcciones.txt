@@ -35,8 +35,9 @@ Correcciones entrega anterior:
 	Con un monto de $2000 y periodo de 18 meses, éste se almacena correctamente en la BD
 	pero no puedo pagar las cuotas del préstamo recién creado. 
 	La aplicación debería mostrar 18 cuotas con un valor de $142.77 y
-	con su fecha de vencimiento correspondiente.
-	Al listar las cuotas del cliente 5, se ven, pero no entra todo el listado en la tabla.
+	con su fecha de vencimiento correspondiente. -ARREGLAR LA BUSQUEDA DE CUOTAS, SE PAGA PERO NO ES LA CONSULTA CORRECTA AL MOSTRARLAS
+	
+	Al listar las cuotas del cliente 5, se ven, pero no entra todo el listado en la tabla. -VER INTERFAZ
 	
 
 --------------------------------------------------------------------------------------------
@@ -52,14 +53,18 @@ Correcciones entrega 3:
 	- Monto
 	- código de caja (referido a un atm o ventanilla donde se realizo la transacción)
 	
+	-PONGO NRO_TARJETA O NO??
+	
 	En el Stored procedure acceden al cliente a través del número de la caja de ahorro
 	y se quedan con el primero de la tabla, pero dado que una caja de ahorro puede pertenecer a más 
 	de un cliente, no es posible identificar bien qué cliente hizo la extracción (quizás no sea el nro 1).
+	
 	* cuando hacen el INSERT de la transacción, deberían ingresar el ID nuevo, y luevo usar LAST_INSERT_ID
-	en transacción_por_caja y en extracción.
+	en transacción_por_caja y en extracción. -LISTO
+	
 	Fíjense que cuando hacen:
 		INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),Cod_Caja)
-	el cod_caja es el código de una Caja (referido a un atm o ventanilla) no de la caja de ahorro!
+	el cod_caja es el código de una Caja (referido a un atm o ventanilla) no de la caja de ahorro! -LISTO
 	
 - Transacción para hacer una transferencia:	    
 	* los parametros de entrada deberían ser: 
@@ -68,13 +73,13 @@ Correcciones entrega 3:
 	- Monto
 	- número de cliente	
 	- código de caja (referido a un atm o ventanilla donde se realizó la transacción) 
+	Les faltaría agregar los últimos 2, para determinar quién hizo la transferencia y por dónde. -LISTO
 	
-	Les faltaría agregar los últimos 2, para determinar quién hizo la transferencia y por dónde.
-	Deberían controlar también que el cliente ingresado sea uno de los titulares de la caja de ahorro orígen.
+	Deberían controlar también que el cliente ingresado sea uno de los titulares de la caja de ahorro orígen. -LISTO
 	
 	- Si se superan los controles y se debe realizar la transferencia
 	fíjense que cuando hacen el INSERT de la transacción, deberían ingresar el ID nuevo, no usar el que se insertó previamente (LAST_INSERT_ID())
-	Luego para transacción_por_caja y transferencia está bien que recuperen el último (el de la transacción recien insertada)
+	Luego para transacción_por_caja y transferencia está bien que recuperen el último (el de la transacción recien insertada) -LISTO
 	
 - Trigger:
 	
@@ -82,7 +87,7 @@ Correcciones entrega 3:
 			SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 		deberían acceder a la cantidad de meses recientemente insertada en préstamo con
 		NEW.cant_meses. Idem para obtener el último nro de préstamo y fecha: NEW.nro_prestamo, NEW.fecha	
-		ya que si se ejecuta concurrentemente, el último ID insertado podría llegar a ser de otro préstamo.				
+		ya que si se ejecuta concurrentemente, el último ID insertado podría llegar a ser de otro préstamo. -LISTO, VERIFICAR	
 		
 - SP a través de la Interfaz gráfica:
 	- Extracción
@@ -112,11 +117,11 @@ Correcciones entrega 3:
 	
 		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+
 		| nro_ca | saldo   | nro_trans | fecha      | hora     | tipo          | monto   | cod_caja | nro_cliente | tipo_doc | nro_doc | nombre      | apellido      | destino |
-		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+                           
-		|      1 |  450.00 |      ...  |  <actual>  | <actual> | transferencia |  150.00 |      100 |           1 | DNI      |       1 | Nombre_Cli1 | Apellido_Cli1 |       2 | 
+		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+
+		|      1 |  450.00 |      ...  |  <actual>  | <actual> | transferencia |  150.00 |      100 |           1 | DNI      |       1 | Nombre_Cli1 | Apellido_Cli1 |       2 |
 		|      2 | 2150.00 |      ...  |  <actual>  | <actual> | deposito      |  150.00 |      100 |        NULL | NULL     |    NULL | NULL        | NULL          |    NULL |
 			...                                                    ...
-		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+	
+		+--------+---------+-----------+------------+----------+---------------+---------+----------+-------------+----------+---------+-------------+---------------+---------+
 
 		
 		
