@@ -27,6 +27,7 @@ import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import java.sql.Statement;
+import java.sql.Types;
 
 @SuppressWarnings("serial")
 public class VentanaAdmin extends javax.swing.JInternalFrame {
@@ -198,9 +199,22 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    	String SQL = txtConsulta.getText().trim();
 	    	t.execute(SQL);
 	    	R = t.getResultSet();
-	    		if(R != null)
+	    		if(R != null) {
+			    	// obtenemos el modelo de la tabla a partir de la consulta para 
+			    	// modificar la forma en que se muestran de algunas columnas
+			    	tabla.createColumnModelFromQuery();
+			    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
+			    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+			    		if (tabla.getColumn(i).getType()==Types.TIME) {    		 
+			    		    tabla.getColumn(i).setType(Types.CHAR);  
+			  	       	}
+			    		// cambiar el formato en que se muestran los valores de tipo DATE
+			    		if (tabla.getColumn(i).getType()==Types.DATE) {
+			    		    tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
+			    		}
+			        } 
 	    			tabla.refresh(R);
-	    	//tabla.setSelectSql(SQL); //el problema es acá 
+	    		}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog (this,"La consulta ingresada no es correcta","Error",JOptionPane.ERROR_MESSAGE);
 		} 
@@ -210,7 +224,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	private void thisComponentShown (ComponentEvent evt) {
 		//Para manejar Logins, hago lo siguiente:
 		/*
-		 * uso JOptionPane.DialogPane para nombres de usuario,/Legajos
+		 * uso JOptionPane.DialogPane para Legajos
 		 * para Claves, uso un JOptionPane.showConfirmDialog con un campo password para verificar el password ingresado
 		 */
 		boolean Verif = false;

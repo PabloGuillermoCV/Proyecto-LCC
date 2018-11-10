@@ -488,7 +488,8 @@ CREATE TABLE Transferencia(
 //al extraer, que en algun lado muestre el saldo que queda.
 
 delimiter ! # defino ! como delimitador
-CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT)//agregar cliente y codigo de caja
+CREATE PROCEDURE RealizarTransferencia(IN Cod_CajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT, IN N_Cliente SMALLINT, IN Cod_Ventana SMALLINT)
+//agregar cliente y codigo de caja(hecho)
 	BEGIN
 		 # Declaro una variable local saldo_actual	
 	 DECLARE saldo_actual DECIMAL(7,2);
@@ -511,9 +512,9 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
         ROLLBACK;
 	  END;		      
          
-	 START TRANSACTION;	# Comienza la transacción  
-	   IF EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_Caja0) AND 
-	      EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_CajaD)
+	 START TRANSACTION;	# Comienza la transacción
+	  IF EXISTS (SELECT * FROM Cliente_ca WHERE Cod_CajaO = nro_ca AND N_Cliente = nro_cliente) //Verifica que el cliente es titular de la caja origen
+	   IF EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_Caja0) AND EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_CajaD)
 	   
 	   THEN
 	    BEGIN
@@ -565,16 +566,19 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_cajaO SMALLINT, IN Cod_CajaD SMALL
             SELECT 'ERROR: Cuenta inexistente' AS resultado; 
 			
 		 END;
-	   END IF;  	 		
+	   END IF;
+      ELSE
+		SELECT 'ERROR: Cuenta inexistente' AS resultado; 
+      END IF;	  
 		
 	 COMMIT;   # Comete la transacción  
 	END; !
 
-CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN nro_tarjeta SMALLINT)//sacar el nro_ca asociado a nro_tarjeta
+CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN N_Tarjeta BIGINT, IN N_Cliente SMALLINT, IN Cod_Ventana SMALLINT)
+//sacar el nro_ca asociado a nro_tarjeta(hecho)
 	BEGIN
-	DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
-
-	DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
+	 DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
+	 DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
 	 DECLARE codigo_MYSQL INT DEFAULT 0;
 	 DECLARE mensaje_error TEXT;
 	 DECLARE N_Cl SMALLINT;
@@ -592,8 +596,9 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN nro_tarjeta SMALLINT)//saca
      
 
 	START TRANSACTION;
-	//aca va un if verificando la tarjeta
-		IF EXISTS(SELECT * FROM Caja_Ahorro WHERE nro_ca = Cod_Caja) THEN //verificar que exista el numero de tarjeta y luego tomar el cliente
+	//aca va un if verificando la tarjeta(hecho)
+	  IF EXISTS(SELECT * FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta) THEN
+		IF EXISTS(SELECT * FROM Tarjeta WHERE nro_ca = Cod_Caja) THEN //verificar que exista el numero de tarjeta y luego tomar el cliente(hecho???)
 		 BEGIN
 		
 		  SELECT saldo INTO Saldo_Actual FROM caja_ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
@@ -607,7 +612,7 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN nro_tarjeta SMALLINT)//saca
 	      
 				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 				
-	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_Caja);
+	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_Ventana);
 				
 	         	INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_Cl,Cod_Caja);
 				
@@ -632,6 +637,11 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN nro_tarjeta SMALLINT)//saca
 			
 		  END;
 	   END IF; 
+	   ELSE
+	     BEGIN
+			SELECT 'ERROR: Tarjeta inexistente' AS resultado;
+		 END;
+	  END IF;
 	COMMIT;
 END; !
 

@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import javax.swing.JScrollBar;
+import java.awt.BorderLayout;
 
 @SuppressWarnings({"serial","unused"})
 public class VentanaEmpleado extends javax.swing.JInternalFrame {
@@ -64,7 +65,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
         });
 		
 		JPanel PaneTabla = new JPanel();
-		PaneTabla.setBounds(0, 161, 493, 326);
+		PaneTabla.setBounds(0, 161, 875, 560);
 		getContentPane().add(PaneTabla);
 			
 		Num_doc = new JTextField();
@@ -91,7 +92,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		
 		btnRegistrarPago = new JButton("Registrar Pago");
 		btnRegistrarPago.setEnabled(false);
-		btnRegistrarPago.setBounds(213, 54, 112, 23);
+		btnRegistrarPago.setBounds(361, 54, 112, 23);
 		getContentPane().add(btnRegistrarPago);
 		btnRegistrarPago.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -99,13 +100,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			}
 		});
 		
-		//JScrollBar scrollBar = new JScrollBar();
-		//PaneTabla.add(scrollBar);
-		//scrollBar.add(tabla);
 		PaneTabla.add(tabla);
 		//hago que NO pueda ser seleccionable por defecto
 		tabla.setEnabled(true);
 		tabla.setEditable(false);
+		
+		JScrollBar scrollBar = new JScrollBar();
+		tabla.add(scrollBar, BorderLayout.WEST);
 		tabla.addMouseListener(new MouseAdapter() {
 			public void MouseListener(MouseEvent evt) {
 				TablaClick(evt);
@@ -131,7 +132,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				verCuotas(arg0);
 			}
 		});
-		CuotasBtn.setBounds(366, 114, 107, 23);
+		CuotasBtn.setBounds(361, 114, 112, 23);
 		getContentPane().add(CuotasBtn);
 		
 		JButton btnVerMorosos = new JButton("Ver Morosos");
@@ -292,8 +293,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			//SQL para determinar los prestamos actuales de un cliente
-			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P WHERE P.nro_cliente = " + doc); //Esto es el problema
+			//SQL para determinar los prestamos actuales de un cliente, Verificar SQL
+			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P NATURAL JOIN Pago X WHERE P.nro_cliente = " + doc + "AND EXISTS fecha_pago = NULL "); 
 			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
 				
 				int m = 0;
@@ -330,7 +331,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			}
 			else {
 				//Muestro un cuadro de error que especifica que el Cliente ya tiene un prestamo
-				JOptionPane.showConfirmDialog(null, "No es posible crear un prestamo ya que el cliente ya posee un prestamo a su nombre", "Error", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showConfirmDialog(null, "No es posible crear un prestamo ya que el cliente ya posee un prestamo a su nombre", "Error", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
 			}
 			stmt.close();
 			R.close();
