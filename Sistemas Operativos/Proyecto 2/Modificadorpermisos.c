@@ -95,13 +95,13 @@ int PerteneceNums(char n){
 int LeerOctal(char *Perms){
 	int ret = 1;
 	int i;
-	if (sizeof(Perms) > 3)
+	if (sizeof(Perms) > 4)
 		ret = ERR_EXTRA_PARAMS; //Código de error propio, como hay más parámetros de los permitidos 
 	else{
-		if(sizeof(Perms) < 3)
+		if(sizeof(Perms) < 4)
 			ret = ERR_INSUFFICIENT_PARAMS; //Código de error propio "Cantidad de permisos a setear insuficiente, debe ser del tipo ugo"
 		else{
-			for(i = 1; i < sizeof(Perms) && ret == 1; i++){
+			for(i = 0; i < (sizeof(Perms) - 1) && ret == 1; i++){
 				ret = PerteneceNums(Perms[i]);
 			}		
 		}
