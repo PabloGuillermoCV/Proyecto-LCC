@@ -88,7 +88,8 @@ uint8_t DecimalABinario8Bits(int n){
 */
 int BinarioADecimal(uint16_t n){
 	int rem,decimal,base = 1;
-
+	decimal = 0;
+	rem = 0;
 	while(n > 0){
 		rem = n % 10;
 		decimal = decimal + rem * base;
@@ -99,9 +100,11 @@ int BinarioADecimal(uint16_t n){
 	return decimal;
 }
 
-int BinarioADecimal8bits(uint8_t n){
-	int rem,decimal,base = 1;
 
+int BinarioADecimal(uint8_t n){
+	int rem,decimal,base = 1;
+	decimal = 0;
+	rem = 0;
 	while(n > 0){
 		rem = n % 10;
 		decimal = decimal + rem * base;
@@ -109,8 +112,9 @@ int BinarioADecimal8bits(uint8_t n){
 		base = base * 2;
 	}
 
-	return decimal; 
+	return decimal;
 }
+
 
 //estas funciones de conversión entre numeros en bits ESTAN PROBADAS Y ANDAN
 /*
