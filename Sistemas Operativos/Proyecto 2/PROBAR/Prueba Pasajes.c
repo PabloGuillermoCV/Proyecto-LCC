@@ -1,5 +1,10 @@
+
+
+#define __STDC_FORMAT_MACROS
 #include<stdlib.h>
 #include<math.h>
+#include<inttypes.h>
+#include<stdint.h>
 
 uint16_t DecimalABinario(int n){
 	uint16_t ret = 0x00; //000000000000000 en binario usando representación en Hexa
@@ -21,7 +26,8 @@ uint16_t DecimalABinario(int n){
 */
 int BinarioADecimal(uint16_t n){
 	int rem,decimal,base = 1;
-
+	decimal = 0;
+	rem = 0;
 	while(n > 0){
 		rem = n % 10;
 		decimal = decimal + rem * base;
@@ -44,6 +50,6 @@ int main (){
 	int numP = 10;
 	uint16_t ret = DecimalABinario(numP);
 	int numB = BinarioADecimal(ret);
-	printf("numero original: %d\n numero en binario: %d\n numero de binario a decimal: %d\n", numP,ret,numB);
+	printf("numero original: %d\n numero en binario: %"PRIu16"\n numero de binario a decimal: %d\n", numP,ret,numB);
 	return 0;
 }

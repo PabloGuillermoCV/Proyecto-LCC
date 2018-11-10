@@ -1,6 +1,9 @@
+#define __STDC_FORMAT_MACROS //Defino las Macros de Impresion para enteros especiales
 #include<stdlib.h>
 #include<math.h>
 #include <bool.h>
+#include<inttypes.h>
+#include<stdint.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
@@ -272,7 +275,7 @@ void main(){
 			Offset = direcc[1]; 
 			framePag = BusquedaTabla(PageNum, TablaPaginas);
 			DirFis = convertFrom8To16(framePag,Offset);
-			printf("Direccion Logica = %d, Direccion Fisica asociada = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
+			printf("Direccion Logica = %d, Direccion Fisica asociada = %"PRIu16" \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
 		corte = Direcciones[i+1] == -1; //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
 
