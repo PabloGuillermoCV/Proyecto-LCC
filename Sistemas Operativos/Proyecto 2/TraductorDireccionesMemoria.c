@@ -2,8 +2,6 @@
 #include<math.h>
 #include <bool.h>
 
-//ASUMIR QUE ME PASAN TODO EN BINARIO!!!
-
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
 #define TLB_MISS -1
@@ -86,35 +84,29 @@ uint8_t DecimalABinario8Bits(int n){
  * Dado un Numero binario, lo paso a Decimal, uso método del producto
 */
 int BinarioADecimal(uint16_t n){
-	int i = 15; //acordarse que las posiciones van de 0 a n-1 cuando haciamos las conversiones en Orga
-	int ret = 0;
-	int aux = 0;
-	while(i >= 0){
-		//Agarrar bit por bit y pasarlo a decimal
-		aux = n % 10;
-		ret = ret + (aux*pow(2,i)); /*el Bit * 2^posicionActual */
-		n = n / 10;
-		i--;
+	int rem,decimal,base = 1;
 
+	while(n > 0){
+		rem = n % 10;
+		decimal = decimal + rem * base;
+		n = n / 10;
+		base = base * 2;
 	}
 
-	return ret + 1; //Esto lo teniamos que hacer en Organización si mal no recuerdo... (Representaciones)
+	return decimal;
 }
 
 int BinarioADecimal8bits(uint8_t n){
-	int i = 7; //acordarse que las posiciones van de 0 a n-1 cuando haciamos las conversiones en Orga
-	int ret = 0;
-	int aux = 0;
-	while(i >= 0){
-		//Agarrar bit por bit y pasarlo a decimal
-		aux = n % 10;
-		ret = ret + (aux*pow(2,i)); /*el Bit * 2^posicionActual */
-		n = n / 10;
-		i--;
+	int rem,decimal,base = 1;
 
+	while(n > 0){
+		rem = n % 10;
+		decimal = decimal + rem * base;
+		n = n / 10;
+		base = base * 2;
 	}
 
-	return ret + 1; //Esto lo teniamos que hacer en Organización si mal no recuerdo... (Representaciones)
+	return decimal; 
 }
 
 //estas funciones de conversión entre numeros en bits ESTAN PROBADAS Y ANDAN
@@ -131,7 +123,7 @@ uint16_t convertFrom8To16(uint8_t dataFirst, uint8_t dataSecond) {
 }
 
 /*
-* función para separar un entero de 16  bits en dos enteros de 8 bits
+* función para separar un entero de 16 bits en dos enteros de 8 bits
 * los resultados se devuelven en un arreglo de dos componentes
 */
 uint8_t *convertFrom16To8(uint16_t dataAll) {
@@ -145,7 +137,6 @@ uint8_t *convertFrom16To8(uint16_t dataAll) {
 
 /*
  * Dado un numero de página, buscar el numero de frame correspondiente en la Tabla de Páginas
- * puede que esta función no se necesite, preguntar
 */
 uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
 	int Nro = BinarioADecimal8bits(PN);
@@ -154,21 +145,19 @@ uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
 
 /*
  * Dado un número de Página, lo intento buscar en el TLB, en caso de no encontrarlo, debo bajar a la Tabla de Páginas
- * NOTA: Devolver -1 significa que NO se encontró el número de página en el TLB
+ * Lo que devuelvo es la POSICIÓN en donde encontré el numero de página o -1 en caso de TLB Miss
 */
-uint8_t BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
-
-	uint8_t ret = 0;
+int BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
 	int C;
+	bool ret = true;
 	//Buscar valor aquí
-	for(C = 0; C <= 15 && ret == 0; C++){
-		if(TLB[C][0] == PN)
-			ret = TLB[C][1];
+	for(C = 0; C <= 15 && ret; C++){
+		ret = TLB[C][0] == PN;
 	}
 	if(ret == 0)
-		ret = TLB_MISS;
+		C = TLB_MISS;
 
-	return ret;
+	return C;
 }
 
 /*
@@ -204,7 +193,7 @@ void LeerArchivo(FILE *file, int Dirs[]){
     const char *errstr = NULL;
     FILE *fp = fopen(file, "r"); //Abro el archivo en modo lectura
     if(fp = NULL)
-    	exit(EXIT_FAILURE);
+    	exit(1);
 
      while ((read = getline(&line, &len, fp)) != -1) {
        //Guardo en line la linea, que en realidad es el numero que debo guardar
@@ -224,6 +213,10 @@ void LeerArchivo(FILE *file, int Dirs[]){
  
 }
 
+
+/*
+ * Función para determinar si estoy intentando insertar un valor repetido en la Tabla de Paginas 
+*/
 bool Repetido(uint8_t Pages[], uint8_t num){
 	bool ret = true;
 	int i;
@@ -234,6 +227,9 @@ bool Repetido(uint8_t Pages[], uint8_t num){
 	return ret;
 }
 
+/*
+ * funcion para inicializar los arreglos de direcciones input y Tabla de Paginas
+*/
 void inicializar(int DirIni[], uint8_t PageT[]){
 	int i;
 	for(i = 0; i < NELEMS(DirIni); i++){
@@ -251,7 +247,7 @@ void inicializar(int DirIni[], uint8_t PageT[]){
 void main(){
 
 	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones
-	int TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
+	uint8_t TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
 	uint8_t framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
 	uint8_t direcc [2]; //arreglo para los cortes de 8 bits
@@ -273,9 +269,7 @@ void main(){
 			uint16_t numCopy = num;
 			direcc = convertFrom16To8(numCopy);
 			PageNum = direcc[0];
-			Offset = direcc[1];
-			//Si lo que digo ariba es cierto, solo deberia buscar en el TLB si el numero ya esta, sino, basta con
-			//transformar el numero de 8 bits a decimal 
+			Offset = direcc[1]; 
 			framePag = BusquedaTabla(PageNum, TablaPaginas);
 			DirFis = convertFrom8To16(framePag,Offset);
 			printf("Direccion Logica = %d, Direccion Fisica asociada = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
