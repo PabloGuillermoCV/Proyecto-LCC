@@ -24,14 +24,14 @@
 
 //0 es para leer y 1 es para escribir
 
-    char writeMessage;
-	char readMessage;
+char writeMessage;
+char readMessage;
 
-	int PipeA[2];
-	int PipeB[2];
-    int PipeC[2];
-	int PipeD[2];
-	int PipeE[2];
+int PipeA[2];
+int PipeB[2];
+int PipeC[2];
+int PipeD[2];
+int PipeE[2];
 
 void A () {
 	close (PipeA[1]);
@@ -43,18 +43,22 @@ void A () {
 	close (PipeE[1]);
 	
 	while (true) {
+		//A recibe un mensaje de E
 		read(PipeA[0],&readMessage,1);
 		printf("A");
 		fflush(NULL);
 		
+		//A envia un mensaje a C
         writeMessage = 'X';
 		write(PipeC[1],&writeMessage,1);
 		fflush(NULL);
 		
+		//A recibe un mensaje de E
 		read(PipeA[0],&readMessage,1);
 		printf("A");
 		fflush(NULL);
 		
+		//A envia un mensaje a B
         writeMessage = 'X';
 		write(PipeB[1],&writeMessage,1);
 		fflush(NULL);
@@ -72,10 +76,12 @@ void B () {
 	close (PipeE[1]);
 	
 	while (true) {
+		//B recibe un mensaje de A o E
 		read(PipeB[0],&readMessage,1);
 		printf("B");
 		fflush(NULL);
 		
+		//B envia un mensaje a C
         writeMessage = 'X';
 		write(PipeC[1],&writeMessage,1);
 		fflush(NULL);
@@ -93,10 +99,12 @@ void C () {
 	close (PipeE[1]);
 	
 	while (true) {
+		//C recibe un mensaje de A o B
 		read(PipeC[0],&readMessage,1);
 		printf("C");
 		fflush(NULL);
 		
+		//C envia un mensaje a D
         writeMessage = 'X';
 		write(PipeD[1],&writeMessage,1);
 		fflush(NULL);
@@ -114,10 +122,12 @@ void D () {
 	close (PipeE[0]);
 	
 	while (true) {
+		//D recibe un mensajde de C
 		read(PipeD[0],&readMessage,1);
 		printf("D");
 		fflush(NULL);
 		
+		//D envia un mensaje a E
         writeMessage = 'X';
 		write(PipeE[1],&writeMessage,1);
 		fflush(NULL);
@@ -133,35 +143,47 @@ void E () {
 	close (PipeD[1]);
 	close (PipeE[1]);
 	
-	writeMessage = 'X';
-    write(PipeA[1],&writeMessage,1);
-	fflush(NULL);
-	
 	while (true) {
+		//E recibe un mensaje de D
 		read(PipeE[0],&readMessage,1);
 		printf("E");
 		fflush(NULL);
 		
+		//E envia un mensaje a B para imprimir BCDE
         writeMessage = 'X';
 		write(PipeB[1],&writeMessage,1);
 		fflush(NULL);
 		
+		//E recibe un mensaje de D
 		read(PipeE[0],&readMessage,1);
 		printf("E");
 		fflush(NULL);
 		
+		//E envia un mensaje a A para imprimir ABCDE
         writeMessage = 'X';
 		write(PipeA[1],&writeMessage,1);
 		fflush(NULL);
 		
+		//E recibe un mensaje de D
 		read(PipeE[0],&readMessage,1);
 		printf("E");
 		fflush(NULL);
 		
+		//E envia un mensaje a A para imprimir ACDE
         writeMessage = 'X';
 		write(PipeA[1],&writeMessage,1);
 		fflush(NULL);
 	}
+}
+
+void dispatch (int I) {
+	switch (I) {
+        case 1: A(); break;
+        case 2: B(); break;
+        case 3: C(); break;
+        case 4: D(); break;
+        case 5: E(); break;
+    }
 }
 
 int main () {
@@ -172,56 +194,40 @@ int main () {
 	pipe (PipeD);
 	pipe (PipeE);
 	
-    int pid = fork ();
-    if (pid == -1) {
-    	fprintf (stderr,"Error al crear el Proceso Hijo A");
+	pid_t pid = NULL;
+	
+	int I;
+    int cantP = 5;
+	//Se crean los 5 procesos A, B, C, D y E
+    for (I = 1; I <= cantP; I++){
+        pid = fork ();
+        if (pid == -1) {
+			fprintf (stderr,"Error al crear el Proceso");
+		}
+        if (pid == 0){
+            dispatch (I);
+            exit (0);
+        }
     }
-    else {
-    	if (pid == 0) {
-        	pid = fork ();
-			if (pid == -1) {
-				fprintf (stderr,"Error al crear el Proceso Hijo B");
-			}
-			else {
-				if (pid != 0) A ();
-				if (pid == 0) {
-					pid = fork ();
-					if (pid == -1) {
-						fprintf (stderr,"Error al crear el Proceso Hijo C");
-					}
-					else {
-						if (pid != 0) B ();
-						if (pid == 0) {
-							pid = fork ();
-							if (pid == -1) {
-								fprintf (stderr,"Error al crear el Proceso Hijo D");
-							}
-							else {
-								if (pid != 0) C ();
-								if (pid == 0) {
-									pid = fork ();
-									if (pid == -1) {
-										fprintf (stderr,"Error al crear el Proceso Hijo E");
-									}
-									else {
-										if (pid != 0) D ();
-										if (pid == 0) {
-											E ();
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-        	exit(0);
-    	}
-    }
+	
+	close (PipeA[0]);
+	close (PipeB[0]);
+	close (PipeB[1]);
+	close (PipeC[0]);
+	close (PipeC[1]);
+	close (PipeD[0]);
+	close (PipeD[1]);
+	close (PipeE[0]);
+	close (PipeE[1]);
+	//El Padre envia un mensaje a A para empezar el ciclo
+	writeMessage = 'X';
+	fflush (NULL);
+    write(PipeA[1],&writeMessage,1);
+	fflush(NULL);
 
-	if (pid > 0){
-    	wait(NULL);
-	}
+	for (I = 1; I <= cantP; I++) {
+        wait (NULL);
+    }
 	
 	return 0;
 }
