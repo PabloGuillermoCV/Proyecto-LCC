@@ -7,7 +7,7 @@
 #include <errno.h>
 
 
-char ALLOWED_OCTAL[6] = {7,5,4,2,1,0} //Arreglo Global para saber los valores permitidos en octal para chmod
+char ALLOWED_OCTAL[6] = {'7','5','4','2','1','0'} //Arreglo Global para saber los valores permitidos en octal para chmod
 char ALLOWED_PERMS[3] = {'r','w','x'} //Arreglo Global para saber los caracteres legales PARA LOS PERMISOS
 char ALLOWED_GROUPS[4] = {'u','g','o','a'} //Arreglo Global para saber los caracteres legales PARA LOS USUARIOS
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
