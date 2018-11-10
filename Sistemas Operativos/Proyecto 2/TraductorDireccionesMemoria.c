@@ -159,9 +159,9 @@ uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
 uint8_t BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
 
 	uint8_t ret = 0;
-
+	int C;
 	//Buscar valor aquí
-	for(int C = 0; C <= 15 && ret == 0; C++){
+	for(C = 0; C <= 15 && ret == 0; C++){
 		if(TLB[C][0] == PN)
 			ret = TLB[C][1];
 	}
