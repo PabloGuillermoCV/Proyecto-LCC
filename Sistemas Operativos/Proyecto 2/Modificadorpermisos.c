@@ -7,9 +7,7 @@
 #include <errno.h>
 
 
-char ALLOWED_OCTAL[6] = {'7','5','4','2','1','0'} //Arreglo Global para saber los valores permitidos en octal para chmod
-char ALLOWED_PERMS[3] = {'r','w','x'} //Arreglo Global para saber los caracteres legales PARA LOS PERMISOS
-char ALLOWED_GROUPS[4] = {'u','g','o','a'} //Arreglo Global para saber los caracteres legales PARA LOS USUARIOS
+char ALLOWED_OCTAL[6] = {'7','5','4','2','1','0'}; //Arreglo Global para saber los valores permitidos en octal para chmod
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 //DEFINO TIPOS DE ERRORES QUE PUEDEN PRODUCIRSE AL PARSEAR LOS DATOS
 #define ERR_EXTRA_PARAMS -1
@@ -111,7 +109,7 @@ int LeerOctal(char *Perms){
 
 
 
-int main(int argc, const char * argv[]){
+int main(int argc, char * argv[]){
 
 	char *Permisos;
 	char *FILE;
@@ -133,11 +131,12 @@ int main(int argc, const char * argv[]){
 		}
 
 		if(errno == 1){
+			int p = strtol(Permisos,0,8); //Hago la llamada a Sting to Long() para transformar la linea de los permisos en un número que pueda leer chmod()
 			//Si llegué hasta aquí, el control fue correcto, puedo invocar a chmod
-			errno = chmod (FILE,Permisos); 
+			errno = (int) chmod (FILE,p); 
 			 if (errno < 0){ //
 	        	fprintf(stderr, "%s: error en la llamada chmod(%s, %s) - %d (%s)\n",
-	                	argv[0], buf, mode, errno, strerror(errno));
+	                	argv[0], FILE, permisos, errno, strerror(errno));
 	        	exit(1);
 	    	}
 	    	else{
