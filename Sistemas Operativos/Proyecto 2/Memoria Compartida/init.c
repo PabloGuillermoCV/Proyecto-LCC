@@ -10,7 +10,7 @@
 //ipcrm -m id para eliminar el segmento
 
 /*
-	
+
     Mutex Bear = 0;
     Semaphore Bees = 0;
     Semaphore Empty = M;
@@ -23,7 +23,7 @@
         }
         signal(Producir)
     }
-	
+
     Abeja {
         wait(Producir)
         wait(Miel)
@@ -35,15 +35,15 @@
             signal(Dormir)
         }
 	}
-	
+
 */
 
 int main(int argc, char* argv[]) {
 
 	Memoria* MemoriaCompartida;
-	
+
 	int pid;
-	
+
 	int I;
 
 	key_t Key = generateKey();
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 	sem_init(&MemoriaCompartida->Dormir,1,0);
 
 	pid = fork();
-	
+
 	if (pid == -1) {
 		fprintf (stderr,"Error al crear el Proceso Oso");
 		exit(1);
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	
+
 	if (pid > 0) {
 		while(true){}
 	}
