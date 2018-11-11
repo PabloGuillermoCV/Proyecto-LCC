@@ -4,6 +4,7 @@
 #include<inttypes.h>
 #include<stdint.h>
 #include<stdio.h>
+#include<time.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
@@ -134,11 +135,11 @@ uint16_t pasarDe8A16(uint8_t dataFirst, uint8_t dataSecond) {
 * los resultados se devuelven en un arreglo de dos componentes
 */
 uint8_t *pasarDe16A8(uint16_t dataAll) {
-    static uint8_t arrayData[2] = { 0x00, 0x00 };
+    static uint8_t arrayData[2] = {0x00,0x00};
 
-    *(arrayData) = (dataAll >> 8) & 0x00FF; //Obtengo la parte alta del numero de 16 bits y la mando a la primer componente del arreglo
+    arrayData[0] = (dataAll >> 8) & 0x00FF; //Obtengo la parte alta del numero de 16 bits y la mando a la primer componente del arreglo
     arrayData[1] = dataAll & 0x00FF; //Obtengo la parte baja del numero de 16 bits
-    return arrayData;
+    return &arrayData;
 }
 
 
