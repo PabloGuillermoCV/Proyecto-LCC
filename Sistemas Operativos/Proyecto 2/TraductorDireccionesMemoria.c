@@ -101,7 +101,7 @@ int BinarioADecimal(uint16_t n){
 }
 
 
-int BinarioADecimal(uint8_t n){
+int BinarioADecimal8bits(uint8_t n){
 	int rem,decimal,base = 1;
 	decimal = 0;
 	rem = 0;
@@ -120,7 +120,7 @@ int BinarioADecimal(uint8_t n){
 /*
  * Función para transformar dos enteros de 8 Bits en un entero de 16 Bits
 */
-uint16_t convertFrom8To16(uint8_t dataFirst, uint8_t dataSecond) {
+uint16_t pasarDe8A16(uint8_t dataFirst, uint8_t dataSecond) {
     uint16_t dataBoth = 0x0000;
 
     dataBoth = dataFirst;
@@ -133,7 +133,7 @@ uint16_t convertFrom8To16(uint8_t dataFirst, uint8_t dataSecond) {
 * función para separar un entero de 16 bits en dos enteros de 8 bits
 * los resultados se devuelven en un arreglo de dos componentes
 */
-uint8_t *convertFrom16To8(uint16_t dataAll) {
+uint8_t *pasarDe16A8(uint16_t dataAll) {
     static uint8_t arrayData[2] = { 0x00, 0x00 };
 
     *(arrayData) = (dataAll >> 8) & 0x00FF; //Obtengo la parte alta del numero de 16 bits y la mando a la primer componente del arreglo
@@ -192,13 +192,13 @@ void Reemplazar(uint8_t FP, uint8_t PN, uint8_t TLB[][2]){
 
 
 //EL código de lectura de archivos hay que probarlo por separado en algún otro lado, hay que probar que esa cosa ande si la vamos a agarrar del Proyecto 1
-void LeerArchivo(FILE *file, int Dirs[]){
+void LeerArchivo(int Dirs[]){
 	char * line = NULL;
     size_t len = 0;
     ssize_t read;
     int i = 0;
     const char *errstr = NULL;
-    FILE *fp = fopen(file, "r"); //Abro el archivo en modo lectura
+    FILE *fp = fopen("memoria.txt", "r"); //Abro el archivo en modo lectura
     if(fp = NULL)
     	exit(1);
 
@@ -254,34 +254,32 @@ void inicializar(int DirIni[], uint8_t PageT[]){
 }
 
 
-void main(){
+int main(){
 
 	int Direcciones [65536]; //Arreglo donde guardaremos las direcciones
-	uint8_t TablaPaginas [256]; //Tabla de Páginas OJO, va de 0 a 255! cuando accedamos hay que restarle 1 al numero con el que se accederá!
+	uint8_t TablaPaginas [256]; //Tabla de Páginas
 	uint8_t framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
-	uint8_t direcc [2]; //arreglo para los cortes de 8 bits
+	uint8_t *Cortes8Bit; //arreglo para los cortes de 8 bits
 	uint8_t TLB [16][2]; //TLB
 	inicializar(Direcciones, TablaPaginas); //función para inicializar los arreglos
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
-	FILE *Direcc; //Archivo de entrada
-	Direcc = "memoria.txt";
-	LeerArchivo(Direcc, Direcciones); 
+	LeerArchivo(Direcciones); 
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
 	int corte = 0;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
-	for(i = 0; i < size && corte == 0; i++){ //Para cada dirección lógica en el arreglo
+	for(i = 0; i < NELEMS(Direcciones) && corte == 0; i++){ //Para cada dirección lógica en el arreglo
 		if(Direcciones[i] != -1){ //Hago este chequeo por las dudas
 			int OG = Direcciones[i];
 			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario  
 			uint16_t numCopy = num;
-			direcc = convertFrom16To8(numCopy);
-			PageNum = direcc[0];
-			Offset = direcc[1]; 
+			Cortes8Bit= pasarDe16A8(numCopy);
+			PageNum = Cortes8Bit[0];
+			Offset = Cortes8Bit[1]; 
 			framePag = BusquedaTabla(PageNum, TablaPaginas);
-			DirFis = convertFrom8To16(framePag,Offset);
+			DirFis = pasarDe8A16(framePag,Offset);
 			printf("Direccion Logica = %d, Direccion Fisica asociada = %"PRIu16" \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
 		if(Direcciones[i+1] == -1); //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
