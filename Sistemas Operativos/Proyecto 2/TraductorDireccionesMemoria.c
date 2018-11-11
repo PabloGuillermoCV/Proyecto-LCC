@@ -3,6 +3,7 @@
 #include<math.h>
 #include<inttypes.h>
 #include<stdint.h>
+#include<stdio.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
@@ -155,11 +156,12 @@ uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
 */
 int BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
 	int C;
-	bool ret = true;
+	int ret = 0;
 	//Buscar valor aquí
-	for(C = 0; C <= 15 && ret; C++){
-		ret = TLB[C][0] == PN;
-	}
+	for(C = 0; C <= 15 && ret == 0; C++){
+		if(TLB[C][0] == PN)
+			ret = 1;
+	}	
 	if(ret == 0)
 		C = TLB_MISS;
 
@@ -202,7 +204,7 @@ void LeerArchivo(FILE *file, int Dirs[]){
 
      while ((read = getline(&line, &len, fp)) != -1) {
        //Guardo en line la linea, que en realidad es el numero que debo guardar
-     	int num = strtonum(line, 0 , 65536, errstr); //el 0 y 65536 representan los numeros mínimo y máximo que acepto, respectivamente
+     	int num = strtol(line, 0 , 65536); //el 0 y 65536 representan los numeros mínimo y máximo que acepto, respectivamente
      	if(errstr != NULL){
      		fprintf(stderr, "Error al intentar obtener las direcciones logicas con mensaje %s", errstr);
      		exit(1);
@@ -243,7 +245,7 @@ void inicializar(int DirIni[], uint8_t PageT[]){
 	}
 	for(i = 0; i < NELEMS(PageT); i++){
 		int r = rand() % 255; //numero random para llenar la tabla de páginas
-		uint8_t r8 = DecimalABinario8bits(r);
+		uint8_t r8 = DecimalABinario8Bits(r);
 		if(Repetido(PageT, r8) == 0) //Si el numero generado NO esta repetido dentro del arreglo, lo pongo como numero de frame
 			PageT[i] = r8;
 		else
