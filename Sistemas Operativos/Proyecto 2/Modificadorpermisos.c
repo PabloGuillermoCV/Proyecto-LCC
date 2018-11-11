@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include <fcnt1.h>
-#include <bool.h>
 #include <string.h>
 #include <errno.h>
 
@@ -136,7 +134,7 @@ int main(int argc, char * argv[]){
 			errno = (int) chmod (FILE,p); 
 			 if (errno < 0){ //
 	        	fprintf(stderr, "%s: error en la llamada chmod(%s, %s) - %d (%s)\n",
-	                	argv[0], FILE, permisos, errno, strerror(errno));
+	                	argv[0], FILE, Permisos, errno, strerror(errno));
 	        	exit(1);
 	    	}
 	    	else{
