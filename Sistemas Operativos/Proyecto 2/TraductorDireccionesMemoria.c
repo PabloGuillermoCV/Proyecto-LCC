@@ -1,13 +1,12 @@
 #define __STDC_FORMAT_MACROS //Defino las Macros de Impresion para enteros especiales
 #include<stdlib.h>
 #include<math.h>
-#include <bool.h>
 #include<inttypes.h>
 #include<stdint.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
-#define TLB_MISS -1
+#define TLB_MISS -1 //Codigo especial para los TLB Miss que se puedan provocar
 
 /*PASOS A SEGUIR:
 	
@@ -64,7 +63,7 @@ uint16_t DecimalABinario(int n){
 		i = i * 10; 
 	}
 
-	return ret; //Dudo de si esto esta bien.
+	return ret;
 
 }
 
@@ -79,7 +78,7 @@ uint8_t DecimalABinario8Bits(int n){
 		i = i * 10; 
 	}
 
-	return ret; //Dudo de si esto esta bien.
+	return ret;
 
 }
 
@@ -169,8 +168,7 @@ int BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
 
 /*
 	Método que despues se encargará de hacer un reemplazo cuando el TLB este lleno
-	Mi idea es usar un algoritmo FIFO para reemplazar, preguntar
-	Asumo que la página más vieja es aquella que esta al final del arreglo!
+	Usa un ALgoritmo de reemplazo FIFO donde la página más vieja es aquella que esta al final del arreglo
 */
 void Reemplazar(uint8_t FP, uint8_t PN, uint8_t TLB[][2]){
 	int i;
@@ -224,11 +222,12 @@ void LeerArchivo(FILE *file, int Dirs[]){
 /*
  * Función para determinar si estoy intentando insertar un valor repetido en la Tabla de Paginas 
 */
-bool Repetido(uint8_t Pages[], uint8_t num){
-	bool ret = true;
+int Repetido(uint8_t Pages[], uint8_t num){
+	int ret = 0;
 	int i;
-	for(i = 0; i < NELEMS(Pages) && ret; i++){
-		ret = Pages[i] == num;
+	for(i = 0; i < NELEMS(Pages) && ret == 0; i++){
+		if(Pages[i] != 0x00 && Pages[i] == num ) //0 es un caso especial ya que PUEDE que alguna página tenga Nro de Frame = 0
+			ret = -1;
 	}
 
 	return ret;
@@ -240,13 +239,15 @@ bool Repetido(uint8_t Pages[], uint8_t num){
 void inicializar(int DirIni[], uint8_t PageT[]){
 	int i;
 	for(i = 0; i < NELEMS(DirIni); i++){
-		DirIni[i] = -1;
+		DirIni[i] = -1; //Leno el arreglo de direcciones con "-1" para luego poder hacer Peek en caso que NO me llenen el arreglo enteramente
 	}
 	for(i = 0; i < NELEMS(PageT); i++){
 		int r = rand() % 255; //numero random para llenar la tabla de páginas
 		uint8_t r8 = DecimalABinario8bits(r);
-		if(!Repetido(PageT, r8)) //Si el numero generado NO esta repetido dentro del arreglo, lo pongo como numero de frame
+		if(Repetido(PageT, r8) == 0) //Si el numero generado NO esta repetido dentro del arreglo, lo pongo como numero de frame
 			PageT[i] = r8;
+		else
+			i--; //Fuerzo al ciclo a repetir la acción para que genere un nuevo numero en esa posición
 	}
 }
 
@@ -259,17 +260,17 @@ void main(){
 	uint16_t DirFis; //Dirección física Resultante
 	uint8_t direcc [2]; //arreglo para los cortes de 8 bits
 	uint8_t TLB [16][2]; //TLB
-	inicializar(Direcciones, TablaPaginas); //función para inicializar todos los arreglos (componentes de Direcciones se inicializa en -1)
+	inicializar(Direcciones, TablaPaginas); //función para inicializar los arreglos
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
-	FILE *Direcc; //Archivo de entrada del proyecto
+	FILE *Direcc; //Archivo de entrada
 	Direcc = "memoria.txt";
 	LeerArchivo(Direcc, Direcciones); 
 	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
 	int i;
-	bool corte = false;
+	int corte = 0;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
-	for(i = 0; i < size && !corte; i++){ //Para cada dirección lógica en el arreglo
+	for(i = 0; i < size && corte == 0; i++){ //Para cada dirección lógica en el arreglo
 		if(Direcciones[i] != -1){ //Hago este chequeo por las dudas
 			int OG = Direcciones[i];
 			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario  
@@ -281,8 +282,8 @@ void main(){
 			DirFis = convertFrom8To16(framePag,Offset);
 			printf("Direccion Logica = %d, Direccion Fisica asociada = %"PRIu16" \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
-		corte = Direcciones[i+1] == -1; //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
-
+		if(Direcciones[i+1] == -1); //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
+			corte = -1;
 	}
 
 	printf("Se ha terminado de traducir las direcciones logicas presentadas en el archivo\n");
