@@ -200,7 +200,7 @@ void LeerArchivo(int Dirs[]){
     int i = 0;
     const char *errstr = NULL;
     FILE *fp = fopen("memoria.txt", "r"); //Abro el archivo en modo lectura
-    if(fp = NULL)
+    if(fp == NULL)
     	exit(1);
 
      while ((read = getline(&line, &len, fp)) != -1) {
