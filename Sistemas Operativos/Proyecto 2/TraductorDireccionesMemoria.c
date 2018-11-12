@@ -20,8 +20,9 @@
 		que serán el Numero de Página y el Offset
 	2) Acceder con el Número de Página a la Tabla de Páginas/TLB
 		En primera Instancia, una vez que se el numero de página, accedo a la Tabla de Páginas y busco el Frame correspondiente
-		Una vez implementada la Tabla de Páginas (arreglo de 256 componentes) y probada, se debe añadir el TLB el cual es un arreglo de 16x2
-		OJO, para el TLB es necesario implementar un algoritmo de reemplazo (FIFO, LRU, etc)
+		Una vez implementada la Tabla de Páginas (arreglo de 256 componentes) y probada, se debe añadir el TLB el cual es un arreglo de 16x3
+			La tercer columna del TLB los uso como si fuesen "Dirty Bits", al inciar, los pongo en 0 y con estos puedo determinar si una entrada del TLB
+				es o inicial y puede ser reemplazada o no
 		Lo que hago aquí es, dado el número de 8 bits, pasarlo a decimal y acceder al arreglo directamente a la componente que apunte el numero convertido (preguntar)
 			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un TLB Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame 
 			debo agregarlo al TLB para futuro uso
@@ -149,7 +150,7 @@ uint8_t *pasarDe16A8(uint16_t dataAll) {
 */
 uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
 	int Nro = BinarioADecimal8bits(PN);
-	return TP[Nro + 1];
+	return TP[Nro];
 }
 
 /*
@@ -174,7 +175,7 @@ int BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
 	Método que despues se encargará de hacer un reemplazo cuando el TLB este lleno
 	Usa un ALgoritmo de reemplazo FIFO donde la página más vieja es aquella que esta al final del arreglo
 */
-void Reemplazar(uint8_t FP, uint8_t PN, uint8_t TLB[][2]){
+void Reemplazar(uint8_t FP, uint8_t PN, uint8_t TLB[][3]){
 	int i;
 
 	//Lo que debo hacer es correr TODAS las posiciones un lugar hacia abajo, dejando el primer espacio libre
@@ -184,11 +185,13 @@ void Reemplazar(uint8_t FP, uint8_t PN, uint8_t TLB[][2]){
 	for(i = 15; i >= 0; i--){
 		TLB[i][0] = TLB[i-1][0]; //Muevo los Page Number existentes hacia abajo
 		TLB[i][1] = TLB [i -1][1]; //Muevo los FP existentes hacia abajo
+		TLB[i][2] = TLB [i-1][2]; //Muevo los Dirty Bits existentes un lugar para abajo
 	}
 
 	//Hecho el reemplazo, agrego las nuevas componentes
 	TLB[0][0] = PN;
 	TLB[0][1] = FP;
+	TLB[0][2] = 1; //marco que es una nueva entrada que NO puede ser reemplazada
 
 }
 
@@ -240,11 +243,13 @@ bool Repetido(uint8_t Pages[], uint8_t num){
 /*
  * funcion para inicializar los arreglos de direcciones input y Tabla de Paginas
 */
-void inicializar(int DirIni[], uint8_t PageT[]){
+void inicializar(int DirIni[], uint8_t PageT[], uint8_t TLB[][3]){
 	int i;
+	//Inicializo arreglo de direcciones logicas
 	for(i = 0; i < NELEMS(DirIni); i++){
 		DirIni[i] = -1; //Leno el arreglo de direcciones con "-1" para luego poder hacer Peek en caso que NO me llenen el arreglo enteramente
 	}
+	//Inicializo Tabla de Páginas
 	for(i = 0; i < NELEMS(PageT); i++){
 		int r = rand() % 255; //numero random para llenar la tabla de páginas
 		uint8_t r8 = DecimalABinario8Bits(r);
@@ -253,8 +258,32 @@ void inicializar(int DirIni[], uint8_t PageT[]){
 		else
 			i--; //Fuerzo al ciclo a repetir la acción para que genere un nuevo numero en esa posición
 	}
+	//INicializo TLB
+	for(i = 0; i < 16; i++){
+		TLB[i][0] = 0;
+		TLB[i][1] = 1;
+		TLB[i][2] = 0; //"Dirty Bit"
+	}
+
 }
 
+/*
+ * Función que intenta agregar una nueva entrada al TLB cuando se produjo un TLB_MISS
+*/
+void AgregarTLB(uint8_t PN, uint8_t FN, uint8_t TLB[][3]){
+	int i;
+	for(i = 0; i < 16; i++){
+		if(TLB[i][0] == 0 & TLB[i][1] == 1 & TLB[i][2] == 0){ //Si encuentro una "Entrada Inicial"
+			TLB[i][0] = PN;
+			TLB[i][1] = FN;
+			TLB[i][2] = 1; //Marco que esta entrada fue modificada
+		}
+		else{
+			Reemplazar(FN,PN,TLB); //Si no, debo reemplazar una entrada para agregar la nueva, delego en el algoritmo de reemplazo
+		}
+	}
+
+}
 
 int main(){
 
@@ -263,8 +292,8 @@ int main(){
 	uint8_t framePag; //Numero de frame resultante
 	uint16_t DirFis; //Dirección física Resultante
 	uint8_t *Cortes8Bit; //arreglo para los cortes de 8 bits
-	uint8_t TLB [16][2]; //TLB
-	inicializar(Direcciones, TablaPaginas); //función para inicializar los arreglos
+	uint8_t TLB [16][3]; //TLB
+	inicializar(Direcciones, TablaPaginas, TLB); //función para inicializar los arreglos
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
 	LeerArchivo(Direcciones); 
@@ -280,8 +309,15 @@ int main(){
 			Cortes8Bit= pasarDe16A8(numCopy);
 			PageNum = Cortes8Bit[0];
 			Offset = Cortes8Bit[1]; 
-			framePag = BusquedaTabla(PageNum, TablaPaginas);
-			DirFis = pasarDe8A16(framePag,Offset);
+			int BT = BusquedaTLB(PageNum, TLB); //En primera instancia, busco si el Page Number esta en el TLB
+			if(BT == TLB_MISS){ //Si NO se encontró el numero de Frame en el TLB, debo bajar a la Tabla de Páginas y luego agregar la entrada al TLB
+				framePag = BusquedaTabla(PageNum, TablaPaginas);
+				AgregarTLB(PageNum, framePag, TLB);
+			}
+			else{ //Si lo encontré en el TLB, solo obtengo el numero de frame y devuelvo los datos, en BT tengo la Fila donde encontré la entrada
+				framePag = TLB[BT][1]; 
+			}
+			DirFis = pasarDe8A16(framePag,Offset); //Obtengo la Dirección Física final
 			printf("Direccion Logica = %d, Direccion Fisica asociada = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
 		if(Direcciones[i+1] == -1); //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
