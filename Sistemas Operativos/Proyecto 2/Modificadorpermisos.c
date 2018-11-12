@@ -74,7 +74,7 @@ char* MensError(int n){
 int PerteneceNums(char n){
 	int i;
 	int ret = 0;
-	for(i = 0; i < NELEMS(ALLOWED_OCTAL) && ret == 0; i++){
+	for(i = 0; i < NELEMS(ALLOWED_OCTAL) && ret; i++){
 		if(n == ALLOWED_OCTAL[i]){
 			ret = 1;  //El numero obtenido es un octal legal para chmod
 		}
