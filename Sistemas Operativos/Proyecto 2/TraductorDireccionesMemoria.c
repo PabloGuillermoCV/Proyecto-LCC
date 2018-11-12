@@ -12,10 +12,10 @@
 #define TLB_MISS -1 //Codigo especial para los TLB Miss que se puedan provocar
 
 /*PASOS A SEGUIR:
-	
+
 	0) Leer el archivo y obtener todas las direcciones lógicas a traducir
-	1) Obtener la Dirección Lógica 
-		Lo que debo hacer es, dado el numero entero, Pasarlo a Base 2 
+	1) Obtener la Dirección Lógica
+		Lo que debo hacer es, dado el numero entero, Pasarlo a Base 2
 		y de ahí usar Enmascarado de Bits para separar el numero de 16 bits resultante en dos secuencias de 8 bits
 		que serán el Numero de Página y el Offset
 	2) Acceder con el Número de Página a la Tabla de Páginas/TLB
@@ -24,10 +24,10 @@
 			La tercer columna del TLB los uso como si fuesen "Dirty Bits", al inciar, los pongo en 0 y con estos puedo determinar si una entrada del TLB
 				es o inicial y puede ser reemplazada o no
 		Lo que hago aquí es, dado el número de 8 bits, pasarlo a decimal y acceder al arreglo directamente a la componente que apunte el numero convertido (preguntar)
-			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un TLB Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame 
+			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un TLB Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame
 			debo agregarlo al TLB para futuro uso
 	3) Obtener la Dirección Física
-		Hecho todo el trámite, termino con al dirección física a devolver 
+		Hecho todo el trámite, termino con al dirección física a devolver
 
 	Sobre uint_x:
 		0x.. -> el número lo represento en Hexadecimal
@@ -37,7 +37,7 @@
 		1111b es un número binario de 4 bits, por ejemplo
 
 	Sobre Enmascarado:
-		La cosa funciona asi, yo al enmascarar, me quedo con los bits que me "Importan" al aplicar una operación AND entre el 
+		La cosa funciona asi, yo al enmascarar, me quedo con los bits que me "Importan" al aplicar una operación AND entre el
 		Numero original en binario y un número binario arbitrario cuyas posiciones en 1 denotan QUE posiciones de bits dejaré como están
 
 		asumamos que el numero es 101011010111111 y la máscara es 1111111100000000
@@ -63,8 +63,8 @@ uint16_t DecimalABinario(int n){
 	while(n > 0){
 		aux = n % 2;
 		n = n / 2;
-		ret = ret + (aux * i); 
-		i = i * 10; 
+		ret = ret + (aux * i);
+		i = i * 10;
 	}
 
 	return ret;
@@ -78,8 +78,8 @@ uint8_t DecimalABinario8Bits(int n){
 	while(n > 0){
 		aux = n % 2;
 		n = n / 2;
-		ret = ret + (aux * i); 
-		i = i * 10; 
+		ret = ret + (aux * i);
+		i = i * 10;
 	}
 
 	return ret;
@@ -141,7 +141,7 @@ uint8_t *pasarDe16A8(uint16_t dataAll) {
 
     arrayData[0] = (dataAll >> 8) & 0x00FF; //Obtengo la parte alta del numero de 16 bits y la mando a la primer componente del arreglo
     arrayData[1] = dataAll & 0x00FF; //Obtengo la parte baja del numero de 16 bits
-    return &arrayData;
+    return arrayData;
 }
 
 
@@ -157,14 +157,14 @@ uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
  * Dado un número de Página, lo intento buscar en el TLB, en caso de no encontrarlo, debo bajar a la Tabla de Páginas
  * Lo que devuelvo es la POSICIÓN en donde encontré el numero de página o -1 en caso de TLB Miss
 */
-int BusquedaTLB(uint8_t PN, uint8_t TLB [][2]){
+int BusquedaTLB(uint8_t PN, uint8_t TLB [][3]){
 	int C;
 	int ret = 0;
 	//Buscar valor aquí
 	for(C = 0; C <= 15 && ret == 0; C++){
 		if(TLB[C][0] == PN)
 			ret = 1;
-	}	
+	}
 	if(ret == 0)
 		C = TLB_MISS;
 
@@ -198,43 +198,33 @@ void Reemplazar(uint8_t FP, uint8_t PN, uint8_t TLB[][3]){
 
 //EL código de lectura de archivos hay que probarlo por separado en algún otro lado, hay que probar que esa cosa ande si la vamos a agarrar del Proyecto 1
 void LeerArchivo(int Dirs[]){
-	char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
     int i = 0;
-    const char *errstr = NULL;
+    int num = 0;
     FILE *fp = fopen("memoria.txt", "r"); //Abro el archivo en modo lectura
-    if(fp == NULL)
-    	exit(1);
-
-     while ((read = getline(&line, &len, fp)) != -1) {
-       //Guardo en line la linea, que en realidad es el numero que debo guardar
-     	int num = strtol(line, 0 , 65536); //el 0 y 65536 representan los numeros mínimo y máximo que acepto, respectivamente
-     	if(errstr != NULL){
-     		fprintf(stderr, "Error al intentar obtener las direcciones logicas con mensaje %s", errstr);
-     		exit(1);
-     	}
-     	//Si no salí en este punto, todo salió bien y en num tengo la direccion logica a traducir
-     	Dirs[i] = num; 
-     	i++;
+    if(fp == NULL){
+        printf("Error al abrir el archivo para lectura!");
+        exit(1);
     }
-
+    else{
+        while(!feof(fp)){
+            fscanf(fp,"%d", &num);
+            Dirs[i] = num;
+            i++;
+        }
+    }
     fclose(fp); //cierro el archivo
-    if (line)
-        free(line); //Libero la memoria reservada
- 
 }
 
 
 /*
- * Función para determinar si estoy intentando insertar un valor repetido en la Tabla de Paginas 
+ * Función para determinar si estoy intentando insertar un valor repetido en la Tabla de Paginas
 */
 bool Repetido(uint8_t Pages[], uint8_t num){
 	bool ret = false;
 	int i;
 	for(i = 0; i < NELEMS(Pages) && !ret; i++){
-		ret = Pages[i] != 0x00 && Pages[i] == num  //0 es un caso especial ya que PUEDE que alguna página tenga Nro de Frame = 0
-			
+		ret = Pages[i] != 0x00 && Pages[i] == num;  //0 es un caso especial ya que PUEDE que alguna página tenga Nro de Frame = 0
+
 	}
 
 	return ret;
@@ -245,12 +235,14 @@ bool Repetido(uint8_t Pages[], uint8_t num){
 */
 void inicializar(int DirIni[], uint8_t PageT[], uint8_t TLB[][3]){
 	int i;
+	time_t t;
+	srand((unsigned) time(&t)); //Seteo el "seed" para la aleatoriedad de rand() usando la hora actual del equipo
 	//Inicializo arreglo de direcciones logicas
-	for(i = 0; i < NELEMS(DirIni); i++){
+	for(i = 0; i <= 65536; i++){
 		DirIni[i] = -1; //Leno el arreglo de direcciones con "-1" para luego poder hacer Peek en caso que NO me llenen el arreglo enteramente
 	}
 	//Inicializo Tabla de Páginas
-	for(i = 0; i < NELEMS(PageT); i++){
+	for(i = 0; i <= 255; i++){
 		int r = rand() % 255; //numero random para llenar la tabla de páginas
 		uint8_t r8 = DecimalABinario8Bits(r);
 		if(!Repetido(PageT, r8)) //Si el numero generado NO esta repetido dentro del arreglo, lo pongo como numero de frame
@@ -296,31 +288,31 @@ int main(){
 	inicializar(Direcciones, TablaPaginas, TLB); //función para inicializar los arreglos
 	uint8_t PageNum = 0x00;
 	uint8_t Offset = 0x00;
-	LeerArchivo(Direcciones); 
-	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones" 
+	LeerArchivo(Direcciones);
+	//Asumo que el archivo se leyó y tengo todas las direcciones en el arreglo "Direcciones"
 	int i;
 	int corte = 0;
 	uint16_t num; //variable que mantendrá el valor original en 16 bits
-	for(i = 0; i < NELEMS(Direcciones) && corte == 0; i++){ //Para cada dirección lógica en el arreglo
+	for(i = 0; i < 65537 && corte == 0; i++){ //Para cada dirección lógica en el arreglo
 		if(Direcciones[i] != -1){ //Hago este chequeo por las dudas
 			int OG = Direcciones[i];
-			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario  
+			num = DecimalABinario(Direcciones[i]); //Obtengo el número de 16 bits en binario
 			uint16_t numCopy = num;
 			Cortes8Bit= pasarDe16A8(numCopy);
 			PageNum = Cortes8Bit[0];
-			Offset = Cortes8Bit[1]; 
+			Offset = Cortes8Bit[1];
 			int BT = BusquedaTLB(PageNum, TLB); //En primera instancia, busco si el Page Number esta en el TLB
 			if(BT == TLB_MISS){ //Si NO se encontró el numero de Frame en el TLB, debo bajar a la Tabla de Páginas y luego agregar la entrada al TLB
 				framePag = BusquedaTabla(PageNum, TablaPaginas);
 				AgregarTLB(PageNum, framePag, TLB);
 			}
 			else{ //Si lo encontré en el TLB, solo obtengo el numero de frame y devuelvo los datos, en BT tengo la Fila donde encontré la entrada
-				framePag = TLB[BT][1]; 
+				framePag = TLB[BT][1];
 			}
 			DirFis = pasarDe8A16(framePag,Offset); //Obtengo la Dirección Física final
 			printf("Direccion Logica = %d, Direccion Fisica asociada = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
-		if(Direcciones[i+1] == -1); //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
+		if(Direcciones[i+1] == -1) //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
 			corte = -1;
 	}
 
