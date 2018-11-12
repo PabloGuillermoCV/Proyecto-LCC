@@ -5,6 +5,7 @@
 #include<stdint.h>
 #include<stdio.h>
 #include<time.h>
+#include<stdbool.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0])) //Macro que calcula la cantidad de elementos presentes en un arreglo cualquiera
 
@@ -225,12 +226,12 @@ void LeerArchivo(int Dirs[]){
 /*
  * Función para determinar si estoy intentando insertar un valor repetido en la Tabla de Paginas 
 */
-int Repetido(uint8_t Pages[], uint8_t num){
-	int ret = 0;
+bool Repetido(uint8_t Pages[], uint8_t num){
+	bool ret = false;
 	int i;
-	for(i = 0; i < NELEMS(Pages) && ret == 0; i++){
-		if(Pages[i] != 0x00 && Pages[i] == num ) //0 es un caso especial ya que PUEDE que alguna página tenga Nro de Frame = 0
-			ret = -1;
+	for(i = 0; i < NELEMS(Pages) && !ret; i++){
+		ret = Pages[i] != 0x00 && Pages[i] == num  //0 es un caso especial ya que PUEDE que alguna página tenga Nro de Frame = 0
+			
 	}
 
 	return ret;
@@ -247,7 +248,7 @@ void inicializar(int DirIni[], uint8_t PageT[]){
 	for(i = 0; i < NELEMS(PageT); i++){
 		int r = rand() % 255; //numero random para llenar la tabla de páginas
 		uint8_t r8 = DecimalABinario8Bits(r);
-		if(Repetido(PageT, r8) == 0) //Si el numero generado NO esta repetido dentro del arreglo, lo pongo como numero de frame
+		if(!Repetido(PageT, r8)) //Si el numero generado NO esta repetido dentro del arreglo, lo pongo como numero de frame
 			PageT[i] = r8;
 		else
 			i--; //Fuerzo al ciclo a repetir la acción para que genere un nuevo numero en esa posición
@@ -281,7 +282,7 @@ int main(){
 			Offset = Cortes8Bit[1]; 
 			framePag = BusquedaTabla(PageNum, TablaPaginas);
 			DirFis = pasarDe8A16(framePag,Offset);
-			printf("Direccion Logica = %d, Direccion Fisica asociada = %"PRIu16" \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
+			printf("Direccion Logica = %d, Direccion Fisica asociada = %d \n", OG,BinarioADecimal(DirFis)); //Hecha la traducción, imprimo, preguntar si es correcto
 		}
 		if(Direcciones[i+1] == -1); //Como NO es probable que me llenen el arreglo, hago un "peek" para ver si debo seguir traduciendo
 			corte = -1;
