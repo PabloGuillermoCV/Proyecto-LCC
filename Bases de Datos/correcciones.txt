@@ -48,7 +48,7 @@ Correcciones entrega 3:
 	
 	- Transacción para hacer una extracción:
 	* los parametros de entrada deberían ser:
-	- número de caja de ahorro  
+	- número de caja de ahorro  equivale junto con cliente a n tarjeta
 	- número de cliente
 	- Monto
 	- código de caja (referido a un atm o ventanilla donde se realizo la transacción)

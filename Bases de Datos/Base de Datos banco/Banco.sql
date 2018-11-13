@@ -490,6 +490,14 @@ CREATE TABLE Transferencia(
 delimiter ! # defino ! como delimitador
 CREATE PROCEDURE RealizarTransferencia(IN Cod_CajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT, IN N_Cliente SMALLINT, IN Cod_Ventana SMALLINT)
 #agregar cliente y codigo de caja(hecho)
+
+//en vez de pedir Cod_CajaO Y N_Cliente puedo pedir N_Tarjeta
+
+//caja destino no si o si esta asociado al cliente
+//se obtiene la caja origen y el n de cliente asociados a la tarjeta de paratetro, es mas simple
+
+//verificar el O y 0 en la caja origen
+
 	BEGIN
 		 # Declaro una variable local saldo_actual	
 	 DECLARE saldo_actual DECIMAL(7,2);
@@ -513,13 +521,14 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_CajaO SMALLINT, IN Cod_CajaD SMALL
 	  END;		      
          
 	 START TRANSACTION;	# Comienza la transacción
+	 //separar el if en caso de que pueda fallar por caja o por cliente
 	  IF EXISTS (SELECT * FROM Cliente_ca WHERE Cod_CajaO = nro_ca AND N_Cliente = nro_cliente) #Verifica que el cliente es titular de la caja origen
-	   IF EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_Caja0) AND EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_CajaD)
+	   IF EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_CajaD)
 	   
 	   THEN
 	    BEGIN
 			SELECT saldo INTO Saldo_actual FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
-			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja0 LIMIT 1;
+			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_CajaO LIMIT 1;
           # Recupero el saldo de la cuenta Origen en Saldo_Actual.
           # Al utilizar FOR UPDATE se indica que los datos involucrados en la
           # consulta van a ser actualizados luego.
@@ -530,7 +539,7 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_CajaO SMALLINT, IN Cod_CajaD SMALL
 	      IF Saldo_actual >= MonT THEN 	  
 		     BEGIN
 			 
-	         UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE numero=Cod_Caja0;
+	         UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE numero=Cod_CajaO;
 			 
 	         UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE numero=Cod_CajaD;
 
@@ -574,7 +583,7 @@ CREATE PROCEDURE RealizarTransferencia(IN Cod_CajaO SMALLINT, IN Cod_CajaD SMALL
 	 COMMIT;   # Comete la transacción  
 	END; !
 
-CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN N_Tarjeta BIGINT, IN N_Cliente SMALLINT, IN Cod_Ventana SMALLINT)
+CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN N_Tarjeta BIGINT, IN Cod_Caja SMALLINT)
 #sacar el nro_ca asociado a nro_tarjeta(hecho)
 	BEGIN
 	 DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
@@ -598,9 +607,10 @@ CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN N_Tarjeta BIGINT, IN N_Clie
 	START TRANSACTION;
 	#aca va un if verificando la tarjeta(hecho)
 	  IF EXISTS(SELECT * FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta) THEN
-		IF EXISTS(SELECT * FROM Tarjeta WHERE nro_ca = Cod_Caja) THEN //verificar que exista el numero de tarjeta y luego tomar el cliente(hecho???)
+		//IF EXISTS(SELECT * FROM Tarjeta WHERE nro_ca = Cod_Caja) THEN //verificar que exista el numero de tarjeta y luego tomar el cliente(hecho???)
 		 BEGIN
-		
+		//definir N_CA IDEM para cliente
+		  SELECT nro_ca INTO N_CA FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta;
 		  SELECT saldo INTO Saldo_Actual FROM caja_ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
 		  //Ver este "LIMIT 1", la asistente habia dicho que hay que buscar al verdadero titular de la caja de ahorro
 		  SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
