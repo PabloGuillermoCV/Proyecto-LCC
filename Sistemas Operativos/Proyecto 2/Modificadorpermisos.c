@@ -14,35 +14,11 @@ char ALLOWED_OCTAL[6] = {'7','5','4','2','1','0'}; //Arreglo Global para saber l
 
 
 /*NOTAS:
-	en Linux, los parámetros para chmod se pueden pasar tanto en caracteres, como en octal
-
-	chmod options permissions filename
-
-	u = user , g = group, o = other
-
-	r = read , w = write, x = execute
-
-	UNA LLAMADA LEGAL A chmod:
-
-	chmod u=rwx,g=rx,o=r myfile -> de aquí se ve que la forma general de los parametros para chmod es "u=xyz,g=xyz,o=xyz myfile" 
-
-	igual llamada, pero en Octal: chmod 754 myfile
-
-	chmod a=rw myfile -> permite A TODOS LOS USUARIO leer y escribir el archivo myfile
+	Se asume que la llamada a chmod se hace en Octal
 
 	en las llamadas que yo uso de ejemplos NO considero el "Sticky Bit", el cual es un cuarto valor en modo octal
 
 		ejemplo -> chmod 1777 myfile
-
-	por ende:
-		1) HAY CONTROLAR QUE EL COMANDO USE UNA DE LAS DOS REPRESENTACIONES
-		2) EL ORDEN IMPORTA EN MODO CARACTER!
-		3) UNA VEZ VERIFICADO QUE LA SECCIÓN DE PERMISOS ES CORECTA, SE HACE LA LLAMADA A CHMOD 
-
-Código original de la llamada a chmod:
-	fprintf(stderr, "%s: error en chmod(%s, %s) - %d (%s)\n",
-                argv[0], buf, mode, errno, strerror(errno));
-        exit(1);
 
 */
 

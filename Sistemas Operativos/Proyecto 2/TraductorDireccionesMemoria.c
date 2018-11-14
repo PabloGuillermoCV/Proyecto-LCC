@@ -18,16 +18,14 @@
 		Lo que debo hacer es, dado el numero entero, Pasarlo a Base 2
 		y de ahí usar Enmascarado de Bits para separar el numero de 16 bits resultante en dos secuencias de 8 bits
 		que serán el Numero de Página y el Offset
-	2) Acceder con el Número de Página a la Tabla de Páginas/TLB
-		En primera Instancia, una vez que se el numero de página, accedo a la Tabla de Páginas y busco el Frame correspondiente
-		Una vez implementada la Tabla de Páginas (arreglo de 256 componentes) y probada, se debe añadir el TLB el cual es un arreglo de 16x3
-			La tercer columna del TLB los uso como si fuesen "Dirty Bits", al inciar, los pongo en 0 y con estos puedo determinar si una entrada del TLB
-				es o inicial y puede ser reemplazada o no
-		Lo que hago aquí es, dado el número de 8 bits, pasarlo a decimal y acceder al arreglo directamente a la componente que apunte el numero convertido (preguntar)
-			Cuando se implante el TLB, se debe agregar que primero se busque en el TLB y en caso de un TLB Miss, bajar a la Tabla, si bajo a la Tabla, una vez encontrado el frame
-			debo agregarlo al TLB para futuro uso
+	2) Acceder con el Número de TLB
+		En primera Instancia, una vez que se el numero de página, accedo al TLB (el cual es una matriz de 16x3, donde La tercer columna del TLB los uso como si fuesen "Dirty Bits", al inciar, los pongo en 0 y con estos puedo determinar si una entrada del TLB
+				es o inicial y puede ser reemplazada o no) y busco el Frame correspondiente, en caso de NO encontrar el numero de página en el TLB (Osea, se produjo un TLB_MISS),
+				debo bajar a la Tabla de Páginas, encontrar el numero de frame y el par (NroPágina,NroFrame) agregarlo al TLB, si NO lo puedo agregar al TLB porque el mismo NO
+				dispone de espacio, debo reemplazar una entrada en el mismo, esto se lleva a cabo por medio de un algoritmo de reemplazo FIFO, donde la entrada más vieja coincide con el último
+				par (NroPágina,NroFrame) de la Matriz
 	3) Obtener la Dirección Física
-		Hecho todo el trámite, termino con al dirección física a devolver
+		Obtenido el Nro de Frame, lo concateno con el Offset y devuelvo el resultado de la concatenación EN DECIMAL, el cual es la dirección Física final
 
 	Sobre uint_x:
 		0x.. -> el número lo represento en Hexadecimal
@@ -37,20 +35,17 @@
 		1111b es un número binario de 4 bits, por ejemplo
 
 	Sobre Enmascarado:
-		La cosa funciona asi, yo al enmascarar, me quedo con los bits que me "Importan" al aplicar una operación AND entre el
+		Yo al enmascarar, me quedo con los bits que me "Importan" al aplicar una operación AND entre el
 		Numero original en binario y un número binario arbitrario cuyas posiciones en 1 denotan QUE posiciones de bits dejaré como están
 
 		asumamos que el numero es 101011010111111 y la máscara es 1111111100000000
 		al hacer 101011010111111 & 1111111100000000 obtengo 1010110100000000
 
 	Sobre Shifting:
-		la operación >> o << denota un shifting de los bits del número a derecha o a izquierda respectivamente (igual que haciamos en Orga)
+		la operación >> o << denota un shifting de los bits del número a derecha o a izquierda respectivamente 
 		se permite usar potencias de dos para hacer shifting de varias posiciones de una.
 		LOS BITS QUE SE CAEN DEL NÚMERO SE PIERDEN
 		si mi numero es 010110, hacer 010110 >> resulta en 001011
-
-	HAY UN TEMA CON INT, PUEDE QUE NO ME ALCANCE PARA REPRESENTAR LOS NUMEROS EN BITS AL HACER CASTEOS, DEPENDE DEL COMPILADOR
-	La alternativa a ^ seria usar long long int
 */
 
 /*

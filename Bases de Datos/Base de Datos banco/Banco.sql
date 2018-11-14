@@ -675,11 +675,11 @@ FOR EACH ROW
 		DECLARE N_P INT;
 		DECLARE Meses INT;
 		DECLARE I INT DEFAULT 0;
-		SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();//eliminar
+		SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 		#Intento de conseguir el prestamo recien creado
-		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();//eliminar
+		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 		WHILE I < NEW.cant_meses DO
-			SELECT fecha INTO fecha_v FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();//eliminar
+			SELECT fecha INTO fecha_v FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (NEW.nro_prestamo,I,DATE_ADD(NEW.fecha,INTERVAL 1 MONTH),NULL);
 			SET I = I + 1;
 		END WHILE;
