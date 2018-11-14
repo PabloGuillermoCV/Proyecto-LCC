@@ -52,12 +52,11 @@ Correcciones entrega 3:
 	- número de cliente
 	- Monto
 	- código de caja (referido a un atm o ventanilla donde se realizo la transacción)
-	
-	-PONGO NRO_TARJETA O NO??
+	-LISTO
 	
 	En el Stored procedure acceden al cliente a través del número de la caja de ahorro
 	y se quedan con el primero de la tabla, pero dado que una caja de ahorro puede pertenecer a más 
-	de un cliente, no es posible identificar bien qué cliente hizo la extracción (quizás no sea el nro 1).
+	de un cliente, no es posible identificar bien qué cliente hizo la extracción (quizás no sea el nro 1). -LISTO
 	
 	* cuando hacen el INSERT de la transacción, deberían ingresar el ID nuevo, y luevo usar LAST_INSERT_ID
 	en transacción_por_caja y en extracción. -LISTO
@@ -87,7 +86,7 @@ Correcciones entrega 3:
 			SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 		deberían acceder a la cantidad de meses recientemente insertada en préstamo con
 		NEW.cant_meses. Idem para obtener el último nro de préstamo y fecha: NEW.nro_prestamo, NEW.fecha	
-		ya que si se ejecuta concurrentemente, el último ID insertado podría llegar a ser de otro préstamo. -LISTO, VERIFICAR	
+		ya que si se ejecuta concurrentemente, el último ID insertado podría llegar a ser de otro préstamo. -LISTO	
 		
 - SP a través de la Interfaz gráfica:
 	- Extracción

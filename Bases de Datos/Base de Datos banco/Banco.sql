@@ -422,7 +422,7 @@ CREATE TABLE Transferencia(
 	
 #-------------------------------------------------------------------------
 
-#consulta trans_cajas_ahorro: se hace por partes, 4 vistas distintas, 1 para cada tipo de transacción. 
+#Consulta trans_cajas_ahorro: se hace por partes, 4 vistas distintas, 1 para cada tipo de transacción. 
 #Luego se agrupan en una sola vista
 
 #Creacion de usuarios y otorgamiento de privilegios.
@@ -481,180 +481,190 @@ CREATE TABLE Transferencia(
 
 #-------------------------------------------------------------------------
 
-#Cosas a Chequear
-#Las Cajas de ahorro Existen
-#El Monto no supera al saldo de la Caja Origen
-
-#al extraer, que en algun lado muestre el saldo que queda.
-
 delimiter ! # defino ! como delimitador
-CREATE PROCEDURE RealizarTransferencia(IN Cod_CajaO SMALLINT, IN Cod_CajaD SMALLINT, IN MonT INT, IN N_Cliente SMALLINT, IN Cod_Ventana SMALLINT)
-#agregar cliente y codigo de caja(hecho)
-
-//en vez de pedir Cod_CajaO Y N_Cliente puedo pedir N_Tarjeta
-
-//caja destino no si o si esta asociado al cliente
-//se obtiene la caja origen y el n de cliente asociados a la tarjeta de paratetro, es mas simple
-
-//verificar el O y 0 en la caja origen
+CREATE PROCEDURE RealizarTransferencia(IN MonT INT, IN N_Tarjeta BIGINT, IN N_CajaD SMALLINT, IN C_Caja SMALLINT)
 
 	BEGIN
-		 # Declaro una variable local saldo_actual	
-	 DECLARE saldo_actual DECIMAL(7,2);
-     
-     # Declaro variables locales para recuperar los errores 
-	 DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
-	 DECLARE codigo_MYSQL INT DEFAULT 0;
-	 DECLARE mensaje_error TEXT;
-	 DECLARE N_Cl SMALLINT;
-	 DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
-	  BEGIN #En caso de una excepción SQLEXCEPTION retrocede la transacción y
-         	# devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
-			# el código de error SQL  (SQLSTATE) y el mensaje de error  	  
-	    # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6, 
-		GET DIAGNOSTICS CONDITION 1  codigo_MYSQL= MYSQL_ERRNO,  
-		                             codigo_SQL= RETURNED_SQLSTATE, 
-									 mensaje_error= MESSAGE_TEXT;
-	    SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, 
-		        codigo_MySQL, codigo_SQL,  mensaje_error;		
-        ROLLBACK;
-	  END;		      
-         
-	 START TRANSACTION;	# Comienza la transacción
-	 //separar el if en caso de que pueda fallar por caja o por cliente
-	  IF EXISTS (SELECT * FROM Cliente_ca WHERE Cod_CajaO = nro_ca AND N_Cliente = nro_cliente) #Verifica que el cliente es titular de la caja origen
-	   IF EXISTS (SELECT * FROM caja_ahorro WHERE nro_ca=Cod_CajaD)
-	   
-	   THEN
-	    BEGIN
-			SELECT saldo INTO Saldo_actual FROM Caja_Ahorro  WHERE nro_ca = Cod_Caja FOR UPDATE;
-			SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_CajaO LIMIT 1;
-          # Recupero el saldo de la cuenta Origen en Saldo_Actual.
-          # Al utilizar FOR UPDATE se indica que los datos involucrados en la
-          # consulta van a ser actualizados luego.
-          # De esta forma se obtiene un write_lock sobre estos datos, que se      
-          # mantiene hasta que la trans. comete. Esto garantiza que nadie pueda
-          # leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
-      
-	      IF Saldo_actual >= MonT THEN 	  
-		     BEGIN
-			 
-	         UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE numero=Cod_CajaO;
-			 
-	         UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE numero=Cod_CajaD;
-
-	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
-				
-	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_Caja0);
-				
-	         INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (transaccion.LAST_INSERT_ID(),N_Cl,Cod_Caja0,Cod_CajaD);
-				
-	         INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
-				
-	         INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_CajaD);
-				
-	         INSERT INTO deposito(nro_trans,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),Cod_CajaD);
-				
-             SELECT 'La transferencia se realizo con exito' AS resultado;
-			 
-			 END;
-	      ELSE 
-		    BEGIN
-			
-            SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado; 
-			
-			END;
-			
-	      END IF;
-		  
+	
+		# Declaro una variable local saldo_actual	
+		DECLARE saldo_Actual DECIMAL(7,2);
+		# Declaro variables locales para recuperar los errores 
+		DECLARE codigo_SQL CHAR(5) DEFAULT '00000';	 
+		DECLARE codigo_MYSQL INT DEFAULT 0;
+		DECLARE mensaje_error TEXT;
+		DECLARE N_Cliente SMALLINT;
+		DECLARE N_CajaO SMALLINT;
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION
+		BEGIN # En caso de una excepción SQLEXCEPTION retrocede la transacción y
+         	  # devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
+			  # el código de error SQL (SQLSTATE) y el mensaje de error  	  
+	          # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6.
+			GET DIAGNOSTICS CONDITION 1 codigo_MYSQL= MYSQL_ERRNO, codigo_SQL= RETURNED_SQLSTATE, mensaje_error= MESSAGE_TEXT;
+			SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, codigo_MySQL, codigo_SQL, mensaje_error;		
+			ROLLBACK;
 		END;
-		  
-	   ELSE
-	     BEGIN
-		 
-            SELECT 'ERROR: Cuenta inexistente' AS resultado; 
-			
-		 END;
-	   END IF;
-      ELSE
-		SELECT 'ERROR: Cuenta inexistente' AS resultado; 
-      END IF;	  
 		
-	 COMMIT;   # Comete la transacción  
+         
+		START TRANSACTION; # Comienza la transacción
+		
+			IF EXISTS (SELECT * FROM Cliente_ca WHERE Cod_CajaO = nro_ca AND N_Cliente = nro_cliente) THEN
+			
+				IF EXISTS (SELECT * FROM Caja WHERE cod_caja = C_Caja) THEN
+			
+					IF EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca = N_CajaD) THEN
+					
+						BEGIN
+							
+							SELECT nro_cliente INTO N_Cliente FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta;
+							IF EXISTS (SELECT * FROM Cliente WHERE nro_cliente = N_Cliente) THEN
+							
+								SELECT nro_ca INTO N_CajaO FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta;
+								IF EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca = N_CajaO) THEN
+								
+									SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = N_CajaO FOR UPDATE;
+									# Recupero el saldo de la cuenta Origen en Saldo_Actual.
+									# Al utilizar FOR UPDATE se indica que los datos involucrados en la
+									# consulta van a ser actualizados luego.
+									# De esta forma se obtiene un write_lock sobre estos datos, que se      
+									# mantiene hasta que la trans. comete. Esto garantiza que nadie pueda
+									# leer ni escribir el saldo de la cuenta de origen hasta que la trans. comete.      	    
+				  
+									IF Saldo_Actual >= MonT THEN
+									
+										BEGIN
+						 
+											UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE numero = N_CajaO;
+										 
+											UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE numero = N_CajaD;
+
+											INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
+											
+											INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),C_Caja);
+											
+											INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (transaccion.LAST_INSERT_ID(),N_Cliente,N_CajaO,N_CajaD);
+											
+											INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
+											
+											INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),C_Caja);
+											
+											INSERT INTO deposito(nro_trans,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_CajaD);
+											
+											SELECT 'La transferencia se realizo con exito' AS resultado;
+						 
+										END;
+										
+									ELSE
+										SELECT 'Saldo insuficiente para realizar la transferencia' AS resultado;
+									END IF;
+								
+								ELSE
+									SELECT 'ERROR: Caja ahorro origen inexistente' AS resultado;
+								END IF;
+								
+							ELSE
+								SELECT 'ERROR: Cliente inexistente' AS resultado;
+							END IF;
+			  
+						END;
+			  
+					ELSE
+						SELECT 'ERROR: Caja ahorro destino inexistente' AS resultado; 
+					END IF;
+					
+				ELSE
+					SELECT 'ERROR: Caja inexistente' AS resultado;
+				END IF;
+				
+			ELSE
+				SELECT 'ERROR: Tarjeta origen inexistente' AS resultado;
+			END IF;	  
+		
+		COMMIT; # Comete la transacción
+		
 	END; !
 
-CREATE PROCEDURE RealizarExtraccion(IN monto INT, IN N_Tarjeta BIGINT, IN Cod_Caja SMALLINT)
-#sacar el nro_ca asociado a nro_tarjeta(hecho)
+#-------------------------------------------------------------------------
+
+CREATE PROCEDURE RealizarExtraccion(IN MonT INT, IN N_Tarjeta BIGINT, IN C_Caja SMALLINT)
+
 	BEGIN
-	 DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
-	 DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
-	 DECLARE codigo_MYSQL INT DEFAULT 0;
-	 DECLARE mensaje_error TEXT;
-	 DECLARE N_Cl SMALLINT;
-	 DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
-	  BEGIN #En caso de una excepción SQLEXCEPTION retrocede la transacción y
-         	# devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
-			# el código de error SQL  (SQLSTATE) y el mensaje de error  	  
-	    # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6, 
-		GET DIAGNOSTICS CONDITION 1  codigo_MYSQL= MYSQL_ERRNO,  
-		                             codigo_SQL= RETURNED_SQLSTATE, 
-									 mensaje_error= MESSAGE_TEXT;
-	    SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, codigo_MySQL, codigo_SQL,  mensaje_error;		
-        ROLLBACK;
-	  END;		      
+	
+		DECLARE Saldo_Actual DECIMAL(7,2); #Para obtener el saldo de la caja
+		DECLARE codigo_SQL  CHAR(5) DEFAULT '00000';	 
+		DECLARE codigo_MYSQL INT DEFAULT 0;
+		DECLARE mensaje_error TEXT;
+		DECLARE N_Cliente SMALLINT;
+		DECLARE N_Caja SMALLINT;
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION 	 	 
+		BEGIN # En caso de una excepción SQLEXCEPTION retrocede la transacción y
+         	  # devuelve el código de error especifico de MYSQL (MYSQL_ERRNO), 
+			  # el código de error SQL (SQLSTATE) y el mensaje de error  	  
+	          # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6.
+			GET DIAGNOSTICS CONDITION 1 codigo_MYSQL= MYSQL_ERRNO, codigo_SQL= RETURNED_SQLSTATE, mensaje_error= MESSAGE_TEXT;
+			SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, codigo_MySQL, codigo_SQL, mensaje_error;		
+			ROLLBACK;
+		END;		      
      
 
-	START TRANSACTION;
-	#aca va un if verificando la tarjeta(hecho)
-	  IF EXISTS(SELECT * FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta) THEN
-		//IF EXISTS(SELECT * FROM Tarjeta WHERE nro_ca = Cod_Caja) THEN //verificar que exista el numero de tarjeta y luego tomar el cliente(hecho???)
-		 BEGIN
-		//definir N_CA IDEM para cliente
-		  SELECT nro_ca INTO N_CA FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta;
-		  SELECT saldo INTO Saldo_Actual FROM caja_ahorro WHERE nro_ca = Cod_Caja FOR UPDATE;
-		  //Ver este "LIMIT 1", la asistente habia dicho que hay que buscar al verdadero titular de la caja de ahorro
-		  SELECT nro_cliente INTO N_Cl FROM Cliente_CA WHERE nro_ca = Cod_Caja LIMIT 1;
-		  
-	      IF Saldo_Actual >= MonT THEN 
-		  
-			BEGIN
-		  
-				UPDATE caja_ahorro SET caja_ahorro.saldo = (saldo - monto) WHERE numero = Cod_Caja;
-	      
-				INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
+		START TRANSACTION; # Comienza la transacción
+		
+			IF EXISTS (SELECT * FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta) THEN
+			
+				IF EXISTS (SELECT * FROM Caja WHERE cod_caja = C_Caja) THEN
 				
-	         	INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),Cod_Ventana);
-				
-	         	INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_Cl,Cod_Caja);
-				
-	      	    SELECT 'La Extracción se realizo con exito' AS resultado;         
+					BEGIN
+						
+						SELECT nro_cliente INTO N_Cliente FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta;
+						IF EXISTS (SELECT * FROM Cliente WHERE nro_cliente = N_Cliente) THEN
+						
+							SELECT nro_ca INTO N_Caja FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta;
+							IF EXISTS (SELECT * FROM Caja_Ahorro WHERE nro_ca = N_Caja) THEN
+							
+								SELECT saldo INTO Saldo_Actual FROM Caja_Ahorro WHERE nro_ca = N_Caja FOR UPDATE;
+							
+								IF Saldo_Actual >= MonT THEN 
+							
+									BEGIN
+							
+										UPDATE caja_ahorro SET caja_ahorro.saldo = (saldo - MonT) WHERE numero = N_Caja;
+							  
+										INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
+									
+										INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),C_Caja);
+									
+										INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_Cliente,N_Caja);
+									
+										SELECT 'La Extracción se realizo con exito' AS resultado;
+							
+									END;
+							
+								ELSE 
+									SELECT 'Saldo insuficiente para realizar la extraccion' AS resultado;
+								END IF;
+								
+							ELSE
+								SELECT 'ERROR: Caja ahorro inexistente' AS resultado;
+							END IF;
+							
+						ELSE
+							SELECT 'ERROR: Cliente inexistente' AS resultado;
+						END IF;
+						
+					END;
+			 
+				ELSE
+					SELECT 'ERROR: Caja inexistente' AS resultado;
+				END IF;
 			
-			END;
+			ELSE
+				SELECT 'ERROR: Tarjeta inexistente' AS resultado;
+			END IF;
 			
-	      ELSE  
-		   BEGIN
-		  
-            SELECT 'Saldo insuficiente para realizar la extraccion' AS resultado;
-			
-		   END;
-	      END IF; 
-		  
-		 END;
-		 
-	   ELSE  
-	      BEGIN
-		  
-            SELECT 'ERROR: Cuenta inexistente' AS resultado;  
-			
-		  END;
-	   END IF; 
-	   ELSE
-	     BEGIN
-			SELECT 'ERROR: Tarjeta inexistente' AS resultado;
-		 END;
-	  END IF;
-	COMMIT;
-END; !
+		COMMIT; # Comete la transacción
+		
+	END; !
+
+#-------------------------------------------------------------------------
 
 CREATE TRIGGER CargoCuotas
 AFTER INSERT ON Prestamo
