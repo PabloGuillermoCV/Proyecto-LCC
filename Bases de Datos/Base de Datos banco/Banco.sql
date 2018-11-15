@@ -500,14 +500,14 @@ CREATE PROCEDURE RealizarTransferencia(IN MonT INT, IN N_Tarjeta BIGINT, IN N_Ca
 			  # el código de error SQL (SQLSTATE) y el mensaje de error  	  
 	          # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6.
 			GET DIAGNOSTICS CONDITION 1 codigo_MYSQL= MYSQL_ERRNO, codigo_SQL= RETURNED_SQLSTATE, mensaje_error= MESSAGE_TEXT;
-			SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, codigo_MySQL, codigo_SQL, mensaje_error;		
+			SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado, codigo_MySQL, codigo_SQL, mensaje_error;		
 			ROLLBACK;
 		END;
 		
          
 		START TRANSACTION; # Comienza la transacción
 		
-			IF EXISTS (SELECT * FROM Cliente_ca WHERE Cod_CajaO = nro_ca AND N_Cliente = nro_cliente) THEN
+			IF EXISTS (SELECT * FROM Tarjeta WHERE nro_tarjeta = N_Tarjeta) THEN
 			
 				IF EXISTS (SELECT * FROM Caja WHERE cod_caja = C_Caja) THEN
 			
@@ -533,21 +533,21 @@ CREATE PROCEDURE RealizarTransferencia(IN MonT INT, IN N_Tarjeta BIGINT, IN N_Ca
 									
 										BEGIN
 						 
-											UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE numero = N_CajaO;
+											UPDATE caja_ahorro SET saldo = (saldo - MonT) WHERE nro_ca = N_CajaO;
 										 
-											UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE numero = N_CajaD;
+											UPDATE caja_ahorro SET saldo = (saldo + MonT) WHERE nro_ca = N_CajaD;
 
 											INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 											
-											INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),C_Caja);
+											INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),C_Caja);
 											
-											INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (transaccion.LAST_INSERT_ID(),N_Cliente,N_CajaO,N_CajaD);
+											INSERT INTO transferencia(nro_trans,nro_cliente,origen,destino) VALUES (LAST_INSERT_ID(),N_Cliente,N_CajaO,N_CajaD);
 											
 											INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 											
-											INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),C_Caja);
+											INSERT INTO transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),C_Caja);
 											
-											INSERT INTO deposito(nro_trans,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_CajaD);
+											INSERT INTO deposito(nro_trans,nro_ca) VALUES (LAST_INSERT_ID(),N_CajaD);
 											
 											SELECT 'La transferencia se realizo con exito' AS resultado;
 						 
@@ -601,7 +601,7 @@ CREATE PROCEDURE RealizarExtraccion(IN MonT INT, IN N_Tarjeta BIGINT, IN C_Caja 
 			  # el código de error SQL (SQLSTATE) y el mensaje de error  	  
 	          # "GET DIAGNOSTICS" solo disponible a partir de la versión 5.6.
 			GET DIAGNOSTICS CONDITION 1 codigo_MYSQL= MYSQL_ERRNO, codigo_SQL= RETURNED_SQLSTATE, mensaje_error= MESSAGE_TEXT;
-			SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado, codigo_MySQL, codigo_SQL, mensaje_error;		
+			SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado, codigo_MySQL, codigo_SQL, mensaje_error;		
 			ROLLBACK;
 		END;		      
      
@@ -626,15 +626,15 @@ CREATE PROCEDURE RealizarExtraccion(IN MonT INT, IN N_Tarjeta BIGINT, IN C_Caja 
 							
 									BEGIN
 							
-										UPDATE caja_ahorro SET caja_ahorro.saldo = (saldo - MonT) WHERE numero = N_Caja;
+										UPDATE caja_ahorro SET caja_ahorro.saldo = (saldo - MonT) WHERE nro_ca = N_Caja;
 							  
 										INSERT INTO transaccion(nro_trans,fecha,hora,monto) VALUES (NULL,CURDATE(),CURTIME(),MonT);
 									
-										INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (transaccion.LAST_INSERT_ID(),C_Caja);
+										INSERT INTO	transaccion_por_caja(nro_trans,cod_caja) VALUES (LAST_INSERT_ID(),C_Caja);
 									
-										INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (transaccion.LAST_INSERT_ID(),N_Cliente,N_Caja);
+										INSERT INTO extraccion(nro_trans,nro_cliente,nro_ca) VALUES (LAST_INSERT_ID(),N_Cliente,N_Caja);
 									
-										SELECT 'La Extracción se realizo con exito' AS resultado;
+										SELECT 'La Extraccion se realizo con exito' AS resultado;
 							
 									END;
 							
@@ -670,17 +670,11 @@ CREATE TRIGGER CargoCuotas
 AFTER INSERT ON Prestamo
 FOR EACH ROW
 	BEGIN
-		DECLARE nro_pres INT; #Defino un entero para obtener el numero de prestamo
-		DECLARE fecha_v DATE;
 		DECLARE N_P INT;
-		DECLARE Meses INT;
-		DECLARE I INT DEFAULT 0;
-		SELECT cant_meses INTO Meses FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
+		DECLARE I INT DEFAULT 1;
 		#Intento de conseguir el prestamo recien creado
-		SELECT nro_prestamo INTO nro_pres FROM Prestamo WHERE nro_prestamo = LAST_INSERT_ID();
 		WHILE I < NEW.cant_meses DO
-			SELECT fecha INTO fecha_v FROM prestamo WHERE nro_prestamo = LAST_INSERT_ID();
-			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (NEW.nro_prestamo,I,DATE_ADD(NEW.fecha,INTERVAL 1 MONTH),NULL);
+			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (NEW.nro_prestamo,I,DATE_ADD(NEW.fecha,INTERVAL I+1 MONTH),NULL);
 			SET I = I + 1;
 		END WHILE;
 	END; !

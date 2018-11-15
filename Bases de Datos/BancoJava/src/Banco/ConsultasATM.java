@@ -46,7 +46,6 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	   private JPasswordField Card;
 	   private String Tarj,Pin;
 	   private Connection conexionBD = null;
-	   private int Cod_Caja = 100;
 	   private JButton BtnRealizarTransferencia;
 	   private JButton BtnRealizarExtraccion;
 	   private JTextField montos;
@@ -210,20 +209,23 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    * @param m Monto a extraer de la tarjeta ingresada en el login
 	    * @return un String que determina la naturaleza de la Extracción, si fue exitosa o no
 	    */
-	   private String Extraer(int m) {
+	   private String Extraer(int monto) {
 		  String ret ="";
 		   try {
 			   Statement stm = this.conexionBD.createStatement();
 			   ResultSet R;
 			   //Aca asumo que el S.P existe y funciona, hay que primero hacer los S.P y corroborar que funcionan con MySQL primero
-			   String sql = "call RealizarExtraccion(" + m + "," + Cod_Caja +")";
+			   String sql = "call RealizarExtraccion(" + monto + "," + Tarj + ",100)";
 			   R = stm.executeQuery(sql);
-			   ret = R.getString(1);
+			   if(R.next()) {
+				   ret = R.getString(1);
+			   }
 			   R.close();
 			   stm.close();
 			   
 		   }
 		   catch(SQLException e) {
+			   e.printStackTrace();
 			   	//Devuelvo que la Transaccion fallo a mi metodo padre para que lo maneje
                       return  "Se produjo un error al realizar la Extraccion.\n" 
 			   			+ e.getMessage() + "\n" + "SQL State: " + e.getSQLState() + "\n" 
@@ -259,14 +261,17 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 	    * @param CajaD Numero de la Caja de ahorro destino
 	    * @param plataT monto a transferir
 	    */
-	   private void Transferir(int CajaD, int plataT) {
+	   private void Transferir(int CajaD, int monto) {
 		   try {
+			String ret = "";
 			Statement stmt = conexionBD.createStatement();
-			ResultSet R = stmt.executeQuery("call RealizarTransferencia(" + Cod_Caja + ", " + CajaD + ", " + plataT + ")");
-			String res = R.getString(1);
+			ResultSet R = stmt.executeQuery("call RealizarTransferencia(" + monto + "," + Tarj + "," + CajaD + ",100)");
+			if(R.next()) {
+				ret = R.getString(1);
+			}
 			R.close();
 			stmt.close();
-			JOptionPane.showConfirmDialog(null, null, res, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showConfirmDialog(null, ret, "Fin Transferencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		} catch (SQLException e) {
 	    	  JOptionPane.showMessageDialog(this,
                       "Se produjo un error al intentar Realizar la Transacción.\n" + e.getMessage(),
