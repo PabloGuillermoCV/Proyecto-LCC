@@ -18,7 +18,7 @@
 		Lo que debo hacer es, dado el numero entero, Pasarlo a Base 2
 		y de ahí usar Enmascarado de Bits para separar el numero de 16 bits resultante en dos secuencias de 8 bits
 		que serán el Numero de Página y el Offset
-	2) Acceder con el Número de TLB
+	2) Acceder con el Número de página al TLB
 		En primera Instancia, una vez que se el numero de página, accedo al TLB (el cual es una matriz de 16x3, donde La tercer columna del TLB los uso como si fuesen "Dirty Bits", al inciar, los pongo en 0 y con estos puedo determinar si una entrada del TLB
 				es o inicial y puede ser reemplazada o no) y busco el Frame correspondiente, en caso de NO encontrar el numero de página en el TLB (Osea, se produjo un TLB_MISS),
 				debo bajar a la Tabla de Páginas, encontrar el numero de frame y el par (NroPágina,NroFrame) agregarlo al TLB, si NO lo puedo agregar al TLB porque el mismo NO
@@ -66,6 +66,9 @@ uint16_t DecimalABinario(int n){
 
 }
 
+/*
+ *
+*/
 uint8_t DecimalABinario8Bits(int n){
 	uint8_t ret = 0x00; //000000000000000 en binario usando representación en Hexa
 	int aux;
@@ -145,7 +148,10 @@ uint8_t *pasarDe16A8(uint16_t dataAll) {
 */
 uint8_t BusquedaTabla(uint8_t PN, uint8_t TP[]){
 	int Nro = BinarioADecimal8bits(PN);
-	return TP[Nro];
+	if(Nro >= 0 & Nro < 256)
+		return TP[Nro];
+	else
+		return 0x00; //En caso que NO Encentre la direccion, devuelvo 0 por default
 }
 
 /*
