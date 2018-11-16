@@ -408,15 +408,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				R2 = stmt2.executeQuery("SELECT COUNT(nro_prestamo) FROM pago WHERE nro_prestamo = " + nro);
 				nro = R2.getInt(1);
 				*/
-				if(nro == periodo) {
-					JOptionPane.showConfirmDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", 
-							"Carga de Prestamo exitosa",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-				}
-				else {
-					JOptionPane.showConfirmDialog(null, "Ha ocurrido un error al cargar las cuotas asociadas al prestamo", 
-							"Carga de Prestamo erronea",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-				}
-			nro = -10;
+			JOptionPane.showMessageDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", 
+							"Carga de Prestamo exitosa", JOptionPane.PLAIN_MESSAGE);
 		} 
 		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
