@@ -212,6 +212,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 * @param e Action Event del boton, no se usa pa mucho
 	 */
 	private void verMor(ActionEvent e) {
+		btnRegistrarPago.setEnabled(false);
 		//Necesito los datos del cliente (Nro Cliente, Tipo y Nro de Doc, Apellido y nombre)
 		//Para cada cliente, neceisto los Prestamos en discordia (Nro de Prest, monto, cant_meses y valor cuota
 		//para cada Prestamo, necesito saber la cantidad de cuotas atrasadas (tienen que ser al menos 2)
@@ -248,9 +249,15 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = '" + nro + "' AND PA.fecha_pago is NULL");
-			tabla.refresh(R);
-			stmt.close();
-			R.close();
+			if(!R.next()){
+				JOptionPane.showMessageDialog(null,"NO existen cuotas a pagar","No hay cuotas",JOptionPane.PLAIN_MESSAGE);
+				btnRegistrarPago.setEnabled(false);
+			}
+			else {
+				tabla.refresh(R);
+				stmt.close();
+				R.close();
+			}
 		}
 		catch(SQLException f) {
 			System.out.println("SQLException: " + f.getMessage());
@@ -270,6 +277,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	 */
 	private void CrearPrest(ActionEvent e) {
 		try {
+			btnRegistrarPago.setEnabled(false);
 			nro = Integer.parseInt(Num_doc.getText());
 			tipo = Tipo_Doc.getText();
 			noPrestActual(nro, tipo);
@@ -357,9 +365,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		int i = 2;
 		try {
 			Statement stmt1 = this.conexionBD.createStatement();
-			Statement stmt2 = this.conexionBD.createStatement();
 			ResultSet R1;
-			ResultSet R2;
 			//cargo el Prestamo
 			int Interes;
 			int ValCuota;
