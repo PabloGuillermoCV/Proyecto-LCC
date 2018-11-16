@@ -294,7 +294,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			//SQL para determinar los prestamos actuales de un cliente, Verificar SQL
-			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P NATURAL JOIN Pago X WHERE P.nro_cliente = " + doc + "AND EXISTS fecha_pago = NULL "); 
+			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P NATURAL JOIN Pago X WHERE P.nro_cliente = " + doc + "AND fecha_pago IS NULL "); 
 			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
 				
 				int m = 0;
@@ -378,7 +378,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			stmt1.executeUpdate(sql);
 			stmt1.close();
 			R1.close();
-			
+			/*
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
 			sql = "SELECT P.nro_prestamo FROM prestamo P WHERE P.nro_cliente = " + intC;
 			stmt2 = this.conexionBD.createStatement();
@@ -401,6 +401,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				//Y corroboro que sea la cantidad correcta de cuotas
 				R2 = stmt2.executeQuery("SELECT COUNT(nro_prestamo) FROM pago WHERE nro_prestamo = " + nro);
 				nro = R2.getInt(1);
+				*/
 				if(nro == periodo) {
 					JOptionPane.showConfirmDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", 
 							"Carga de Prestamo exitosa",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -409,16 +410,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 					JOptionPane.showConfirmDialog(null, "Ha ocurrido un error al cargar las cuotas asociadas al prestamo", 
 							"Carga de Prestamo erronea",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
 				}
-			}
-			else {
-				JOptionPane.showConfirmDialog(null, "Ha ocurrido un error que impidio cargar el prestamo", 
-						"Carga de Prestamo erronea",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-			}
-			
-			
 			nro = -10;
-			stmt2.close();
-			R2.close();
 		} 
 		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
@@ -427,6 +419,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	//Metodo auxiliar para cargar las cuotas
 	//DEBE  "Borrarse" UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!

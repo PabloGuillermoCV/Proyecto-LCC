@@ -271,7 +271,7 @@ public class ConsultasATM extends javax.swing.JInternalFrame {
 			}
 			R.close();
 			stmt.close();
-			JOptionPane.showConfirmDialog(null, ret, "Fin Transferencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showConfirmDialog(null, ret, "Fin Transferencia", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
 		} catch (SQLException e) {
 	    	  JOptionPane.showMessageDialog(this,
                       "Se produjo un error al intentar Realizar la Transacción.\n" + e.getMessage(),

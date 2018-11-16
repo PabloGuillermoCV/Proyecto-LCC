@@ -15,7 +15,7 @@ Correcciones entrega anterior:
 - Usuario ADMIN: 
 	- Fijense que si se quiere ejecutar desde la aplicación la siguiente consulta: 
 		create table t (c int) 
-	no se puede e informa el siguiente error:  "La consulta ingresada no es correcta" -VER HORARIO
+	no se puede e informa el siguiente error:  "La consulta ingresada no es correcta" -Listo
 	
 	Deberían corregirlo para que se puedan ingresar este tipo de consultas.
 	Sucede lo mismo al intentar insertar/actualizar datos en una tabla existente:
