@@ -302,7 +302,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			//SQL para determinar los prestamos actuales de un cliente, Verificar SQL
-			R = stmt.executeQuery("SELECT P.nro_prestamo FROM Prestamo P NATURAL JOIN Pago X WHERE P.nro_cliente = " + doc + "AND fecha_pago IS NULL "); 
+			R = stmt.executeQuery("SELECT PR.nro_prestamo FROM Prestamo PR NATURAL JOIN Pago PA WHERE PR.nro_cliente = " + doc + " AND PA.fecha_pago IS NULL "); 
 			if(!R.next()) { //si no hay prestamos vigentes (la primer columna del Query es vacia, por ende no hay filas) 
 				
 				int m = 0;
