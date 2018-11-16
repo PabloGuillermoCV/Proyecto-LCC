@@ -380,7 +380,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			LocalDateTime now = LocalDateTime.now(); 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String fechaAInsertar = now.format(formatter);
-			sql = "INSERT INTO prestamo (fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES ('" + fechaAInsertar + "'," + periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," + legajo + "," + intC + ")";
+			sql = "INSERT INTO prestamo (nro_prestamo,fecha,cant_meses,monto,tasa_interes,interes,valor_cuota,legajo,nro_cliente) VALUES (NULL,'" + fechaAInsertar + "'," + periodo + "," + plata + "," + tasa + "," + Interes + "," + ValCuota + "," + legajo + "," + intC + ");";
 			stmt1.executeUpdate(sql);
 			stmt1.close();
 			R1.close();
