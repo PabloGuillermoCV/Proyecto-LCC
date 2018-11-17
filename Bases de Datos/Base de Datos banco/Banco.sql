@@ -670,7 +670,7 @@ CREATE TRIGGER CargoCuotas
 AFTER INSERT ON Prestamo
 FOR EACH ROW
 	BEGIN
-		DECLARE I INT DEFAULT 0;
+		DECLARE I INT DEFAULT 1;
 		#Intento de conseguir el prestamo recien creado
 		WHILE I <= NEW.cant_meses DO
 			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (NEW.nro_prestamo,I,DATE_ADD(NEW.fecha,INTERVAL I MONTH),NULL);
