@@ -245,15 +245,15 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
 			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
-			if(!R.next()){
-				JOptionPane.showMessageDialog(null,"NO existen cuotas a pagar","No hay cuotas",JOptionPane.PLAIN_MESSAGE);
-				btnRegistrarPago.setEnabled(false);
-			}
-			else {
+			if(R.next()) {
+				R.previous(); //Como con R.next() me moví uno para adelante, vuelvo un paso hacia atras
 				btnRegistrarPago.setEnabled(true);
 				tabla.refresh(R);
 				stmt.close();
 				R.close();
+			}
+			else {
+				JOptionPane.showMessageDialog(null, "El cleinte solicitado NO dispone de cuotas a pagar", "No hay cuotas",JOptionPane.PLAIN_MESSAGE);
 			}
 		}
 		catch(SQLException f) {
