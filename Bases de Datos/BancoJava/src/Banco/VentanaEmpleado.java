@@ -246,7 +246,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			ResultSet R;
 			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
 			if(R.next()) {
-				R.previous(); //Como con R.next() me moví uno para adelante, vuelvo un paso hacia atras
+				R.previous(); //Como con R.next() me movi uno para adelante, vuelvo un paso hacia atras
 				btnRegistrarPago.setEnabled(true);
 				tabla.refresh(R);
 				stmt.close();
@@ -381,7 +381,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			stmt1.executeUpdate(sql);
 			stmt1.close();
 			R1.close();
-			/*
+			/* Esta seccion de codigo ya no es usada ya que tenemos el trigger
 			//Para cargar las cuotas necesito el nro de prestamo del prestamo recien creado
 			sql = "SELECT P.nro_prestamo FROM prestamo P WHERE P.nro_cliente = " + intC;
 			stmt2 = this.conexionBD.createStatement();
@@ -390,7 +390,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			if (R2.next()) {
 				nro_pre = R2.getInt(1);
 			}
-			//ESTE METODO DEBE BORRARSE UNA VEZ QUE SE CORROBORE QUE EL TRIGGER DE CUOTAS FUNCIONA!!!!!!!
 			cargarCuotas(intC,fechaAInsertar,nro_pre,periodo);
 			
 			int nro = -10;
@@ -405,8 +404,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				R2 = stmt2.executeQuery("SELECT COUNT(nro_prestamo) FROM pago WHERE nro_prestamo = " + nro);
 				nro = R2.getInt(1);
 				*/
-			JOptionPane.showMessageDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", 
-							"Carga de Prestamo exitosa", JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se ha cargado el Prestamo y sus cuotas asociadas correctamente", "Carga de Prestamo exitosa", JOptionPane.PLAIN_MESSAGE);
 		} 
 		catch (SQLException e) {
 			System.out.println("SQLException: " + e.getMessage());
@@ -417,9 +415,8 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	}
 	
 	
-	//Metodo auxiliar para cargar las cuotas
-	//DEBE  "Borrarse" UNA VEZ QUE EL TRIGGER DE LAS CUOTAS ANDE!
-	private void cargarCuotas(int c, String fechaD, int nro_pre, int periodo) {
+	//Metodo auxiliar para cargar las cuotas ya no utilizado, por el trigger
+	/*private void cargarCuotas(int c, String fechaD, int nro_pre, int periodo) {
 		Statement stmt;
 		try {
 			stmt = this.conexionBD.createStatement();
@@ -448,7 +445,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 	        System.out.println("VendorError: " + e.getErrorCode());
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	   /**
 	    * Metodo que se ejecuta cuando este componente aparece en pantalla
