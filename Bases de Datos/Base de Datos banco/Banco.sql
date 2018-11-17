@@ -672,7 +672,7 @@ FOR EACH ROW
 	BEGIN
 		DECLARE I INT DEFAULT 1;
 		#Intento de conseguir el prestamo recien creado
-		WHILE I <= NEW.cant_meses DO
+		WHILE I < (NEW.cant_meses)+1 DO
 			INSERT INTO pago(nro_prestamo,nro_pago,fecha_venc,fecha_pago) VALUES (NEW.nro_prestamo,I,DATE_ADD(NEW.fecha,INTERVAL I MONTH),NULL);
 			SET I = I + 1;
 		END WHILE;
