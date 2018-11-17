@@ -35,7 +35,7 @@ Correcciones entrega anterior:
 	Con un monto de $2000 y periodo de 18 meses, éste se almacena correctamente en la BD
 	pero no puedo pagar las cuotas del préstamo recién creado. 
 	La aplicación debería mostrar 18 cuotas con un valor de $142.77 y
-	con su fecha de vencimiento correspondiente. -ARREGLAR LA BUSQUEDA DE CUOTAS, SE PAGA PERO NO ES LA CONSULTA CORRECTA AL MOSTRARLAS
+	con su fecha de vencimiento correspondiente. -Se muestra medio raro, las cuotas estan, una queda cortada, pero estan todas
 	
 	Al listar las cuotas del cliente 5, se ven, pero no entra todo el listado en la tabla. -VER INTERFAZ
 	

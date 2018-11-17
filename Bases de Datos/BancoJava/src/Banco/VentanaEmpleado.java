@@ -65,34 +65,34 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
         });
 		
 		JPanel PaneTabla = new JPanel();
-		PaneTabla.setBounds(0, 161, 875, 560);
+		PaneTabla.setBounds(0, 131, 875, 590);
 		getContentPane().add(PaneTabla);
 			
 		Num_doc = new JTextField();
-		Num_doc.setBounds(10, 83, 129, 20);
+		Num_doc.setBounds(0, 40, 129, 20);
 		getContentPane().add(Num_doc);
 		Num_doc.setColumns(10);
 		
 		JLabel Label_Doc = new JLabel("Numero de Documento");
 		Label_Doc.setHorizontalAlignment(SwingConstants.CENTER);
 		Label_Doc.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Label_Doc.setBounds(10, 58, 129, 14);
+		Label_Doc.setBounds(0, 15, 129, 14);
 		getContentPane().add(Label_Doc);
 		
 		JLabel Label_tipo_doc = new JLabel("Tipo de Documento");
 		Label_tipo_doc.setHorizontalAlignment(SwingConstants.CENTER);
 		Label_tipo_doc.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Label_tipo_doc.setBounds(662, 58, 122, 14);
+		Label_tipo_doc.setBounds(652, 15, 122, 14);
 		getContentPane().add(Label_tipo_doc);
 		
 		Tipo_Doc = new JTextField();
-		Tipo_Doc.setBounds(672, 83, 112, 20);
+		Tipo_Doc.setBounds(662, 40, 112, 20);
 		getContentPane().add(Tipo_Doc);
 		Tipo_Doc.setColumns(10);
 		
 		btnRegistrarPago = new JButton("Registrar Pago");
 		btnRegistrarPago.setEnabled(false);
-		btnRegistrarPago.setBounds(361, 54, 112, 23);
+		btnRegistrarPago.setBounds(361, 11, 112, 23);
 		getContentPane().add(btnRegistrarPago);
 		btnRegistrarPago.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -104,9 +104,6 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 		//hago que NO pueda ser seleccionable por defecto
 		tabla.setEnabled(true);
 		tabla.setEditable(false);
-		
-		JScrollBar scrollBar = new JScrollBar();
-		tabla.add(scrollBar, BorderLayout.WEST);
 		tabla.addMouseListener(new MouseAdapter() {
 			public void MouseListener(MouseEvent evt) {
 				TablaClick(evt);
@@ -121,18 +118,17 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				CrearPrest(arg1);
 			}
 		});
-		CrearPrest.setBounds(20, 114, 107, 23);
+		CrearPrest.setBounds(0, 82, 107, 23);
 		getContentPane().add(CrearPrest);
 		
 		JButton CuotasBtn = new JButton("Ver Cuotas");
 		CuotasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				tabla.setEnabled(true);
-				btnRegistrarPago.setEnabled(true);
 				verCuotas(arg0);
 			}
 		});
-		CuotasBtn.setBounds(361, 114, 112, 23);
+		CuotasBtn.setBounds(361, 82, 112, 23);
 		getContentPane().add(CuotasBtn);
 		
 		JButton btnVerMorosos = new JButton("Ver Morosos");
@@ -143,7 +139,7 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 				verMor(e);
 			}
 		});
-		btnVerMorosos.setBounds(672, 114, 107, 23);
+		btnVerMorosos.setBounds(662, 82, 107, 23);
 		getContentPane().add(btnVerMorosos);
 		
 		}
@@ -248,12 +244,13 @@ public class VentanaEmpleado extends javax.swing.JInternalFrame {
 			Tipo_Doc.setText("");
 			Statement stmt = this.conexionBD.createStatement();
 			ResultSet R;
-			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = '" + nro + "' AND PA.fecha_pago is NULL");
+			R = stmt.executeQuery("SELECT PA.nro_pago AS Cuota_Nro, PR.valor_cuota AS Valor, PA.fecha_venc AS Vencimiento FROM Prestamo PR NATURAL JOIN Pago PA NATURAL JOIN Cliente C WHERE C.tipo_doc = '" + tipo + "' AND C.nro_doc = " + nro + " AND PA.fecha_pago is NULL");
 			if(!R.next()){
 				JOptionPane.showMessageDialog(null,"NO existen cuotas a pagar","No hay cuotas",JOptionPane.PLAIN_MESSAGE);
 				btnRegistrarPago.setEnabled(false);
 			}
 			else {
+				btnRegistrarPago.setEnabled(true);
 				tabla.refresh(R);
 				stmt.close();
 				R.close();
