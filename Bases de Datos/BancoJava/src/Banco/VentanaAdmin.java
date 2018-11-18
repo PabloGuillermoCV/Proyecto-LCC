@@ -202,7 +202,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    		if(R != null) {
 			    	// obtenemos el modelo de la tabla a partir de la consulta para 
 			    	// modificar la forma en que se muestran de algunas columnas
-	    			if(SQL.toLowerCase().contains("select"))
+	    			if(SQL.substring(0, 6).toLowerCase().equals("select"))
 	    				tabla.setSelectSql(SQL);
 	    			
 			    	tabla.createColumnModelFromQuery();
