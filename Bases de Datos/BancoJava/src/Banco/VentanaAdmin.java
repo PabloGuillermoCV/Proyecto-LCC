@@ -202,6 +202,7 @@ public class VentanaAdmin extends javax.swing.JInternalFrame {
 	    		if(R != null) {
 			    	// obtenemos el modelo de la tabla a partir de la consulta para 
 			    	// modificar la forma en que se muestran de algunas columnas
+	    			tabla.setSelectSql(SQL);
 			    	tabla.createColumnModelFromQuery();
 			    	for (int i = 0; i < tabla.getColumnCount(); i++) { 
 			    	    // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
