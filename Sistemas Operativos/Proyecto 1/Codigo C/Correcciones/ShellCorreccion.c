@@ -19,7 +19,7 @@ char *Comandos_Disponibles[] = {
 	"help" //comando ayuda
 };
 
-char* flags[] = {"-h", "-v", "-a", "-l", "-o", "-la", "-q", "-r", "-f"};
+char flags[] = {'-','h', 'v', 'a', 'l', 'o', 'q', 'r', 'f'};
 
 int esLegal(char*str){
 	bool es =  false;
@@ -30,6 +30,16 @@ int esLegal(char*str){
 	}
 
 	return i;
+}
+
+bool esFlagLegal(char c){
+	bool ret = false;
+	int i;
+	for(i = 0; i < 9 && !ret; i++){
+		ret = c == flags[i];
+	}
+
+	return ret;
 }
 
 void help(){
@@ -73,7 +83,7 @@ int main(){
 				else{
 					i = strlen(substring) + 1; //salto al fin del nombre del comando y pasado el espacio de separacion, deberia de encontrar flags o \n
 					while(buffer[i] != '\n' && !error && !corte){
-						if(!esFlagLegal(buffer[i]))
+						if(buffer[i] != ' ' & !esFlagLegal(buffer[i]))
 							error = true;
 					}
 					//saliendo del while, puede ser o porque todo es legal o porque hubo un error, debo verlo
