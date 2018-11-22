@@ -1,0 +1,27 @@
+Comisión Ceballos-Gomez
+------------------------ 
+
+- Usuario EMPLEADO: Ok
+
+- Usuario ATM: Ok
+
+- Usuario ADMIN: 
+	
+	Faltó corregir:
+
+	- Si se quiere ejecutar desde la aplicación la siguiente consulta: 
+		create table t (c int) 
+	no se puede e informa el siguiente error:  "La consulta ingresada no es correcta"
+	
+	Se deberían poder ingresar este tipo de consultas.
+	Sucede lo mismo al intentar insertar/actualizar datos en una tabla existente:
+		insert into tasa_prestamo values (5,0,1000,15)
+		update tasa_prestamo set tasa=16 where periodo=5
+		delete from tasa_prestamo where periodo=5
+	
+- Transacciones y Stored Procedures: Ok
+	
+- Trigger: Ok
+		
+- SP a través de la Interfaz gráfica: Ok
+		
