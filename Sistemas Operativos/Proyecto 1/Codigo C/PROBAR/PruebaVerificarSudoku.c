@@ -14,28 +14,33 @@
 *   al retornar, devuelve Verdadero (La Columna es correcta) o Falso (La Columna NO es válida, aquí se debe terminar todo)
 */
 bool VerificarColumna(char GrillaSudoku [][9], int C){
-    bool Lista [9];
+    int Lista [10] = {0,0,0,0,0,0,0,0,0,0};
     int I;
     for (I = 0; I < 9; I++) {
         int X = GrillaSudoku[I][C] - '0';
+        printf("VerificarColumna [%d][%d] = %d \n", I,C,X);
         if (X < 1 || X > 9) {
+            printf("Valor ilegal en la columna %d\n",C);
             //Tengo un valor no posible
             return false;
         }
-        if (Lista[X] == true) {
+        if (Lista[X] == 1) {
+            printf("Lista[%d] = %d en I =%d\n",X,Lista[X],I);
+            printf("Valor repetido en la columna %d\n",C);
             //Me encuentro con un valor repetido
             return false;
         }
-        Lista[X] = true;
+        Lista[X] = 1;
     }
-    for (I = 0; I < 9; I++) {
+    for (I = 1; I <= 9; I++) {
         //Verifico que esten todos los numeros
-        int X = I + 1;
-        if (Lista[X] == false) {
+        if (Lista[I] == 0) {
+            printf("Valor en la Columna %d Faltante\n",C);
             //Faltaba un valor en la lista
             return false;
         }
     }
+    printf("Columna %d verificada con exito\n",C);
     return true;
 }
 
@@ -46,28 +51,32 @@ bool VerificarColumna(char GrillaSudoku [][9], int C){
 *	al retornar, devuelve Verdadero (la fila es correcta) o Falso (la Fila NO es válida, aquí se debe terminar todo)
 */
 bool VerificarFila(char GrillaSudoku [][9], int F){
-    bool Lista [9];
+    int Lista [10] = {0,0,0,0,0,0,0,0,0,0};
     int I;
     for (I = 0; I < 9; I++) {
         int X = GrillaSudoku [F][I] - '0';
+        printf("VerficarFila en %d [%d] = %d \n",F,I,X);
         if (X < 1 || X > 9) {
+            printf("Valor ilegal en la fila\n");
             //Tengo un valor no posible
             return false;
         }
-        if (Lista[X] == true) {
+        if (Lista[X] == 1) {
+            printf("Valor repetido en la Fila %d\n",F);
             //Me encuentro con un valor repetido
             return false;
         }
-        Lista[X] = true;
+        Lista[X] = 1;
     }
-    for (I = 0; I < 9; I++) {
+    for (I = 1; I <= 9; I++) {
         //Verifico que esten todos los numeros
-        int X = I + 1;
-        if (Lista[X] == false) {
+        if (Lista[I] == 0) {
+            printf("Valor en  la fila %d faltante\n",F);
             //Faltaba un valor en la lista
             return false;
         }
     }
+    printf("Fila %d Verificada con exito\n",F);
 	return true;
 }
 
@@ -78,43 +87,47 @@ bool VerificarFila(char GrillaSudoku [][9], int F){
 *   al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
 */
 bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
-    bool Lista [9];
+    int Lista [10] = {0,0,0,0,0,0,0,0,0,0}; //1 based, de 1 a 9
     int I;
     int J;
     for (I = X; I < X+3; I++) {
         for (J = Y; J < Y+3; J++) {
             int N = GrillaSudoku[I][J] - '0';
+            printf("VerificarCuadrante en %d , %d = %d \n",X,Y,N);
             if (N < 1 || N > 9) {
                 //Tengo un valor no posible
+                printf("Hay un valor ilegal en el cuadrante\n");
                 return false; //usar fputs()
             }
-            if (Lista[N] == true) {
+            if (Lista[N] == 1) {
+                printf("Habia un valor repetido en el cuadrante\n");
                 //Me encuentro con un valor repetido
                 return false;
             }
-            Lista[N] = true;
+            Lista[N] = 1;
         }
     }
-    for (I = 0; I < 9; I++) {
+    for (I = 1; I <= 9; I++) {
         //Verifico que esten todos los numeros
-        int N = I + 1;
-        if (Lista[N] == false) {
+        if (Lista[I] == 0) {
             //Faltaba un valor en la lista
+            printf("Valor en la lista faltante para el cuadrante\n");
             return false;
         }
     }
+    printf("Cuadrante %d,%d verificado con exito\n",X,Y);
     return true;
 }
 
 int main(){
     char Grilla[9][9]={ {'6','3','2','7','8','1','9','4','5'},
-                        {'4','8','7','5','9','6','2','1','3'}, 
-                        {'5','1','9','2','4','3','8','7','6'}, 
-                        {'8','6','4','3','5','2','7','9','1'}, 
+                        {'4','8','7','5','9','6','2','1','3'},
+                        {'5','1','9','2','4','3','8','7','6'},
+                        {'8','6','4','3','5','2','7','9','1'},
                         {'7','5','1','9','6','8','3','2','4'},
-                        {'2','9','3','1','7','4','6','5','8'}, 
+                        {'2','9','3','1','7','4','6','5','8'},
                         {'9','4','5','6','3','7','1','8','2'},
-                        {'1','7','6','8','2','5','4','3','9'}, 
+                        {'1','7','6','8','2','5','4','3','9'},
                         {'3','2','8','4','1','9','5','6','7'}  };
 
     printf("Verificando Fila numero 1 = %d \n", VerificarFila(Grilla,0));
