@@ -12,7 +12,7 @@
 #include <process.h> 
 #include "Params.h"
 
-int main(){
+int main(int argc, char *argv[]){
 
 	args *Par;
 	int check;

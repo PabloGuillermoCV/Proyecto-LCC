@@ -130,9 +130,22 @@ int main(){
                         {'1','7','6','8','2','5','4','3','9'},
                         {'3','2','8','4','1','9','5','6','7'}  };
 
-    printf("Verificando Fila numero 1 = %d \n", VerificarFila(Grilla,0));
-    printf("Verificando Columna Numero 1 = %d \n",VerificarColumna(Grilla,0));
-    printf("Verificando Cuadrante Numero 1 = %d \n",VerificarCuadrante(Grilla,0,0));
-
+    int F,C;
+    for(F = 0; F < 9; F++){
+        printf("Verificando Fila numero %d = %d \n",F, VerificarFila(Grilla,0));    
+        for(C = 0; C < 9; C++){
+            printf("Verificando Columna numero %d = %d \n",C, VerificarFila(Grilla,0));
+        }
+    }
+    F = 0;
+    C = 0;
+    while(F <= 6 && C <= 6){
+        printf("Verificando cuadrante %d,%d\n" F,C,VerificarCuadrante(GrillaSudoku, rec, Y));
+                F = F + 3;
+                if(F == 6 && C != 6){
+                    F = 0;
+                    C = C + 3;
+                }
+    }
     return 0;
 }

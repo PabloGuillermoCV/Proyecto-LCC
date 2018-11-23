@@ -7,11 +7,10 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <dirent.h> //libreria para manejo de directorios
-#include "Params.h"
 
 //OJO! ls IGNORA el params!
 
-int main(){
+int main(int argc, char *argv[]){
 
 	struct dirent *de;
 	DIR *dr = opendir("."); //Abro la carpeta en donde estoy

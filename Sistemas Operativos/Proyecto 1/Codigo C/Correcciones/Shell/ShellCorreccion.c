@@ -6,7 +6,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include "Params.h"
 
 #define MAX_BUF 1000
 
@@ -75,12 +74,11 @@ int main(){
 
 					if(!corte){
 						
-						param->nombre = name;
 						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
 						int id = fork();
 						if(PID == 0){ //estoy en el hijo, debo hacer execv
-							llamada = strcat(substring,); //Tengo que ejecutar mi propio archivo
-							errno = execv(llamada,param); //VER ESTO
+							llamada = strcat(,"./", substring); //Tengo que ejecutar mi propio archivo
+							errno = execv(llamada,name); //VER ESTO
 							if(errno < 0){
 								fprintf(stderr,"Error al intentar llamar a la funcion %s con codigo de error %d, cuyo significado es: %s \n",substring,errno,strerror(errno));
 							}

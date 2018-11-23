@@ -6,9 +6,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include "Params.h"
 
-int main(){
+int main(int argc, char *argv[]){
 
 	args *Par;
 	char *name = Par->nombre;

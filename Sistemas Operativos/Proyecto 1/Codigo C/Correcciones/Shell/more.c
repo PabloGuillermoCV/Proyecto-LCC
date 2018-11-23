@@ -6,7 +6,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include "Params.h"
 
 /*
  * FUnción auxiliar para leer un archivo
@@ -27,9 +26,13 @@ void leer(char *name){
 	}
 }
 
-int main(){
+int main(int argc , char * argv[]){
 
 	args *Par;
+	int i = 0;
+	for(i = 0; i < argc; i++){
+		printf("i= %d , %s\n",i,argv[i]);
+	}
 	char *nom = Par->nombre; //Obtengo el nombre del archivo a leer con mi estructura compartida (PREGUNTAR)
 	leer(nom);
 	return 0;
