@@ -86,13 +86,16 @@ void *UsuarioSolicita (void *threadarg) {
 	struct ID_Usuario *U;
 	U = (struct ID_Usuario *) threadarg;
 	
+	int Id = U->ID;
+	
 	int Imp;
-    int C;
-	for (C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
+    int Ciclo;
+	
+	for (Ciclo = 0; Ciclo < 20; Ciclo++) { //Este usuario solicitara durante 20 ciclos
 		Imp = Requerir ();
-		printf ("El Usuario %d Requirio La Impresora %d.\n",U->ID,Imp);
+		printf ("El Usuario %d Requirio La Impresora %d.\n",Id,Imp);
 		sleep (3); //Tiempo que tarda antes de liberarla
-		printf ("El Usuario %d Libero La Impresora %d.\n",U->ID,Imp);
+		printf ("El Usuario %d Libero La Impresora %d.\n",Id,Imp);
 		Liberar (Imp);
 		sleep (1); //Esperan un poco antes de volver a requerir
 	}
