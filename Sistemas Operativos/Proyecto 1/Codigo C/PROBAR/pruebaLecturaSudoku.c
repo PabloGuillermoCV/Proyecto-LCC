@@ -15,26 +15,30 @@ void Lectura(int GrillaSudoku[][9]){
 	FILE *SudokuR = fopen("sudoku.txt","r");
 	while(!feof(SudokuR) && F < 9 && !corte){
 		printf("Fila Nro: %d = ",F);
-		while(C < 9 && !corte){
+		while(C < 9 && !corte){ 
 			num = fgetc(SudokuR); //obtengo el caracter
 			if((int)num != 44 && (int)num < 48 && (int)num > 57)
 				corte = true;
-			if(num != ',' && num != '\n'){
-				int x = num - '0';
-				GrillaSudoku[F][C] = x; //si lo leido no es EOL o "," (la grilla esta separada por comas), lo añado a la matriz
-				C++;
-				printf("%d ",x);
+			else{
+				if(num != ',' && num != '\n'){
+					int x = num - '0';
+					GrillaSudoku[F][C] = x; //si lo leido no es EOL o "," (la grilla esta separada por comas), lo añado a la matriz
+					C++;
+					printf("%d ",x);
+				}
 			}
 		}
 		printf("\n");
 		F++;
-		C = 0;
+		C = 0; //Al terminar de leer una fila, paso a la siguiente y reseteo la Columna
 	}
-	if(corte)
+	if(corte) //Lei algo ilegal que no es una ","
 		printf("Error al procesar la entrada, %c NO es una entrada valida para un sudoku",num);
 }
 
 int main(){
+	//NOTA: se puede hacer Grilla [9][9] = {{0}} para inicializar la matriz entera en 0
+	//int array[1024] = {[0 ... 1023] = 5}; tambien sirve
 	int Grilla[9][9];
 	int F;
 	int C;
