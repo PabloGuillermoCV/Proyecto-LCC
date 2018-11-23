@@ -170,18 +170,18 @@ int main () {
 		sem_init (&EsperandoImpresion[I],0,0);
 	}
 	
-	pthread_t Usuarios [N];
-	pthread_t Impresora1;
-	pthread_t Impresora2;
+	pthread_t TUsuarios [N];
+	pthread_t TImpresora1;
+	pthread_t TImpresora2;
 	
 	//Crea Impresora 1
-	rc = pthread_create (&Impresora1, NULL, Imprimir1, NULL);
+	rc = pthread_create (&TImpresora1, NULL, Imprimir1, NULL);
 	if (rc) { //ocurrió un error al crear el Thread, reportar
         printf ("ERROR; Código de retorno: %d\n", rc);
         exit (-1);
     }
 	//Crea Impresora 2
-	rc = pthread_create (&Impresora2, NULL, Imprimir2, NULL);
+	rc = pthread_create (&TImpresora2, NULL, Imprimir2, NULL);
 	if (rc) { //ocurrió un error al crear el Thread, reportar
         printf ("ERROR; Código de retorno: %d\n", rc);
         exit (-1);
@@ -190,7 +190,7 @@ int main () {
 	for (I = 0; I < N; I++) { //Crea los N hilos usuario
 		datosStruct[I].ID = I;
 		datosStruct[I].Prioridad = I;
-		rc = pthread_create (&Usuarios[I], NULL, UsuarioSolicita, (void *) &datosStruct[I]);
+		rc = pthread_create (&TUsuarios[I], NULL, UsuarioSolicita, (void *) &datosStruct[I]);
 		if (rc) { //Ocurrió un error al crear el Thread, reportar
         	printf ("ERROR; Código de retorno: %d\n", rc);
         	exit (-1);
@@ -198,10 +198,10 @@ int main () {
 	}
 	
 	for (I = 0; I < N; I++){
-		pthread_join (Usuarios[I], NULL);
+		pthread_join (TUsuarios[I], NULL);
 	}
-	pthread_join (Impresora1,NULL);
-	pthread_join (Impresora2,NULL);
+	pthread_join (TImpresora1,NULL);
+	pthread_join (TImpresora2,NULL);
 	
 	sem_destroy (&Impresora1);
 	sem_destroy (&Impresora2);

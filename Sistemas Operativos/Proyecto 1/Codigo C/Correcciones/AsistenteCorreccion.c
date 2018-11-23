@@ -55,7 +55,6 @@ void *Atender () {
 	for (Ciclo = 0; Ciclo < 60; Ciclo++) { //El asistente atendera durante 60 ciclos
 		sem_wait (&EsperarTurno); //El asistente espera hasta que alguien espere por su turno
 		sleep (4); //Tiempo que tarda el asistente en atender a un alumno
-		printf ("Se atiende a un alumno.\n");
 		sem_post (&Atendido); //El asistente le avisa al alumno que termino
 	}
 	exit (0);
@@ -77,6 +76,7 @@ void *Solicitar (void *threadarg) {
 			printf ("El alumno %d pasa a la oficina y se libera un asiento.\n",Id);
 			sem_post (&Asiento); //Atienden al alumno y deja libre el asiento para otro alumno
 			sem_wait (&Atendido); //El alumno pasa de aca cuando el asistente termine
+			printf ("El alumno %d fue atendido y se va.\n",Id);
 			sem_post (&OficinaLibre); //El alumno deja libre la oficina para alguno de los que esta esperando
 		}
 		sleep (10); //El alumno espera antes de volver al asistente
