@@ -45,6 +45,11 @@ sem_t Atendido; //Semaforo usado para indicar que un alumno debe esperar a que t
 sem_t Asiento; //Semaforo que nota la cantidad de asientos disponibles (hasta 3)
 sem_t OficinaLibre; //Semaforo que sirve para notificar cuando esta ocupada la oficina
 
+struct ID_Alumno {
+	int ID;
+};
+struct ID_Alumno datosStruct [N];
+
 void *Atender () {
 	int Ciclo;
 	for (Ciclo = 0; Ciclo < 60; Ciclo++) { //El asistente atendera durante 60 ciclos
@@ -56,15 +61,20 @@ void *Atender () {
 	exit (0);
 }
 
-void *Solicitar () {
+void *Solicitar (void *threadarg) {
+	struct ID_Alumno *A;
+	A = (struct ID_Alumno *) threadarg;
+	
+	int Id = A->ID;
+	
     int Ciclo;
 	for (Ciclo = 0; Ciclo < 20; Ciclo++) { //Este usuario solicitara durante 20 ciclos
         int A = sem_trywait (&Asiento);
         if (A == 0) { //Si hay asientos disponibles espera su turno, sino se va
-            printf ("Se ocupa un asiento.\n");
+            printf ("El alumno %d ocupa un asiento.\n",Id);
 			sem_post (&EsperarTurno); //El alumno llega y pide el turno
 			sem_wait (&OficinaLibre); //El alumno espera a que le dejen pasar
-			printf ("Se pasa a la oficina y se libera un asiento.\n");
+			printf ("El alumno %d pasa a la oficina y se libera un asiento.\n",Id);
 			sem_post (&Asiento); //Atienden al alumno y deja libre el asiento para otro alumno
 			sem_wait (&Atendido); //El alumno pasa de aca cuando el asistente termine
 			sem_post (&OficinaLibre); //El alumno deja libre la oficina para alguno de los que esta esperando
@@ -93,8 +103,9 @@ int main () {
         exit (-1);
     }
 
-	for (I = 0; I < N; I++){
-		rc = pthread_create(&Alumnos[I], NULL, Solicitar, NULL);
+	for (I = 0; I < N; I++) {
+		datosStruct[I].ID = I;
+		rc = pthread_create(&Alumnos[I], NULL, Solicitar, (void *) &datosStruct[I]);
 		if (rc) { //ocurrió un error al crear el Thread, reportar
         	printf ("ERROR; Código de retorno: %d\n", rc);
         	exit (-1);
