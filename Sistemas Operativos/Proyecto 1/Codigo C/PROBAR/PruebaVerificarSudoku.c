@@ -18,7 +18,6 @@ bool VerificarColumna(char GrillaSudoku [][9], int C){
     int I;
     for (I = 0; I < 9; I++) {
         int X = GrillaSudoku[I][C] - '0';
-        printf("VerificarColumna [%d][%d] = %d \n", I,C,X);
         if (X < 1 || X > 9) {
             printf("Valor ilegal en la columna %d\n",C);
             //Tengo un valor no posible
@@ -55,7 +54,6 @@ bool VerificarFila(char GrillaSudoku [][9], int F){
     int I;
     for (I = 0; I < 9; I++) {
         int X = GrillaSudoku [F][I] - '0';
-        printf("VerficarFila en %d [%d] = %d \n",F,I,X);
         if (X < 1 || X > 9) {
             printf("Valor ilegal en la fila\n");
             //Tengo un valor no posible
@@ -93,7 +91,6 @@ bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
     for (I = X; I < X+3; I++) {
         for (J = Y; J < Y+3; J++) {
             int N = GrillaSudoku[I][J] - '0';
-            printf("VerificarCuadrante en %d , %d = %d \n",X,Y,N);
             if (N < 1 || N > 9) {
                 //Tengo un valor no posible
                 printf("Hay un valor ilegal en el cuadrante\n");
