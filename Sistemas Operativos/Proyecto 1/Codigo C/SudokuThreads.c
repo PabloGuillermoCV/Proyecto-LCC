@@ -6,12 +6,12 @@
 #include <pthread.h>
 
 /*número máximo de Threads que estarán presentes
-	1 Thread para todas las filas
-	1 Thread para todas las columnas
+	9 Thread para todas las filas
+	9 Thread para todas las columnas
 	9 Threads, 1 para cada Cuadrante
 */
 
-#define NUM_THREADS 11
+#define NUM_THREADS 27
 
 /*Estructura para pasar los Argumentos necesarios para verificar una parte del Sudoku
 	le paso tanto Fila y Columna Inicial como Fila y Columna Final ya que manejaré
@@ -75,26 +75,39 @@ void *VerificarParte(void *threadarg){
 	pthread_exit(NULL);
 }
 
-/*
-	Función para modularizar, esta se encarga de leer el archivo
-	COMPLETAR, hay que hacer chequeos adicionales y ver si realmente estaria leyendo y asignando el valor
-*/
-void Lectura(FILE *SudokuR){
+void Lectura(int GrillaSudoku[][9]){
 
 	int F = 0;
 	int C = 0;
-	while(!feof(SudokuR) && F < 9){
-		while(C < 9){
-			char num = fgetc(SudokuR); //obtengo el caracter
-			int x = num - '0';
-			if(num != EOF && num != ',' && num != '\n' && !(x < 1 || x > 9)  ){
-				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," (la grilla esta separada por comas), lo añado a la matriz
-				C++;
-			} //buscar cuanto era EOF en Linux
-		}
-		F++;
-		C = 0;
+	bool corte = false;
+	char num;
+	FILE *fp;
+	fp = fopen("sudoku.txt","r");
+	if(fp == NULL)
+        printf("error al abrir el archivo\n");
+    else{
+        while(!feof(fp) && F < 9 && !corte){
+            printf("Fila Nro: %d = ",F);
+            while(C < 9 && !corte){
+                num = fgetc(fp); //obtengo el caracter
+                if((int)num != 44 && (int)num < 48 && (int)num > 57)
+                    corte = true;
+                else{
+                    if(num != ',' && num != '\n' && num != ' '){
+                        int x = (int)(num - '0');
+                        GrillaSudoku[F][C] = x; //si lo leido no es EOL o "," (la grilla esta separada por comas), lo añado a la matriz
+                        C++;
+                        printf("%d ",x);
+                    }
+                }
+            }
+            printf("\n");
+            F++;
+            C = 0; //Al terminar de leer una fila, paso a la siguiente y reseteo la Columna
+        }
 	}
+	if(corte) //Lei algo ilegal que no es una ","
+		printf("Error al procesar la entrada, %c NO es una entrada valida para un sudoku",num);
 }
 
 //Hay que llenar el arreglo de thread_Data

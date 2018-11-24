@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#define NUM_PROC 27
+
 /* Como seria la idea general para resolver el tester de Sudoku?
    1) generar la matriz -> El Padre lo hace
    		1.1)sabemos que la Matriz es de 9x9, asi que un arreglo bi-dimensional cuadrado de caracteres bastará
@@ -32,30 +34,39 @@ FILE *Proc1;
 FILE *Proc2;
 FILE *Proc3;
 
-/*
-	Función para modularizar, esta se encarga de leer el archivo
-	COMPLETAR, hay que hacer chequeos adicionales y ver si realmente estaria leyendo y asignando el valor
-*/
-void Lectura(FILE *SudokuR, char GrillaSudoku [][9]){
+void Lectura(int GrillaSudoku[][9]){
 
 	int F = 0;
 	int C = 0;
-	while(!feof(SudokuR) && F < 9){
-		while(C < 9){
-			char num = fgetc(SudokuR); //obtengo el caracter
-			int x = num - '0';
-			if(num != EOF && num != ',' && num != '\n' && !(x < 1 || x > 9) ){
-				GrillaSudoku[F][C] = num; //si lo leido no es EOF o "," o un caracter que NO se una Dígito numérico (la grilla esta separada por comas), lo añado a la matriz
-			}
-			else{
-				GrillaSudoku[F][C] = NULL;
-			}
-			C++;
-			//buscar cuanto era EOF en Linux
-		}
-		F++;
-		C = 0;
+	bool corte = false;
+	char num;
+	FILE *fp;
+	fp = fopen("sudoku.txt","r");
+	if(fp == NULL)
+        printf("error al abrir el archivo\n");
+    else{
+        while(!feof(fp) && F < 9 && !corte){
+            printf("Fila Nro: %d = ",F);
+            while(C < 9 && !corte){
+                num = fgetc(fp); //obtengo el caracter
+                if((int)num != 44 && (int)num < 48 && (int)num > 57)
+                    corte = true;
+                else{
+                    if(num != ',' && num != '\n' && num != ' '){
+                        int x = (int)(num - '0');
+                        GrillaSudoku[F][C] = x; //si lo leido no es EOL o "," (la grilla esta separada por comas), lo añado a la matriz
+                        C++;
+                        printf("%d ",x);
+                    }
+                }
+            }
+            printf("\n");
+            F++;
+            C = 0; //Al terminar de leer una fila, paso a la siguiente y reseteo la Columna
+        }
 	}
+	if(corte) //Lei algo ilegal que no es una ","
+		printf("Error al procesar la entrada, %c NO es una entrada valida para un sudoku",num);
 }
 
 /*Función adicional para chequear que  una vez llenada la matriz, la misma este completa, ya que si el input
@@ -83,79 +94,77 @@ bool Completitud(char GrillaSudoku [][9]){
 *	F, Fila de Inicio del cuadrante
 *	al retornar, devuelve Verdadero (la fila es correcta) o Falso (la Fila NO es válida, aquí se debe terminar todo)
 */
-bool VerificarFila(char GrillaSudoku [][9], int F){
-    bool Lista [9];
+void VerificarFila(char GrillaSudoku [][9], int F){
+    int Lista [10] = {0,0,0,0,0,0,0,0,0,0};
     int I;
     for (I = 0; I < 9; I++) {
         int X = GrillaSudoku [F][I] - '0';
         if (X < 1 || X > 9) {
+            printf("Valor ilegal en la fila\n");
             //Tengo un valor no posible
-            fputs("false",Proc1);
             return false;
         }
-        if (Lista[X] == true) {
+        if (Lista[X] == 1) {
+            printf("Valor repetido en la Fila %d\n",F);
             //Me encuentro con un valor repetido
-            fputs("false",Proc1);
             return false;
         }
-        Lista[X] = true;
+        Lista[X] = 1;
     }
-    for (I = 0; I < 9; I++) {
+    for (I = 1; I <= 9; I++) {
         //Verifico que esten todos los numeros
-        int X = I + 1;
-        if (Lista[X] == false) {
+        if (Lista[I] == 0) {
+            printf("Valor en  la fila %d faltante\n",F);
             //Faltaba un valor en la lista
-            fputs("false",Proc1);
             return false;
         }
     }
-    fputs("true",Proc1);
+    printf("Fila %d Verificada con exito\n",F);
 	return true;
 }
-
 /* Función que verificará una Columna del Sudoku
-*	gril, grilla del Sudoku
-*	C, Columna de Inicio del Cuadrante
-*	al retornar, devuelve Verdadero (La Columna es correcta) o Falso (La Columna NO es válida, aquí se debe terminar todo)
+*   gril, grilla del Sudoku
+*   C, Columna de Inicio del Cuadrante
+*   al retornar, devuelve Verdadero (La Columna es correcta) o Falso (La Columna NO es válida, aquí se debe terminar todo)
 */
-bool VerificarColumna(char GrillaSudoku [][9], int C){
-    bool Lista [9];
+void VerificarColumna(char GrillaSudoku [][9], int C){
+    int Lista [10] = {0,0,0,0,0,0,0,0,0,0};
     int I;
     for (I = 0; I < 9; I++) {
         int X = GrillaSudoku[I][C] - '0';
         if (X < 1 || X > 9) {
+            printf("Valor ilegal en la columna %d\n",C);
             //Tengo un valor no posible
-            fputs("false",Proc2);
             return false;
         }
-        if (Lista[X] == true) {
+        if (Lista[X] == 1) {
+            printf("Lista[%d] = %d en I =%d\n",X,Lista[X],I);
+            printf("Valor repetido en la columna %d\n",C);
             //Me encuentro con un valor repetido
-            fputs("false",Proc2);
             return false;
         }
-        Lista[X] = true;
+        Lista[X] = 1;
     }
-    for (I = 0; I < 9; I++) {
+    for (I = 1; I <= 9; I++) {
         //Verifico que esten todos los numeros
-        int X = I + 1;
-        if (Lista[X] == false) {
+        if (Lista[I] == 0) {
+            printf("Valor en la Columna %d Faltante\n",C);
             //Faltaba un valor en la lista
-            fputs("false",Proc2);
             return false;
         }
     }
-    fputs("true",Proc2);
-	return true;
+    printf("Columna %d verificada con exito\n",C);
+    return true;
 }
 
 /* Función que verificará un Cuadrante del Sudoku
-*	gril, grilla del Sudoku
-*	X, Fila de Inicio del cuadrante
-*	Y, Columna de Inicio del Cuadrante
-*	al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
+*   gril, grilla del Sudoku
+*   X, Fila de Inicio del cuadrante
+*   Y, Columna de Inicio del Cuadrante
+*   al retornar, devuelve Verdadero (El cuadrante es correcto) o Falso (El Cuadrante NO es válido, aquí se debe terminar todo)
 */
-bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
-    bool Lista [9];
+void VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
+    int Lista [10] = {0,0,0,0,0,0,0,0,0,0}; //1 based, de 1 a 9
     int I;
     int J;
     for (I = X; I < X+3; I++) {
@@ -163,27 +172,26 @@ bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
             int N = GrillaSudoku[I][J] - '0';
             if (N < 1 || N > 9) {
                 //Tengo un valor no posible
-                fputs("false",Proc3);
+                printf("Hay un valor ilegal en el cuadrante\n");
                 return false; //usar fputs()
             }
-            if (Lista[N] == true) {
+            if (Lista[N] == 1) {
+                printf("Habia un valor repetido en el cuadrante\n");
                 //Me encuentro con un valor repetido
-                fputs("false",Proc3);
                 return false;
             }
-            Lista[N] = true;
+            Lista[N] = 1;
         }
     }
-    for (I = 0; I < 9; I++) {
+    for (I = 1; I <= 9; I++) {
         //Verifico que esten todos los numeros
-        int N = I + 1;
-        if (Lista[N] == false) {
+        if (Lista[I] == 0) {
             //Faltaba un valor en la lista
-            fputs("false",Proc3);
+            printf("Valor en la lista faltante para el cuadrante\n");
             return false;
         }
     }
-    fputs("true",Proc3);
+    printf("Cuadrante %d,%d verificado con exito\n",X,Y);
     return true;
 }
 
@@ -191,7 +199,7 @@ bool VerificarCuadrante(char GrillaSudoku [][9], int X, int Y){
 	si es el primer Proceso, le asigno que tiene que verificar las filas, si es el segundo, las columnas, sino,
 	es el tercero y le asigno revisar los cuadrantes con sus respectivas funciones especiales dentro de un loop while
 */
-bool HacerTarea(int ProcNum, char GrillaSudoku [][9]){
+void HacerTarea(int ProcNum, char GrillaSudoku [][9]){
 
 	int rec,Y = 0;
 	bool check = true;
@@ -230,32 +238,18 @@ int main(){
 	Proc2 = fopen("Proceso2.txt","w");
 	Proc3 = fopen("Proceso3.txt","w");
 	
-	//Variable para manejar el archivo
-	FILE *SudokuR;
 	//Matriz de 9x9 donde se guardará el sudoku
 	char GrillaSudoku [9][9];
-	int processCount = 2;
 	bool check1 = true;
 	int pid = 0;
-	//Abro el archivo, para lectura (por el enunciado, debe llamarse "sudoku.txt").
-	SudokuR = fopen("sudoku.txt", "r");
-
-	if(!SudokuR){
-		fprintf(stderr, "Ocurió un error al intentar abrir el archivo de Input, verifique que el mismo se encuentra en la misma ubicación que el código fuente y vuelva a intentarlo");
-		return 1;}
-		//Ocurrió un error al abrir el archivo, reportar dicho error
-	else{
 
 		Lectura(SudokuR, GrillaSudoku);
 
-		//asumiendo que terminé de leer todo correctamente, deberia tener la matriz totalmente cargada
-		//ya no necesito más el archivo, puedo cerrarlo y continuar
-		fclose(SudokuR);
 		if(Completitud(GrillaSudoku) != true){
 			fprintf(stderr,"La jugada NO es correcta ya que el Input del mismo NO ERAN NÚMEROS EN SU TOTALIDAD\n");
 			return 1;
 		}
-	}
+	
 
 
 
@@ -264,7 +258,7 @@ int main(){
 		Entro a un método especial que le asigna un trabajo a realizar
 	*/
 	int i;
-	for(i=0; i<processCount && check1; i++){
+	for(i=0; i<NUM_PROC && check1; i++){
     	pid=fork();
     	if(pid == -1){
     		fprintf(stderr,"Error al crear el Proceso Hijo Numero %d", i);
@@ -280,8 +274,17 @@ int main(){
     	}
 
 	}
-	if (pid == 0){
-    	wait(NULL);
+	if (pid == 0){ //Esty en el padre, debo esperar por mis 27 hijos
+		int status;
+		if(waitpid(pid,&status,0) == -1){
+			printf("Error al esperar por el hijo %d\n",pid);
+			return -1;
+		}
+		if(WIFEXITED(status)){
+			const int es = WEXITSTATUS(status);
+			if(es == -1)
+				printf("El Proceso %d no pudo completar su tarea correctamente, la jugada de sudoku es invalida\n",pid);
+		}
 	}
 	char res[100]; //Buffer para leer los archivos
 	//Chequeo que todo esté bien, esto es, leo los 3 archivos y si todos tienen "true", entonces estaba todo bien.
