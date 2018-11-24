@@ -23,27 +23,27 @@ Correcciones Ej sincronización (impresoras sin prioridad):
 */
 
 /*Algoritmo Impresoras Sin Prioridad
-
+	
 	//UsuarioSolicita:
-	//While True, hacer
-		//Requerir
-		//Sleep 3 Segundos
-		//Liberar
-		//Sleep 1 Segundo
+	While True, hacer
+		Requerir
+		Sleep 3 Segundos
+		Liberar
+		Sleep 1 Segundo
 	
 	//Requerir:
-	//Wait (PermisoLibre)
-	//Trywait (Impresora1)
-		//Retornar Impresora 1
-	//Sino
-		//Trywait (Impresora2)
-			//Retornar Impresora 2
-		//Sino
-			//Se produjo un error
+	Wait(PermisoLibre)
+	Trywait(Impresora1)
+		Retornar ID Impresora 1
+	Sino
+		Trywait(Impresora2)
+			Retornar ID Impresora 2
+		Sino
+			Se produjo un error, retornar 1
 	
 	//Liberar:
-	//Liberar impresora pasada por parametro (signal)
-	//Signal (PermisoLibre)
+	Liberar impresora pasada por parametro (Signal(ImpresoraX))
+	Signal(PermisoLibre)
 */
 
 sem_t PermisoLibre; //Semaforo que indica cuantas impresoras estan libres. Empieza en 2.
@@ -104,15 +104,16 @@ void *UsuarioSolicita (void *threadarg) {
 
 int main () {
 	
+	int I;
+	int rc;
+	
 	sem_init (&PermisoLibre,0,2);
 	sem_init (&Impresora1,0,1);
 	sem_init (&Impresora2,0,1);
 	
 	pthread_t Usuarios [N];
 	
-	int I;
-	int rc;
-	
+	//Crea los N hilos usuario
 	for (I = 0; I < N; I++) {
 		datosStruct[I].ID = I;
 		rc = pthread_create (&Usuarios[I], NULL, UsuarioSolicita, (void *) &datosStruct[I]);
@@ -121,7 +122,7 @@ int main () {
         	exit (-1);
        	}
 	}
-
+	
 	for (I = 0; I < N; I++) {
 		pthread_join (Usuarios[I], NULL);
 	}

@@ -24,27 +24,26 @@ Correcciones Asistente (diseño e implementación):
 -) Asistente atiende de a 3 a la vez
 */
 
-/*Algoritmo Atender
-
-	//While True, hacer
-		//Esperar un turno de un alumno (wait(EsperarTurno))
-		//Atender alumno
-		//Liberar(Atendido)
-*/
-
-/*Algoritmo Solicitar
-
-	//While True, hacer
-		//Verificar si hay asientos (trywait(Asiento))
-		//Si no hay Asientos
-			//Irse y esperar un tiempo antes de volver a intentar
-		//Si hay un asiento disponible, ocuparlo
-			//Pedir turno (liberar(EsperarTurno))
-			//El alumno espera a que la oficina este libre para entrar, no deja su asiento todavia (wait(OficinaLibre))
-			//Liberar(Asiento)
-			//Esperar a que termine de ser atentido por el asistente (wait(Atendido))
-			//El alumno abandona la oficina (Liberar(OficinaLibre))
-			//Al terminar, esperar un tiempo antes de volver a consultar
+/*Algoritmos Asistente
+	
+	//Atender:
+	While True, hacer
+		Esperar hasta que alguien pida turno (Wait(EsperarTurno))
+		Atender al alumno, la consulta tarda 4 segundos
+		Avisar al alumno que la consulta termino (Signal(Atendido))
+	
+	//Solicitar:
+	While True, hacer
+	Verificar si hay asientos libres (Trywait(Asiento))
+	Si hay un asiento disponible, se ocupa
+		El alumno se sienta y avisa que esta esperando (Signal(EsperarTurno))
+		El alumno se queda esperando a que la oficina este libre (Wait(OficinaLibre))
+		El alumno se levanta, pasa a la oficina y libera el asiento (Post(Asiento))
+		El alumno espera a que termine la consulta (Wait(Atendido))
+		El alumno abandona la oficina y se va (Signal(OficinaLibre))
+		Se va y no vuelve a consultar por 10 segundos
+	Sino
+		El alumno se va y vuelve a intentar en 10 segundos
 */
 
 sem_t EsperarTurno; //Semaforo usado para indicarle al asistente que hay alumnos esperando su turno. Empieza en 0.
@@ -92,24 +91,27 @@ void *Solicitar (void *threadarg) {
 }
 
 int main () {
+	
+	int I;
+	int rc;
+	
 	sem_init (&EsperarTurno,0,0);
 	sem_init (&Atendido,0,0);
 	sem_init (&Asiento,0,3);
 	sem_init (&OficinaLibre,0,1);
-
+	
 	pthread_t Alumnos [N];
-
+	
 	pthread_t Asistente;
 	
-	int I;
-	int rc;
-
+	//Crea el hilo Asistente
 	rc = pthread_create (&Asistente, NULL, Atender, NULL);
 	if (rc) { //ocurrió un error al crear el Thread, reportar
 		printf ("ERROR; Código de retorno: %d\n", rc);
         exit (-1);
     }
-
+	
+	//Crea los N hilos alumno
 	for (I = 0; I < N; I++) {
 		datosStruct[I].ID = I;
 		rc = pthread_create(&Alumnos[I], NULL, Solicitar, (void *) &datosStruct[I]);
@@ -118,18 +120,18 @@ int main () {
         	exit (-1);
        	}
 	}
-
+	
+	pthread_join (Asistente,NULL);
 	for (I = 0; I < N; I++){
 		pthread_join (Alumnos[I], NULL);
 	}
-	pthread_join (Asistente,NULL);
-
+	
 	sem_destroy (&EsperarTurno);
 	sem_destroy (&Atendido);
 	sem_destroy (&Asiento);
 	sem_destroy (&OficinaLibre);
-
+	
 	printf("Terminaron Las Consultas.\n");
-
+	
 	return 0;
 }
