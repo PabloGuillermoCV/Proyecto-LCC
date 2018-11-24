@@ -10,14 +10,12 @@
 #include <conio.h> 
 #include <dir.h> 
 #include <process.h> 
-#include "Params.h"
 
 int main(int argc, char *argv[]){
 
-	args *Par;
 	int check;
 	DIR *d;
-	char *path = Par->nombre;
+	char *path = argv[1];
 	d = opendir(path);
 	if(d == NULL){
 		printf("Error -3: El directorio dado NO se encuentra en las inmediaciones\n");

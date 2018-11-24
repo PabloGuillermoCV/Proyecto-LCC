@@ -70,7 +70,7 @@ int main(){
 				}
 				else{
 					name = strtok(buffer," "); //obtengo el segundo parámetro, que es un nombre
-					strtok(NULL," "); //hago strtok de NULL para cortar
+					strtok(NULL," "); //hago strtok de NULL para cortar, probar contra datos de más
 
 					if(!corte){
 						
@@ -78,7 +78,7 @@ int main(){
 						int id = fork();
 						if(PID == 0){ //estoy en el hijo, debo hacer execv
 							llamada = strcat(,"./", substring); //Tengo que ejecutar mi propio archivo
-							errno = execv(llamada,name); //VER ESTO
+							errno = execv(llamada,name); //PROBAR
 							if(errno < 0){
 								fprintf(stderr,"Error al intentar llamar a la funcion %s con codigo de error %d, cuyo significado es: %s \n",substring,errno,strerror(errno));
 							}

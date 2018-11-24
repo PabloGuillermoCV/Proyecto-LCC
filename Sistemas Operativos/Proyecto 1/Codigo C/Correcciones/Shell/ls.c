@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <dirent.h> //libreria para manejo de directorios
 
-//OJO! ls IGNORA el params!
+//OJO! ls IGNORA los parametros!
 
 int main(int argc, char *argv[]){
 

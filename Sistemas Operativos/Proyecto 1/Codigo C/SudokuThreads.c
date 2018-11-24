@@ -31,9 +31,6 @@ struct datos_thread thread_Data[NUM_THREADS];
 //Arreglo de booleanos global para los Threads
 bool Check[10];
 
-//Matriz de 9x9 donde se guardará el sudoku
-char GrillaSudoku [9][9];
-
 /*Función genérica para todos los threads para verificar una parte del Sudoku
 	la Estructura "misDatos" es el cjto de Datos que posee el Thread con el cual
 		Se debe manejar para verificar, esta función es independiente de la fila y Columna
@@ -75,7 +72,7 @@ void *VerificarParte(void *threadarg){
 	pthread_exit(NULL);
 }
 
-void Lectura(int GrillaSudoku[][9]){
+void Lectura(char GrillaSudoku[][9]){
 
 	int F = 0;
 	int C = 0;
@@ -94,8 +91,7 @@ void Lectura(int GrillaSudoku[][9]){
                     corte = true;
                 else{
                     if(num != ',' && num != '\n' && num != ' '){
-                        int x = (int)(num - '0');
-                        GrillaSudoku[F][C] = x; //si lo leido no es EOL o "," (la grilla esta separada por comas), lo añado a la matriz
+                        GrillaSudoku[F][C] = num; //si lo leido no es EOL o "," (la grilla esta separada por comas), lo añado a la matriz
                         C++;
                         printf("%d ",x);
                     }
@@ -112,19 +108,24 @@ void Lectura(int GrillaSudoku[][9]){
 
 //Hay que llenar el arreglo de thread_Data
 void Cargar(){
-	thread_Data[0].thread_id = 0;
-	thread_Data[0].pos = 0;
-	thread_Data[0].FilaI = 0;
-	thread_Data[0].ColumnaI = 8;
-	thread_Data[0].FilaF = 0;
-	thread_Data[0].ColumnaF = 8;
+	int I;
+	for(I = 0; I < 9; I++){ //inicializo Verificadores de Filas
+		thread_Data[I].thread_id = I;
+		thread_Data[I].pos = I;
+		thread_Data[I].FilaI = I;
+		thread_Data[I].ColumnaI = 0;
+		thread_Data[I].FilaF = I;
+		thread_Data[I].ColumnaF = 8;
+	}
 	
-	thread_Data[1].thread_id = 1;
-	thread_Data[1].pos = 1;
-	thread_Data[1].FilaI = 0;
-	thread_Data[1].ColumnaI = 0;
-	thread_Data[1].FilaF = 0;
-	thread_Data[1].ColumnaF = 8;
+	for(I = 10; I < 18; I++){
+		thread_Data[I].thread_id = I;
+		thread_Data[I].pos = I;
+		thread_Data[I].FilaI = 0;
+		thread_Data[I].ColumnaI = I;
+		thread_Data[I].FilaF = 8;
+		thread_Data[I].ColumnaF = I;
+	}
 	
 	int fi [3] = {0, 3, 6};
 	int ci [3] = {0, 3, 6};
@@ -141,8 +142,8 @@ void Cargar(){
 	thread_Data[8] = { 8, 8, fi[2], ci[0], fi[2], cf[0]};
 	thread_Data[9] = { 9, 9, fi[2], ci[1], fi[2], cf[1]};
 	thread_Data[10] = { 10, 10, fi[2], ci[2], fi[2], cf[2]};*/
-	int i = 2;
-	while(i < NUM_THREADS){
+	int i = 18;
+	while(i < 27){
         int f;
 		for(f = 0; f < 3; f++){
             int c;
@@ -161,27 +162,17 @@ void Cargar(){
 
 int main(){
 
-	//Variable para manejar el archivo
-	FILE *SudokuR;
 	
 	int rc;
 
+	char Grilla[9][9];
 
 	pthread_t Hilos[NUM_THREADS];
 	//Cargar thread_Data en algún lado
 	Cargar();
 
-	//Abro el archivo, para lectura (por el enunciado, debe llamarse "sudoku.txt").
-	SudokuR = fopen("sudoku.txt", "r");
-
-	if(!SudokuR){
-		//Ocurrió un error al abrir el archivo, reportar dicho error, por ahora solo devuelvo 1, mejorar
-		fprintf(stderr, "Ocurrió un error al Abrir el archivo del Sudoku");
-		return 1;
-	}
-	else{
-		Lectura(SudokuR);
-	}
+	Lectura(Grilla);
+	
 
     int i;
 	for(i = 0; i < NUM_THREADS; i++){

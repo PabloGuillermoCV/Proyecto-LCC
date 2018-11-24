@@ -13,9 +13,9 @@
 
 int main(int argc, char *argv[]){
 
-	args *Par;
+	
 	int check;
-	char *dirname = Par->nombre; //obtengo el nombre del directorio a crear
+	char *dirname = argv[1]; //obtengo el nombre del directorio a crear
 
 	check = mkdir(dirname); //ES UNA SYSCALL, preguntar
 	if(!check){
