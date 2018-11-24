@@ -5,6 +5,7 @@
 #include<sys/sem.h>
 #include<pthread.h>
 #include<semaphore.h>
+#include<stdbool.h>
 
 #define N 6 //Numero de usuarios
 #define Imp1 1 //ID de la impresora 1
@@ -24,7 +25,7 @@ Correcciones Ej sincronización (impresoras sin prioridad):
 /*Algoritmo Impresoras Sin Prioridad
 
 	//UsuarioSolicita:
-	//Durante 20 ciclos, hacer
+	//While True, hacer
 		//Requerir
 		//Sleep 3 Segundos
 		//Liberar
@@ -45,17 +46,17 @@ Correcciones Ej sincronización (impresoras sin prioridad):
 	//Signal (PermisoLibre)
 */
 
-sem_t PermisoLibre; //Semaforo que indica cuantas impresoras estan libres
-sem_t Impresora1; //Semaforo para la impresora 1
-sem_t Impresora2; //Semaforo para la impresora 2
+sem_t PermisoLibre; //Semaforo que indica cuantas impresoras estan libres. Empieza en 2.
+sem_t Impresora1; //Semaforo para la impresora 1. Empieza en 1.
+sem_t Impresora2; //Semaforo para la impresora 2. Empieza en 1.
 
 struct ID_Usuario {
 	int ID;
 };
-struct ID_Usuario datosStruct [N];
+struct ID_Usuario datosStruct [N]; //Estructura usada para definir la ID de un usuario.
 
 int Requerir () {
-	int S;
+	int S = 0;
 	sem_wait (&PermisoLibre);
 	S = sem_trywait (&Impresora1);
 	if (S == 0) {
@@ -89,9 +90,8 @@ void *UsuarioSolicita (void *threadarg) {
 	int Id = U->ID;
 	
 	int Imp;
-    int Ciclo;
 	
-	for (Ciclo = 0; Ciclo < 20; Ciclo++) { //Este usuario solicitara durante 20 ciclos
+	while (true) { //Este usuario solicitara durante 20 ciclos
 		Imp = Requerir ();
 		printf ("El Usuario %d Requirio La Impresora %d.\n",Id,Imp);
 		sleep (3); //Tiempo que tarda antes de liberarla

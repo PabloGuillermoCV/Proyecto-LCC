@@ -5,8 +5,15 @@
 #include<sys/sem.h>
 #include<pthread.h>
 #include<semaphore.h>
+#include<stdbool.h>
 
 #define N 6 //Numero de alumnos
+
+//EXPLICAR QUE NO SE MODELA LO DE QUE EL ASISTENTE DUERME
+//
+//
+//
+//
 
 /*
 Correcciones Asistente (diseño e implementación):
@@ -19,15 +26,15 @@ Correcciones Asistente (diseño e implementación):
 
 /*Algoritmo Atender
 
-	//Durante 60 ciclos, hacer
-		//Esperar un turno de un alumno (wait(EsperarAlumno))
+	//While True, hacer
+		//Esperar un turno de un alumno (wait(EsperarTurno))
 		//Atender alumno
 		//Liberar(Atendido)
 */
 
 /*Algoritmo Solicitar
 
-	//Durante 20 ciclos, hacer
+	//While True, hacer
 		//Verificar si hay asientos (trywait(Asiento))
 		//Si no hay Asientos
 			//Irse y esperar un tiempo antes de volver a intentar
@@ -40,21 +47,21 @@ Correcciones Asistente (diseño e implementación):
 			//Al terminar, esperar un tiempo antes de volver a consultar
 */
 
-sem_t EsperarTurno; //Semaforo usado para indicarle al asistente que hay alumnos esperando su turno
-sem_t Atendido; //Semaforo usado para indicar que un alumno debe esperar a que termine de ser atendido para seguir (binario)
-sem_t Asiento; //Semaforo que nota la cantidad de asientos disponibles (hasta 3)
-sem_t OficinaLibre; //Semaforo que sirve para notificar cuando esta ocupada la oficina
+sem_t EsperarTurno; //Semaforo usado para indicarle al asistente que hay alumnos esperando su turno. Empieza en 0.
+sem_t Atendido; //Semaforo usado para indicar que un alumno debe esperar a que termine de ser atendido para seguir (binario). Empieza en 0.
+sem_t Asiento; //Semaforo que nota la cantidad de asientos disponibles (hasta 3). Empieza en 3.
+sem_t OficinaLibre; //Semaforo que sirve para notificar cuando esta ocupada la oficina. Empieza en 1.
 
 struct ID_Alumno {
 	int ID;
 };
-struct ID_Alumno datosStruct [N];
+struct ID_Alumno datosStruct [N]; //Estructura usada para definir la ID de un alumno.
 
 void *Atender () {
-	int Ciclo;
-	for (Ciclo = 0; Ciclo < 60; Ciclo++) { //El asistente atendera durante 60 ciclos
+	while (true) {
 		sem_wait (&EsperarTurno); //El asistente espera hasta que alguien espere por su turno
 		sleep (4); //Tiempo que tarda el asistente en atender a un alumno
+		printf ("El asistente termino de atender un alumno.\n");
 		sem_post (&Atendido); //El asistente le avisa al alumno que termino
 	}
 	exit (0);
@@ -66,8 +73,7 @@ void *Solicitar (void *threadarg) {
 	
 	int Id = A->ID;
 	
-    int Ciclo;
-	for (Ciclo = 0; Ciclo < 20; Ciclo++) { //Este usuario solicitara durante 20 ciclos
+	while (true) {
         int A = sem_trywait (&Asiento);
         if (A == 0) { //Si hay asientos disponibles espera su turno, sino se va
             printf ("El alumno %d ocupa un asiento.\n",Id);
@@ -76,7 +82,8 @@ void *Solicitar (void *threadarg) {
 			printf ("El alumno %d pasa a la oficina y se libera un asiento.\n",Id);
 			sem_post (&Asiento); //Atienden al alumno y deja libre el asiento para otro alumno
 			sem_wait (&Atendido); //El alumno pasa de aca cuando el asistente termine
-			printf ("El alumno %d fue atendido y se va.\n",Id);
+			printf ("El alumno %d fue atendido.\n",Id);
+			printf ("El alumno %d abandono la oficina.\n",Id);
 			sem_post (&OficinaLibre); //El alumno deja libre la oficina para alguno de los que esta esperando
 		}
 		sleep (10); //El alumno espera antes de volver al asistente

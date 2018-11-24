@@ -24,25 +24,43 @@ Correcciones Impresoras con prioridad:
 -) No ejecuta. Termina con error sin imprimir nada.
 */
 
-sem_t Impresora1; //Semaforo para la impresora 1
-sem_t Impresora2; //Semaforo para la impresora 2
-sem_t BloquearImpresora; //Semaforo que hace que la busqueda de prioridad se haga de a 1
-sem_t ColaPrioridades [N]; //Semaforos que indican cuando un usuario esta pidiendo impresora, ordenado por prioridad
-sem_t EsperandoImpresion [N]; //Semaforos que indican que un usuario esta esperando a ser elegido
+//EXPLICAR EL PROBLEMA DE INANICION
+//
+//
+//
+//
+//
+
+sem_t Impresora1Tomar; //Semaforo que se usa para que el usuario pueda tomar la impresora 1. Empieza en 0.
+sem_t Impresora2Tomar; //Semaforo que se usa para que el usuario pueda tomar la impresora 2. Empieza en 0.
+sem_t Impresora1Dejar; //Semaforo que se usa para decir que el usuario termino de usar la impresora 1. Empieza en 0.
+sem_t Impresora2Dejar; //Semaforo que se usa para decir que el usuario termino de usar la impresora 2. Empieza en 0.
+sem_t BloquearImpresora; //Semaforo que hace que la busqueda de prioridad se haga de a 1. Empieza en 1.
+sem_t ColaPrioridades [N]; //Semaforos que indican cuando un usuario esta pidiendo impresora, ordenado por prioridad. Empiezan en 0.
+sem_t EsperandoImpresion [N]; //Semaforos que indican que un usuario esta esperando a ser elegido. Empiezan en 0.
 
 struct ID_Usuario {
 	int ID;
 	int Prioridad;
 };
-struct ID_Usuario datosStruct [N];
+struct ID_Usuario datosStruct [N]; //Estructura usada para definir la ID y prioridad de un usuario.
 
-void *Imprimir1 () { //Metodo para la impresora 1
+struct ID_Impresora {
+	int ID;
+};
+struct ID_Impresora datosStructI [2]; //Estructura usada para definir la ID de una impresora
+
+void *Imprimir (void *threadarg) { //Metodo para las impresoras
+	struct ID_Impresora *Imp;
+	Imp = (struct ID_Impresora *) threadarg;
+	
+	int Id = Imp->ID;
+	
 	bool Encontre;
-	int Ciclo;
 	int I;
 	int S;
 	
-	for (Ciclo = 0; Ciclo < 60; Ciclo++) { //Esta impresora trabajara durante 60 ciclos
+	while (true) {
 		sem_wait (&BloquearImpresora);
 		Encontre = false;
 		
@@ -51,48 +69,24 @@ void *Imprimir1 () { //Metodo para la impresora 1
 			
             if (S == 0) { //Si el usuario necesita la impresora
 				//Le digo al usuario a cual entrar
-				sem_post (&Impresora1);
-				 //Le aviso al usuario que la impresora termino de imprimir
+				if (Id == 1) {
+					sem_post (&Impresora1Tomar);
+				}
+				else {
+					sem_post (&Impresora2Tomar);
+				}
+				//Le aviso al usuario que puede pasar a tomar una impresora
 				sem_post (&EsperandoImpresion[I]);
 				//Dejo que la otra impresora entre
 				sem_post (&BloquearImpresora);
 				Encontre = true;
 				//Espero a que el usuario termine de usar la impresora
-				sem_wait (&Impresora1);
-			}
-		}
-		
-		if (Encontre == false) {
-			//En caso de no encontrar ningun pedido, le deja intentar a la otra impresora
-			sem_post (&BloquearImpresora);
-		}
-	}
-	exit (0);
-}
-
-void *Imprimir2 () { //Metodo para la impresora 1
-	bool Encontre;
-	int Ciclo;
-	int I;
-	int S;
-	
-	for (Ciclo = 0; Ciclo < 60; Ciclo++) { //Esta impresora trabajara durante 60 ciclos
-		sem_wait (&BloquearImpresora);
-		Encontre = false;
-		
-		for (I = N - 1; I > -1 && !Encontre; I--) {
-            S = sem_trywait (&ColaPrioridades[I]);
-			
-            if (S == 0) { //Si el usuario necesita la impresora
-				//Le digo al usuario a cual entrar
-				sem_post (&Impresora2);
-				 //Le aviso al usuario que la impresora termino de imprimir
-				sem_post (&EsperandoImpresion[I]);
-				//Dejo que la otra impresora entre
-				sem_post (&BloquearImpresora);
-				Encontre = true;
-				//Espero a que el usuario termine de usar la impresora
-				sem_wait (&Impresora2);
+				if (Id == 1) {
+					sem_wait (&Impresora1Dejar);
+				}
+				else {
+					sem_wait (&Impresora2Dejar);
+				}
 			}
 		}
 		
@@ -105,19 +99,19 @@ void *Imprimir2 () { //Metodo para la impresora 1
 }
 
 int Requerir (int P) {
-	int S;
+	int S = 0;
 	//El usuario se ubica en la cola para que lo busquen por prioridad con prioridad P
 	sem_post (&ColaPrioridades[P]);
 	//El usuario se queda esperando a que una impresora le deje pasar
 	sem_wait (&EsperandoImpresion[P]);
 	
 	//Al recibir respuesta, el usuario toma una impresora
-	S = sem_trywait (&Impresora1);
+	S = sem_trywait (&Impresora1Tomar);
 	if (S == 0) {
 		return Imp1;
 	}
 	else {
-		S = sem_trywait (&Impresora2);
+		S = sem_trywait (&Impresora2Tomar);
 		if (S == 0) {
 			return Imp2;
 		}
@@ -131,8 +125,8 @@ int Requerir (int P) {
 void Liberar (int I) {
 	//El usuario libera la impresora que tomo
 	switch (I) {
-		case 1: sem_post (&Impresora1); break;
-		case 2: sem_post (&Impresora2); break;
+		case 1: sem_post (&Impresora1Dejar); break;
+		case 2: sem_post (&Impresora2Dejar); break;
 	}
 }
 
@@ -145,8 +139,7 @@ void *UsuarioSolicita (void *threadarg) { //Metodo donde inician los usuarios
 	int P = U->Prioridad;
 	
 	int Imp;
-    int C;
-	for (C = 0; C < 20; C++) { //Este usuario solicitara durante 20 ciclos
+	while (true) {
 		Imp = Requerir (P);
 		printf ("El Usuario %d Requirio La Impresora %d.\n",Id,Imp);
 		sleep (3); //Tiempo que tarda antes de liberarla
@@ -162,8 +155,10 @@ int main () {
 	int I;
 	int rc;
 	
-	sem_init (&Impresora1,0,0);
-	sem_init (&Impresora2,0,0);
+	sem_init (&Impresora1Tomar,0,0);
+	sem_init (&Impresora2Tomar,0,0);
+	sem_init (&Impresora1Dejar,0,0);
+	sem_init (&Impresora2Dejar,0,0);
 	sem_init (&BloquearImpresora,0,1);
 	for (I = 0; I < N; I++) {
 		sem_init (&ColaPrioridades[I],0,0);
@@ -175,13 +170,15 @@ int main () {
 	pthread_t TImpresora2;
 	
 	//Crea Impresora 1
-	rc = pthread_create (&TImpresora1, NULL, Imprimir1, NULL);
+	datosStructI[0].ID = Imp1;
+	rc = pthread_create (&TImpresora1, NULL, Imprimir, (void *) &datosStructI[0]);
 	if (rc) { //ocurrió un error al crear el Thread, reportar
         printf ("ERROR; Código de retorno: %d\n", rc);
         exit (-1);
     }
 	//Crea Impresora 2
-	rc = pthread_create (&TImpresora2, NULL, Imprimir2, NULL);
+	datosStructI[1].ID = Imp2;
+	rc = pthread_create (&TImpresora2, NULL, Imprimir, (void *) &datosStructI[1]);
 	if (rc) { //ocurrió un error al crear el Thread, reportar
         printf ("ERROR; Código de retorno: %d\n", rc);
         exit (-1);
@@ -203,8 +200,10 @@ int main () {
 	pthread_join (TImpresora1,NULL);
 	pthread_join (TImpresora2,NULL);
 	
-	sem_destroy (&Impresora1);
-	sem_destroy (&Impresora2);
+	sem_destroy (&Impresora1Tomar);
+	sem_destroy (&Impresora2Tomar);
+	sem_destroy (&Impresora1Dejar);
+	sem_destroy (&Impresora2Dejar);
 	sem_destroy (&BloquearImpresora);
 	for (I = 0; I < N; I++) {
 		sem_destroy (&ColaPrioridades[I]);
