@@ -233,9 +233,9 @@ int VerificarCuadrante(char GrillaSudoku [][9], int X, int Y,char *nombre){
 int HacerTarea(int ProcNum, char GrillaSudoku [][9]){
 
 	int rec,Y,res = 0;
-    char *nombre;
-    sprintf(nombre,"%d",ProcNum); //paso el Procnum a un string para hacer el nombre del archivo
-    nombre = strcat(nombre,".txt");
+    char nombre[27];
+    sprintf(nombre,"%d.txt",ProcNum); //paso el Procnum a un string para hacer el nombre del archivo
+    //nombre = strcat(nombre,".txt");
     printf("%s\n",nombre);
 	switch(ProcNum){
 

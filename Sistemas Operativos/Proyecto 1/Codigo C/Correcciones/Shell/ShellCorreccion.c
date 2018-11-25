@@ -132,9 +132,11 @@ void ls(){
 int esLegal(char*str){
 	bool es =  false;
 	int i = 0;
-	for(i = 0; i < 7; i++){
-		if(strcmp(Comandos_Disponibles[i], str) == 0) //Uso string Compare
+	for(i = 0; i < 7 && !es; i++){
+		if(strcmp(Comandos_Disponibles[i], str) == 0) { //Uso string Compare
 			es = true;
+			break;
+		}
 	}
 	if(!es)
         i = -1;
@@ -202,8 +204,9 @@ int main(){
 					printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
 				}
 				else{
-                    //Ver que hacer para obtener el parametro
-                    name = "hola\n";
+					scanf("%s",&buffer);
+					token = strtok(buffer," ");
+					name = token;
 					if(!corte){
 
 						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
