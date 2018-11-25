@@ -29,7 +29,8 @@ struct datos_thread{
 //Variable Global para obtener los Argumentos para cada Thread
 struct datos_thread thread_Data[NUM_THREADS];
 //Arreglo de booleanos global para los Threads
-bool Check[10];
+bool Check[27];
+char Grilla[9][9];
 
 /*Función genérica para todos los threads para verificar una parte del Sudoku
 	la Estructura "misDatos" es el cjto de Datos que posee el Thread con el cual
@@ -45,7 +46,7 @@ bool Check[10];
 */
 void *VerificarParte(void *threadarg){
 
-	bool nums[10]; //arreglo para comprobar existencia de los números, lo hago de 10 para hacerlo 1-Based
+	bool nums[10] = {{false}}; //arreglo para comprobar existencia de los números, lo hago de 10 para hacerlo 1-Based
 	struct datos_thread *misDatos;
 	misDatos = (struct thread_data *) threadarg; //obtengo la estructura de argumentos que posee el Thread
 
@@ -58,14 +59,16 @@ void *VerificarParte(void *threadarg){
 			if(num < 1 || num > 9) {
 				Check[misDatos->pos] = false; //si el valor leido es ilegal(esto no deberia pasar, indica error de lectura, termino).
 			}
-			if(nums[num] != false){
+			if(nums[num]){
 				Check[misDatos->pos] = false; //si hay números repetidos mientras leo, corto
 			}
+			else
+				nums[num] = true; //Si todo va bien, agrego el numero a los numeros encontrados
 		}
 	}
 	int i;
 	for(i = 1; i < 10 && Check[misDatos->pos]; i++){
-		if(nums[i] != true){ //Si falta un número, corto, la jugada es invalida
+		if(!nums[i]){ //Si falta un número, corto, la jugada es invalida
 			Check[misDatos->pos] = false;
 		}
 	}
@@ -142,18 +145,18 @@ void Cargar(){
 	thread_Data[8] = { 8, 8, fi[2], ci[0], fi[2], cf[0]};
 	thread_Data[9] = { 9, 9, fi[2], ci[1], fi[2], cf[1]};
 	thread_Data[10] = { 10, 10, fi[2], ci[2], fi[2], cf[2]};*/
-	int i = 18;
-	while(i < 27){
+	I = 18;
+	while(I < 27){
         int f;
 		for(f = 0; f < 3; f++){
             int c;
 			for(c = 0; c < 3; c++){
-				thread_Data[i].thread_id = i;
-				thread_Data[i].pos = i;
-				thread_Data[i].FilaI = fi[f];
-				thread_Data[i].ColumnaI = ci[c];
-				thread_Data[i].FilaF = ff[f];
-				thread_Data[i].ColumnaF = cf[c];
+				thread_Data[I].thread_id = I;
+				thread_Data[I].pos = I;
+				thread_Data[I].FilaI = fi[f];
+				thread_Data[I].ColumnaI = ci[c];
+				thread_Data[I].FilaF = ff[f];
+				thread_Data[I].ColumnaF = cf[c];
 				i++;
 			}
 		}
@@ -165,7 +168,7 @@ int main(){
 	
 	int rc;
 
-	char Grilla[9][9];
+	
 
 	pthread_t Hilos[NUM_THREADS];
 	//Cargar thread_Data en algún lado
@@ -193,7 +196,7 @@ int main(){
 	for (n = 0; n < 10 && TodoVerdadero; n++) {
 		TodoVerdadero = Check[n];
 	}
-	if (TodoVerdadero == true) {
+	if (TodoVerdadero) {
 		printf("La jugada de Sudoku era Valida");
 	}
 	else {

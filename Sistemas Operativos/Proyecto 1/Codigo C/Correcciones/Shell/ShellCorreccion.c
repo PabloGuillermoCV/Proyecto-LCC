@@ -20,12 +20,14 @@ char *Comandos_Disponibles[] = {
 	"help" //comando ayuda
 };
 
-
+/*
+ * Método que verifica si el comando obtenido es alguno de los comandos disponibles
+*/
 int esLegal(char*str){
 	bool es =  false;
 	int i = 0;
 	for(i = 0; i < 7; i++){
-		if(strcmp(Comandos_Disponibles[i], str))
+		if(strcmp(Comandos_Disponibles[i], str)) //Uso string Compare
 			es = true;
 	}
 
@@ -76,11 +78,12 @@ int main(){
 						
 						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
 						int id = fork();
-						if(PID == 0){ //estoy en el hijo, debo hacer execv
+						if(PID == 0){ //estoy en el hijo, debo hacer execl ya que paso un unico string, execv necesita un arreglo de strings
 							llamada = strcat(,"./", substring); //Tengo que ejecutar mi propio archivo
-							errno = execv(llamada,name); //PROBAR
+							errno = execl(llamada,name); //PROBAR
 							if(errno < 0){
-								fprintf(stderr,"Error al intentar llamar a la funcion %s con codigo de error %d, cuyo significado es: %s \n",substring,errno,strerror(errno));
+								fprintf(stderr,"Error al intentar llamar a la funcion %s con codigo de error %d, cuyo significado es: %s \n",
+									substring,errno,strerror(errno));
 							}
 						}
 						else{ //estoy en el padre, debo esperar
