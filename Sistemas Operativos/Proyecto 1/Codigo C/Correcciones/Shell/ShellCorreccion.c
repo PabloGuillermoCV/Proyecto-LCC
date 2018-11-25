@@ -27,9 +27,13 @@ int esLegal(char*str){
 	bool es =  false;
 	int i = 0;
 	for(i = 0; i < 7; i++){
-		if(strcmp(Comandos_Disponibles[i], str)) //Uso string Compare
+		if(strcmp(Comandos_Disponibles[i], str) == 0) //Uso string Compare
 			es = true;
 	}
+	if(!es)
+        i = -1;
+    else
+        i = 0;
 
 	return i;
 }
@@ -50,51 +54,53 @@ void help(){
 
 int main(){
 
-	args *param;
 	char * buffer[MAX_BUF]; //para obtener la linea completa
 	char *token;
 	char *name;
 	bool corte = false; //boolean de corte para salir del programa
 	bool error = false; //boolean para errores
-	int errno = 0;
+	int errno;
 	while(!corte){
 		printf("pr1> ");
-		scanf("%s", &buffer); //leo la linea, estoy asumiendo que el "pr1>" NO APARECE
+		scanf("%s", &buffer); //leo la linea, "pr1>" NO APARECE en strtok
 		//Obtengo un substring, para ver que comando es
 		token = strtok(buffer," ");
-		if(esLegal(token)){ //Pregunto que el comando dado sea legal 
-			if(strcmp(substring,"help")) //si es "help" o "exit" actuo acordemente
+		if(esLegal(token) == 0){ //Pregunto que el comando dado sea legal
+			if(strcmp(token,"help") == 0) //si es "help" o "exit" actuo acordemente
 				help();
 			else
-				if(strcmp(substring,"exit")){
+				if(strcmp(token,"exit") == 0){
 					corte = true;
-					printf("Se ha salido de la consola con exito, que tenga un buen dia!");
+					printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
 				}
 				else{
 					name = strtok(buffer," "); //obtengo el segundo parámetro, que es un nombre
 					strtok(NULL," "); //hago strtok de NULL para cortar, probar contra datos de más
 
 					if(!corte){
-						
+
 						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
 						int id = fork();
-						if(PID == 0){ //estoy en el hijo, debo hacer execl ya que paso un unico string, execv necesita un arreglo de strings
-							llamada = strcat(,"./", substring); //Tengo que ejecutar mi propio archivo
+						if(id == 0){ //estoy en el hijo, debo hacer execl ya que paso un unico string, execv necesita un arreglo de strings
+                            char *llamada;
+                            char *h = "./";
+							llamada = strcat(h, token); //Tengo que ejecutar mi propio archivo
 							errno = execl(llamada,name); //PROBAR
+							printf("El comando se ejecuto con exito\n");
 							if(errno < 0){
 								fprintf(stderr,"Error al intentar llamar a la funcion %s con codigo de error %d, cuyo significado es: %s \n",
-									substring,errno,strerror(errno));
+									token,errno,strerror(errno));
 							}
 						}
 						else{ //estoy en el padre, debo esperar
 							wait(NULL);
 						}
 					}
-					
+
 				}
 		}
 		else{
-			printf("Error al procesar el comando, NO es un comando valido, por favor, consulte la ayuda usando el comando "help"\n ");
+			printf("Error al procesar el comando, NO es un comando valido, por favor, consulte la ayuda usando el comando help\n ");
 		}
 
 	}
