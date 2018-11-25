@@ -283,7 +283,7 @@ int main(){
     		//tirar error, algo salió mal al crear el hijo
     	}
     	else{
-    		if(pid != 0){
+    		if(pid == 0){
         		int E = HacerTarea(i,GrillaSudoku); //Entro al método para saber que hacer yo como Hijo
         		//OJO, ver donde meter el exit() para terminar el hijo
         		exit(E); //una vez que yo, Proceso Hijo, termino mi tarea, hago Exit.
@@ -292,7 +292,7 @@ int main(){
     	}
 
 	}
-	if (pid == 0){ //Esty en el padre, debo esperar por mis 27 hijos
+	if (pid != 0){ //Esty en el padre, debo esperar por mis 27 hijos
 		wait(NULL);
 		/*if(waitpid(pid,&status,0) == -1){ VER ESTO
 			printf("Error al esperar por el hijo %d\n",pid);
