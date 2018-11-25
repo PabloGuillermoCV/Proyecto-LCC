@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <strings.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+//ls
+#include <dirent.h>
 
 #define MAX_BUF 1000
 
@@ -20,6 +23,109 @@ char *Comandos_Disponibles[] = {
 	"help" //comando ayuda
 };
 
+void makedir(char * dn){
+int check;
+	char *dirname = dn; //obtengo el nombre del directorio a crear
+
+	check = mkdir(dirname);
+	if(!check){
+		printf("El directorio %s fue creado en la ruta actual con éxito\n",dirname);
+	}
+	else{
+		fprintf(stderr,"Codigo de error %d, el cual significa %s. Ocurrió un error al crear el directorio %s \n",
+					errno,strerror(errno),dn);
+        exit(-1);
+	}
+
+	exit(0);
+
+}
+
+void remdir(char *name){
+	int check;
+	DIR *d;
+	char *path = name;
+	d = opendir(path);
+	if(d == NULL){
+		printf("Error -3: El directorio dado NO se encuentra en las inmediaciones\n");
+		exit(-1);
+	}
+	else{
+		closedir(d); //ANTES de continuar, cierro el directorio
+		//ESTOY ASUMINEDO QUE EL DIRECTORIO YA ESTA VACIO PARA LLAMAR A LA SYSCALL!
+		check = rmdir(path);
+		if(check < 0){
+			fprintf(stderr,"Codigo de error %d, el cual significa %s, ocurrió un error al borrar el directorio %s \n",
+					errno,strerror(errno),path);
+			exit(-1);
+		}
+		else{
+			printf("Se ha eliminado el directorio %s con exito\n",path);
+			exit(0);
+		}
+	}
+	exit(0);
+
+}
+
+void more(char *name){
+	FILE *f = fopen(name,"r"); //Abro el archivo en modo lectura
+	char buff[255];
+	if(f != NULL){ //Si la apertura fue correcta, comienzo a leer
+		while(!feof(f)){
+			fgets(buff,255,(FILE*)f);
+			printf("%s",buff);
+		}
+		fclose(f); //terminada la lectura, cierro el archivo
+	}
+	else{ //Si no pude abrir el archivo, tiro error
+		printf("codigo de error -4: Error al abrir el archivo especificado\n");
+		exit(-1);
+	}
+	exit(0);
+}
+
+void cat(char *name){
+
+    FILE *file;
+	file = fopen(name,"rb+"); //Abro el archivo para intentar ver si ya existe
+	if(file != NULL){ //Si es != NULL, el archivo ya existia, esto tecnicamente es un error
+		printf("Codigo de error -5: No se ha podido crear el archivo porque el mismo ya existe\n");
+		exit(-1);
+	}
+	else{ //Sino, intento crear el archivo
+		file = fopen(name,"wb"); //Fuerzo la creación del archivo
+		if(file == NULL){
+			printf("Codigo de error -6: Error al crear el archivo especificado\n");
+		}
+		else{ //Si todo sale bien, cierro el archivo recien creado y reporto el exito de la operación
+			fclose(file);
+			printf("El archivo %s fue creado con exito\n",name);
+			exit(0);
+		}
+	}
+	exit(0);
+
+}
+
+void ls(){
+    struct dirent *de;
+	DIR *dr = opendir("."); //Abro la carpeta en donde estoy
+	if(dr == NULL){
+		fprintf(stderr,"Error -1: NO se ha podido abrir el Directorio");
+		exit(-1);
+	}
+	else{
+		while((de = readdir(dr)) != NULL) //Mientras la carpeta leida no sea NULL
+			printf("%s\n",de->d_name); //Obtengo el nombre de la carpeta y la imprimo por pantalla
+
+		closedir(dr); //cierro el directorio
+		exit(0);
+	}
+	exit(0);
+
+}
+
 /*
  * Método que verifica si el comando obtenido es alguno de los comandos disponibles
 */
@@ -32,10 +138,31 @@ int esLegal(char*str){
 	}
 	if(!es)
         i = -1;
-    else
-        i = 0;
 
 	return i;
+}
+
+void determinar(int i, char*param){
+
+    switch(i){
+
+        case 0:
+            makedir(param);
+            break;
+        case 1:
+            remdir(param);
+            break;
+        case 2:
+            cat(param);
+            break;
+        case 3:
+            ls();
+            break;
+        case 4:
+            more(param);
+
+    }
+
 }
 
 void help(){
@@ -54,7 +181,7 @@ void help(){
 
 int main(){
 
-	char * buffer[MAX_BUF]; //para obtener la linea completa
+	char buffer[MAX_BUF]; //para obtener la linea completa
 	char *token;
 	char *name;
 	bool corte = false; //boolean de corte para salir del programa
@@ -65,7 +192,8 @@ int main(){
 		scanf("%s", &buffer); //leo la linea, "pr1>" NO APARECE en strtok
 		//Obtengo un substring, para ver que comando es
 		token = strtok(buffer," ");
-		if(esLegal(token) == 0){ //Pregunto que el comando dado sea legal
+		int t = esLegal(token);
+		if(t >= 0){ //Pregunto que el comando dado sea legal
 			if(strcmp(token,"help") == 0) //si es "help" o "exit" actuo acordemente
 				help();
 			else
@@ -74,23 +202,18 @@ int main(){
 					printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
 				}
 				else{
-					name = strtok(buffer," "); //obtengo el segundo parámetro, que es un nombre
-					strtok(NULL," "); //hago strtok de NULL para cortar, probar contra datos de más
-
+                    //Ver que hacer para obtener el parametro
+                    name = "hola\n";
 					if(!corte){
 
 						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
 						int id = fork();
-						if(id == 0){ //estoy en el hijo, debo hacer execl ya que paso un unico string, execv necesita un arreglo de strings
-                            char *llamada;
-                            char *h = "./";
-							llamada = strcat(h, token); //Tengo que ejecutar mi propio archivo
-							errno = execl(llamada,name); //PROBAR
-							printf("El comando se ejecuto con exito\n");
-							if(errno < 0){
-								fprintf(stderr,"Error al intentar llamar a la funcion %s con codigo de error %d, cuyo significado es: %s \n",
-									token,errno,strerror(errno));
-							}
+						if(id == -1)
+                            printf("Error al crear el hijo\n");
+
+						if(id == 0){ //procedo a llamara  adeterminar, el cual luego llamará a alguna de las funciones de los comandos
+							determinar(t,name);
+							//ls(); //si hago la llamada directa, ls anda, si lo hago con determinar, no me muestra nada
 						}
 						else{ //estoy en el padre, debo esperar
 							wait(NULL);
@@ -100,7 +223,7 @@ int main(){
 				}
 		}
 		else{
-			printf("Error al procesar el comando, NO es un comando valido, por favor, consulte la ayuda usando el comando help\n ");
+			printf("Error al procesar el comando, NO es un comando valido, por favor, consulte la ayuda usando el comando help\n");
 		}
 
 	}

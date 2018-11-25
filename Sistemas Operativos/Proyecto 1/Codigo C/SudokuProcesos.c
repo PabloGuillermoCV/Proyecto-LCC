@@ -94,35 +94,42 @@ bool Completitud(char GrillaSudoku [][9]){
 int VerificarFila(char GrillaSudoku [][9], int F,char *nombre){
     int Lista [10] = {0,0,0,0,0,0,0,0,0,0};
     int I;
-    FILE *res = fopen(nombre,"w");
-    for (I = 0; I < 9; I++) {
-        int X = GrillaSudoku [F][I] - '0';
-        if (X < 1 || X > 9) {
-            printf("Valor ilegal en la fila\n");
-            //Tengo un valor no posible
-            fputc(-1,res);
-            return 0;
+    FILE *res = fopen(nombre,"wb");
+    if(res != NULL){
+        for (I = 0; I < 9; I++) {
+            int X = GrillaSudoku [F][I] - '0';
+            if (X < 1 || X > 9) {
+                printf("Valor ilegal en la fila\n");
+                //Tengo un valor no posible
+                fputc(-1,res);
+                return 0;
+            }
+            if (Lista[X] == 1) {
+                printf("Valor repetido en la Fila %d\n",F);
+                //Me encuentro con un valor repetido
+                fputc(-1,res);
+                return 0;
+            }
+            Lista[X] = 1;
         }
-        if (Lista[X] == 1) {
-            printf("Valor repetido en la Fila %d\n",F);
-            //Me encuentro con un valor repetido
-            fputc(-1,res);
-            return 0;
+        for (I = 1; I <= 9; I++) {
+            //Verifico que esten todos los numeros
+            if (Lista[I] == 0) {
+                printf("Valor en  la fila %d faltante\n",F);
+                //Faltaba un valor en la lista
+                fputc(-1,res);
+                return 0;
+            }
         }
-        Lista[X] = 1;
+        printf("Fila %d Verificada con exito\n",F);
+        fputc(0,res);
+        fclose(res);
     }
-    for (I = 1; I <= 9; I++) {
-        //Verifico que esten todos los numeros
-        if (Lista[I] == 0) {
-            printf("Valor en  la fila %d faltante\n",F);
-            //Faltaba un valor en la lista
-            fputc(-1,res);
-            return 0;
-        }
+    else{
+        printf("Error al crear el archivo de escritura\n");
+        return -1;
     }
-    printf("Fila %d Verificada con exito\n",F);
-    fputc(0,res);
-    fclose(res);
+
 	return 0;
 }
 /* Función que verificará una Columna del Sudoku
@@ -133,32 +140,39 @@ int VerificarFila(char GrillaSudoku [][9], int F,char *nombre){
 int VerificarColumna(char GrillaSudoku [][9], int C,char *nombre){
     int Lista [10] = {0,0,0,0,0,0,0,0,0,0};
     int I;
-    FILE *res = fopen(nombre,"w");
-    for (I = 0; I < 9; I++) {
-        int X = GrillaSudoku[I][C] - '0';
-        if (X < 1 || X > 9) {
-            printf("Valor ilegal en la columna %d\n",C);
-            //Tengo un valor no posible
-            return -1;
+    FILE *res = fopen(nombre,"wb");
+    if(res != NULL){
+        for (I = 0; I < 9; I++) {
+            int X = GrillaSudoku[I][C] - '0';
+            if (X < 1 || X > 9) {
+                printf("Valor ilegal en la columna %d\n",C);
+                //Tengo un valor no posible
+                return -1;
+            }
+            if (Lista[X] == 1) {
+                printf("Lista[%d] = %d en I =%d\n",X,Lista[X],I);
+                printf("Valor repetido en la columna %d\n",C);
+                //Me encuentro con un valor repetido
+                return -1;
+            }
+            Lista[X] = 1;
         }
-        if (Lista[X] == 1) {
-            printf("Lista[%d] = %d en I =%d\n",X,Lista[X],I);
-            printf("Valor repetido en la columna %d\n",C);
-            //Me encuentro con un valor repetido
-            return -1;
+        for (I = 1; I <= 9; I++) {
+            //Verifico que esten todos los numeros
+            if (Lista[I] == 0) {
+                printf("Valor en la Columna %d Faltante\n",C);
+                //Faltaba un valor en la lista
+                return -1;
+            }
         }
-        Lista[X] = 1;
+        printf("Columna %d verificada con exito\n",C);
+        fputc(0,res);
+        fclose(res);
     }
-    for (I = 1; I <= 9; I++) {
-        //Verifico que esten todos los numeros
-        if (Lista[I] == 0) {
-            printf("Valor en la Columna %d Faltante\n",C);
-            //Faltaba un valor en la lista
-            return -1;
-        }
+    else{
+        printf("Error al abrir el archivo res para escribir\n");
+        return -1;
     }
-    printf("Columna %d verificada con exito\n",C);
-    fclose(res);
     return 0;
 }
 
@@ -171,37 +185,44 @@ int VerificarCuadrante(char GrillaSudoku [][9], int X, int Y,char *nombre){
     int Lista [10] = {0,0,0,0,0,0,0,0,0,0}; //1 based, de 1 a 9
     int I;
     int J;
-    FILE *res = fopen(nombre,"w");
-    for (I = X; I < X+3; I++) {
-        for (J = Y; J < Y+3; J++) {
-            int N = GrillaSudoku[I][J] - '0';
-            if (N < 1 || N > 9) {
-                //Tengo un valor no posible
-                printf("Hay un valor ilegal en el cuadrante\n");
-                fputc(-1,res);
-                return 0; //usar fputs()
+    FILE *res = fopen(nombre,"wb");
+    if(res != NULL){
+        for (I = X; I < X+3; I++) {
+            for (J = Y; J < Y+3; J++) {
+                int N = GrillaSudoku[I][J] - '0';
+                if (N < 1 || N > 9) {
+                    //Tengo un valor no posible
+                    printf("Hay un valor ilegal en el cuadrante\n");
+                    fputc(-1,res);
+                    return 0; //usar fputs()
+                }
+                if (Lista[N] == 1) {
+                    printf("Habia un valor repetido en el cuadrante\n");
+                    fputc(-1,res);
+                    //Me encuentro con un valor repetido
+                    return 0;
+                }
+                Lista[N] = 1;
             }
-            if (Lista[N] == 1) {
-                printf("Habia un valor repetido en el cuadrante\n");
+        }
+        for (I = 1; I <= 9; I++) {
+            //Verifico que esten todos los numeros
+            if (Lista[I] == 0) {
+                //Faltaba un valor en la lista
+                printf("Valor en la lista faltante para el cuadrante\n");
                 fputc(-1,res);
-                //Me encuentro con un valor repetido
-                return 0;
+                return -1;
             }
-            Lista[N] = 1;
         }
+        printf("Cuadrante %d,%d verificado con exito\n",X,Y);
+        fputc(0,res);
+        fclose(res);
     }
-    for (I = 1; I <= 9; I++) {
-        //Verifico que esten todos los numeros
-        if (Lista[I] == 0) {
-            //Faltaba un valor en la lista
-            printf("Valor en la lista faltante para el cuadrante\n");
-            fputc(-1,res);
-            return -1;
-        }
+    else{
+        printf("Error al crear el archivo para escribir\n");
+        return -1;
     }
-    printf("Cuadrante %d,%d verificado con exito\n",X,Y);
-    fputc(0,res);
-    fclose(res);
+
     return 0;
 }
 
@@ -215,6 +236,7 @@ int HacerTarea(int ProcNum, char GrillaSudoku [][9]){
     char *nombre;
     sprintf(nombre,"%d",ProcNum); //paso el Procnum a un string para hacer el nombre del archivo
     nombre = strcat(nombre,".txt");
+    printf("%s\n",nombre);
 	switch(ProcNum){
 
 		case 0 ... 8:
