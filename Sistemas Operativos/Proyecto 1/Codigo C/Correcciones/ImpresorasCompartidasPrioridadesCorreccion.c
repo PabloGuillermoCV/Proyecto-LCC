@@ -11,13 +11,6 @@
 #define Imp1 1 //ID de la impresora 1
 #define Imp2 2 //ID de la impresora 2
 
-//EXPLICAR EL PROBLEMA DE INANICION
-//
-//
-//
-//
-//
-
 /*
 Correcciones Impresoras con prioridad:
 
