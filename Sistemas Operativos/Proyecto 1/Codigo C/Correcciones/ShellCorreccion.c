@@ -19,7 +19,7 @@ char *Comandos_Disponibles[] = {
 	"cat", //Crear archivo
 	"more", //Mostrar contenido de un archivo
 	"ls", //Listar contenidos de un directorio
-	"help" //comando ayuda
+	"help", //comando ayuda
 	"exit", //salir
 };
 
@@ -43,27 +43,20 @@ int check;
 
 int remdir(char *name){
 	int check;
-	DIR *d;
 	char *path = name;
-	d = opendir(path);
-	if(d == NULL){
-		printf("Error -3: El directorio dado NO se encuentra en las inmediaciones\n");
-		return(-1);
-	}
-	else{
-		closedir(d); //ANTES de continuar, cierro el directorio
-		//ESTOY ASUMINEDO QUE EL DIRECTORIO YA ESTA VACIO PARA LLAMAR A LA SYSCALL!
-		check = rmdir(path);
-		if(check < 0){
-			fprintf(stderr,"Codigo de error %d, el cual significa %s, ocurrió un error al borrar el directorio %s \n",
-					errno,strerror(errno),path);
-			return(-1);
-		}
-		else{
-			printf("Se ha eliminado el directorio %s con exito\n",path);
-			return(0);
-		}
-	}
+
+    //ESTOY ASUMINEDO QUE EL DIRECTORIO YA ESTA VACIO PARA LLAMAR A LA SYSCALL!
+    check = rmdir(path);
+    if(check < 0){
+        fprintf(stderr,"Codigo de error %d, el cual significa %s, ocurrió un error al borrar el directorio %s \n",
+                errno,strerror(errno),path);
+        return(-1);
+    }
+    else{
+        printf("Se ha eliminado el directorio %s con exito\n",path);
+        return(0);
+    }
+
 	return(0);
 
 }
@@ -82,6 +75,7 @@ int more(char *name){
 		printf("codigo de error -4: Error al abrir el archivo especificado\n");
 		return(-1);
 	}
+	printf("\n");
 	return(0);
 }
 
@@ -165,27 +159,6 @@ int determinar1P(int i, char*param){ //Para makedir, remdir, cat o more
 
 }
 
-int determinar0P(int i){ //Para ls, help o exit
-	ret = 0;
-	switch(i){
-		
-		case 4:
-			ret = ls();
-			break;
-		case 5:
-			help();
-			break;
-		case 6:
-			corte = true;
-			printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
-			break;
-		default: //No es ninguno de los 3
-			ret = -2;
-			break;
-		
-	}
-}
-
 void help(){
 	printf("Shell en C para el Primer Proyecto de Sistemas Operativos\n");
 	printf("Ingrese alguno de los comandos disponibles con sus parametros correspondientes si los necesitase y presione ENTER\n");
@@ -198,6 +171,29 @@ void help(){
 	printf("exit -> termina la ejecución de esta consola\n");
 	printf("help -> muestra el presente mensaje\n");
 }
+
+int determinar0P(int i, bool *corte){ //Para ls, help o exit
+    int ret = 0;
+	switch(i){
+
+		case 4:
+			ret = ls();
+			break;
+		case 5:
+			help();
+			break;
+		case 6:
+			*corte = true;
+			printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
+			break;
+		default: //No es ninguno de los 3
+			ret = -2;
+			break;
+    }
+    return ret;
+}
+
+
 
 int main(){
 
@@ -213,8 +209,9 @@ int main(){
 		//Obtengo un substring, para ver que comando es
 		token = strtok(buffer," ");
 		int t = esLegal(token);
-		if(t >= 0){ //Pregunto que el comando dado sea legal
-			int E = determinar0P(t);
+		if(t >= 0 ){ //Pregunto que el comando dado sea legal
+			int E = 0;
+			E = determinar0P(t, &corte);
 			if (E == -2){ //Si no es ni ls, ni help, ni exit, entonces tengo algo con un parametro
 				scanf("%s",&buffer);
 				token = strtok(buffer," ");
