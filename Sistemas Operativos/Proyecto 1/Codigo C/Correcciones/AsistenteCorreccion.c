@@ -49,7 +49,7 @@ Correcciones Asistente (diseño e implementación):
 		El alumno se va y vuelve a intentar en 10 segundos
 */
 
-sem_t EsperarTurno; //Semaforo usado para indicarle al asistente que hay alumnos esperando su turno. Empieza en 0.
+sem_t EsperarTurno; //Semaforo usado para indicarle al alumno que ya esta listo. Empieza en 0.
 sem_t Atendido; //Semaforo usado para indicar que un alumno debe esperar a que termine de ser atendido para seguir (binario). Empieza en 0.
 sem_t Asiento; //Semaforo que nota la cantidad de asientos disponibles (hasta 3). Empieza en 3.
 sem_t OficinaLibre; //Semaforo que sirve para notificar cuando esta ocupada la oficina. Empieza en 1.
