@@ -23,7 +23,7 @@ char *Comandos_Disponibles[] = {
 	"help" //comando ayuda
 };
 
-void makedir(char * dn){
+int makedir(char * dn){
 int check;
 	char *dirname = dn; //obtengo el nombre del directorio a crear
 
@@ -34,21 +34,21 @@ int check;
 	else{
 		fprintf(stderr,"Codigo de error %d, el cual significa %s. Ocurrió un error al crear el directorio %s \n",
 					errno,strerror(errno),dn);
-        exit(-1);
+        return(-1);
 	}
 
-	exit(0);
+	return(0);
 
 }
 
-void remdir(char *name){
+int remdir(char *name){
 	int check;
 	DIR *d;
 	char *path = name;
 	d = opendir(path);
 	if(d == NULL){
 		printf("Error -3: El directorio dado NO se encuentra en las inmediaciones\n");
-		exit(-1);
+		return(-1);
 	}
 	else{
 		closedir(d); //ANTES de continuar, cierro el directorio
@@ -57,18 +57,18 @@ void remdir(char *name){
 		if(check < 0){
 			fprintf(stderr,"Codigo de error %d, el cual significa %s, ocurrió un error al borrar el directorio %s \n",
 					errno,strerror(errno),path);
-			exit(-1);
+			return(-1);
 		}
 		else{
 			printf("Se ha eliminado el directorio %s con exito\n",path);
-			exit(0);
+			return(0);
 		}
 	}
-	exit(0);
+	return(0);
 
 }
 
-void more(char *name){
+int more(char *name){
 	FILE *f = fopen(name,"r"); //Abro el archivo en modo lectura
 	char buff[255];
 	if(f != NULL){ //Si la apertura fue correcta, comienzo a leer
@@ -80,18 +80,18 @@ void more(char *name){
 	}
 	else{ //Si no pude abrir el archivo, tiro error
 		printf("codigo de error -4: Error al abrir el archivo especificado\n");
-		exit(-1);
+		return(-1);
 	}
-	exit(0);
+	return(0);
 }
 
-void cat(char *name){
+int cat(char *name){
 
     FILE *file;
 	file = fopen(name,"rb+"); //Abro el archivo para intentar ver si ya existe
 	if(file != NULL){ //Si es != NULL, el archivo ya existia, esto tecnicamente es un error
 		printf("Codigo de error -5: No se ha podido crear el archivo porque el mismo ya existe\n");
-		exit(-1);
+		return(-1);
 	}
 	else{ //Sino, intento crear el archivo
 		file = fopen(name,"wb"); //Fuerzo la creación del archivo
@@ -101,28 +101,28 @@ void cat(char *name){
 		else{ //Si todo sale bien, cierro el archivo recien creado y reporto el exito de la operación
 			fclose(file);
 			printf("El archivo %s fue creado con exito\n",name);
-			exit(0);
+			return(0);
 		}
 	}
-	exit(0);
+	return(0);
 
 }
 
-void ls(){
+int ls(){
     struct dirent *de;
 	DIR *dr = opendir("."); //Abro la carpeta en donde estoy
 	if(dr == NULL){
 		fprintf(stderr,"Error -1: NO se ha podido abrir el Directorio");
-		exit(-1);
+		return (-1);
 	}
 	else{
 		while((de = readdir(dr)) != NULL) //Mientras la carpeta leida no sea NULL
 			printf("%s\n",de->d_name); //Obtengo el nombre de la carpeta y la imprimo por pantalla
 
 		closedir(dr); //cierro el directorio
-		exit(0);
+		return(0);
 	}
-	exit(0);
+	return(0);
 
 }
 
@@ -144,24 +144,24 @@ int esLegal(char*str){
 	return i;
 }
 
-void determinar(int i, char*param){
-
+int determinar(int i, char*param){
+    int ret = 0;
     switch(i){
 
         case 0:
-            makedir(param);
+            ret = makedir(param);
             break;
         case 1:
-            remdir(param);
+            ret = remdir(param);
             break;
         case 2:
-            cat(param);
+            ret = cat(param);
             break;
         case 3:
-            ls();
+            ret = ls();
             break;
         case 4:
-            more(param);
+            ret = more(param);
 
     }
 
@@ -210,13 +210,14 @@ int main(){
 					if(!corte){
 
 						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
-						int id = fork();
+						pid_t id = fork();
 						if(id == -1)
                             printf("Error al crear el hijo\n");
 
 						if(id == 0){ //procedo a llamara  adeterminar, el cual luego llamará a alguna de las funciones de los comandos
-							determinar(t,name);
-							//ls(); //si hago la llamada directa, ls anda, si lo hago con determinar, no me muestra nada
+							//int E = determinar(t,name);
+							//exit(E);
+							ls(); //si hago la llamada directa, ls anda, si lo hago con determinar, no me muestra nada
 						}
 						else{ //estoy en el padre, debo esperar
 							wait(NULL);
