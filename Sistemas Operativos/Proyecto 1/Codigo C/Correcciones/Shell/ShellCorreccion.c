@@ -17,8 +17,8 @@ char *Comandos_Disponibles[] = {
 	"makedir", //Crear directorio
 	"remdir", //Eliminar Directorio
 	"cat", //Crear archivo
-	"ls", //Listar contenidos de un directorio
 	"more", //Mostrar contenido de un archivo
+	"ls", //Listar contenidos de un directorio
 	"exit", //salir
 	"help" //comando ayuda
 };
@@ -144,7 +144,28 @@ int esLegal(char*str){
 	return i;
 }
 
-int determinar(int i, char*param){
+int determinar0P(int i){
+	ret = 0;
+	switch(i){
+		
+		case 4:
+			ret = ls();
+			break;
+		case 5:
+			corte = true;
+			printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
+			break;
+		case 6:
+			help();
+			break;
+		default:
+			ret = -2;
+			break;
+		
+	}
+}
+
+int determinar1P(int i, char*param){
     int ret = 0;
     switch(i){
 
@@ -158,9 +179,6 @@ int determinar(int i, char*param){
             ret = cat(param);
             break;
         case 3:
-            ret = ls();
-            break;
-        case 4:
             ret = more(param);
 
     }
@@ -196,41 +214,64 @@ int main(){
 		token = strtok(buffer," ");
 		int t = esLegal(token);
 		if(t >= 0){ //Pregunto que el comando dado sea legal
-			if(strcmp(token,"help") == 0) //si es "help" o "exit" actuo acordemente
+			int E = determinar0P(t);
+			if (E == -2){
+				scanf("%s",&buffer);
+				token = strtok(buffer," ");
+				name = token;
+				if(!corte) {
+					//si llegué aquí, el comando Y los flags son validos y tengo un parametro, puedo ir a crear el proceso hijo y ejecutar
+					pid_t id = fork();
+					if(id == -1) {
+						printf("Error al crear el hijo\n");
+					}
+					if(id == 0) { //procedo a llamara a determinar, el cual luego llamará a alguna de las funciones de los comandos
+						E = determinar1P(t,name);
+						exit(E);
+					}
+					if(id > 0) { //estoy en el padre, debo esperar
+						wait(NULL);
+					}
+				}
+			}
+			
+			/*if(strcmp(token,"help") == 0){ //si es "help" o "exit" actuo acordemente
 				help();
-			else
+			}
+			else {
 				if(strcmp(token,"exit") == 0){
 					corte = true;
 					printf("Se ha salido de la consola con exito, que tenga un buen dia!\n");
 				}
 				else{
-					scanf("%s",&buffer);
-					token = strtok(buffer," ");
-					name = token;
-					if(!corte){
-
-						//si llegué aquí, el comando Y los flags son validos, puedo ir a crear el proceso hijo y ejecutar
-						pid_t id = fork();
-						if(id == -1)
-                            printf("Error al crear el hijo\n");
-
-						if(id == 0){ //procedo a llamara  adeterminar, el cual luego llamará a alguna de las funciones de los comandos
-							//int E = determinar(t,name);
-							//exit(E);
-							ls(); //si hago la llamada directa, ls anda, si lo hago con determinar, no me muestra nada
-						}
-						else{ //estoy en el padre, debo esperar
-							wait(NULL);
+					if (strcmp(token,"ls") == 0) {
+						ls();
+					}
+					else {
+						scanf("%s",&buffer);
+						token = strtok(buffer," ");
+						name = token;
+						
+						if(!corte) {
+							//si llegué aquí, el comando Y los flags son validos y tengo un parametro, puedo ir a crear el proceso hijo y ejecutar
+							pid_t id = fork();
+							if(id == -1) {
+								printf("Error al crear el hijo\n");
+							}
+							if(id == 0) { //procedo a llamara a determinar, el cual luego llamará a alguna de las funciones de los comandos
+								int E = determinar(t,name);
+								exit(E);
+							}
+							if(id > 0) { //estoy en el padre, debo esperar
+								wait(NULL);
+							}
 						}
 					}
-
 				}
+			}*/
 		}
 		else{
 			printf("Error al procesar el comando, NO es un comando valido, por favor, consulte la ayuda usando el comando help\n");
 		}
-
 	}
-
-
 }
