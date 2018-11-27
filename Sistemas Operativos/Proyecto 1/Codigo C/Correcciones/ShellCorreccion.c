@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
-//ls
 #include <dirent.h>
 
 #define MAX_BUF 1000
@@ -23,6 +22,10 @@ char *Comandos_Disponibles[] = {
 	"exit", //salir
 };
 
+/*
+ * función que simula el comportamiento del comando "mkdir"
+ * EL cual crea un directorio con nombre "dn" 
+*/
 int makedir(char * dn){
 int check;
 	char *dirname = dn; //obtengo el nombre del directorio a crear
@@ -41,11 +44,16 @@ int check;
 
 }
 
+/*
+ * función que simula el comportamineto del comando "rmdir"
+ * el cual elimina un directorio
+ * se asume que la carpeta se encuentra localizada dentro de donde esta este archivo fuente
+*/
 int remdir(char *name){
 	int check;
 	char *path = name;
 
-    //ESTOY ASUMINEDO QUE EL DIRECTORIO YA ESTA VACIO PARA LLAMAR A LA SYSCALL!
+    //ESTOY ASUMINEDO QUE EL DIRECTORIO YA ESTA VACIO PARA LLAMAR A LA FUNCION DE LIBRERIA!
     check = rmdir(path);
     if(check < 0){
         fprintf(stderr,"Codigo de error %d, el cual significa %s, ocurrió un error al borrar el directorio %s \n",
@@ -60,7 +68,10 @@ int remdir(char *name){
 	return(0);
 
 }
-
+/*
+ *función que simula el comportamiento de la función "more"
+ * el cual lee un archivo de texto
+*/
 int more(char *name){
 	FILE *f = fopen(name,"r"); //Abro el archivo en modo lectura
 	char buff[255];
@@ -79,6 +90,10 @@ int more(char *name){
 	return(0);
 }
 
+/*
+ * Función que simula la ejecución del comando "cat", el cual crea un archivo
+ * con un nombre pasado por parámetro
+*/
 int cat(char *name){
 
     FILE *file;
@@ -101,7 +116,10 @@ int cat(char *name){
 	return(0);
 
 }
-
+/*
+ * función que simula el comportamineto del comando "ls", el cual 
+ * lista los contenidos de la carpeta donde se encuentra el codigo fuente
+*/
 int ls(){
     struct dirent *de;
 	DIR *dr = opendir("."); //Abro la carpeta en donde estoy
@@ -138,6 +156,9 @@ int esLegal(char*str){
 	return i;
 }
 
+/*
+ * Función que se encarga de  determinar que comando legal que requiere un paraetro fue ingresado
+*/
 int determinar1P(int i, char*param){ //Para makedir, remdir, cat o more
     int ret = 0;
     switch(i){
@@ -159,6 +180,7 @@ int determinar1P(int i, char*param){ //Para makedir, remdir, cat o more
 
 }
 
+//Función que imprime el ensaje de ayuda
 void help(){
 	printf("Shell en C para el Primer Proyecto de Sistemas Operativos\n");
 	printf("Ingrese alguno de los comandos disponibles con sus parametros correspondientes si los necesitase y presione ENTER\n");
@@ -172,6 +194,10 @@ void help(){
 	printf("help -> muestra el presente mensaje\n");
 }
 
+/*
+ * Función que determina si el comando legal ingresado es alguno de los comandos
+ * que NO requieren un parametro adicional
+*/
 int determinar0P(int i, bool *corte){ //Para ls, help o exit
     int ret = 0;
 	switch(i){
@@ -208,7 +234,7 @@ int main(){
 		scanf("%s", &buffer); //leo la linea, "pr1>" NO APARECE en strtok
 		//Obtengo un substring, para ver que comando es
 		token = strtok(buffer," ");
-		int t = esLegal(token);
+		int t = esLegal(token); //Determino si el comando ingresado es alguno de los permitidos
 		if(t >= 0 ){ //Pregunto que el comando dado sea legal
 			int E = 0;
 			E = determinar0P(t, &corte);
@@ -217,14 +243,14 @@ int main(){
 				token = strtok(buffer," ");
 				name = token;
 				if(!corte) {
-					//si llegué aquí, el comando Y los flags son validos y tengo un parametro, puedo ir a crear el proceso hijo y ejecutar
+					//si llegué aquí, el comando Y tengo un parametro, puedo ir a crear el proceso hijo y ejecutar
 					pid_t id = fork();
 					if(id == -1) {
 						printf("Error al crear el hijo\n");
 					}
-					if(id == 0) { //procedo a llamara a determinar, el cual luego llamará a alguna de las funciones de los comandos
+					if(id == 0) { //procedo a llamara a determinar1P, el cual luego llamará a alguna de las funciones de los comandos
 						E = determinar1P(t,name);
-						exit(E);
+						exit(E); //hago Exit con el estado que devolvió la función
 					}
 					if(id > 0) { //estoy en el padre, debo esperar
 						wait(NULL);
